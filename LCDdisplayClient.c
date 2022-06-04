@@ -9,12 +9,11 @@
 #include "TempData.h"
 #include "TempSensor.h"
 
-void DisplayClient_init(DisplayClient *const me)
+void DisplayClient_init(DisplayClient *const me, TempSensor *const ts)
 {
-
     me->itsDisplayProxy = LCD_create();
     me->itsTempData = NULL;
-    me->itsTempSensor = TempSensor_create();
+    me->itsTempSensor = ts;
 
     //Initialize LCD
 //    LCD_clear(me->itsDisplayProxy);
@@ -31,7 +30,6 @@ void DisplayClient_clean(DisplayClient *const me)
     }
     if (me->itsTempSensor != NULL)
     {
-        TempSensor_destroy(me->itsTempSensor);
         me->itsTempSensor = NULL;
     }
     if (me->itsDisplayProxy != NULL)
@@ -52,7 +50,6 @@ void DisplayClient_accept(DisplayClient *const me, TempData *td)
     {
         me->itsTempData->temperature = td->temperature;
         me->itsTempData->humidity = td->humidity;
-        DisplayClient_show(me);
     }
 }
 
@@ -70,8 +67,10 @@ void DisplayClient_show(DisplayClient *const me)
     LCD_clear(me->itsDisplayProxy);
     if (me->itsTempData)
     {
-        sprintf(output, "T:%d*C, H:%d%%", me->itsTempData->temperature,
-                me->itsTempData->humidity);
+        sprintf(output, "T. Act:%d'C", me->itsTempData->temperature);
+        LCD_write(me->itsDisplayProxy, output, strlen(output));
+        LCD_setCursor(me->itsDisplayProxy, 0, 1);
+        sprintf(output, "T. Obj:%d'C", 24);
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
     else
@@ -85,10 +84,6 @@ DisplayClient* DisplayClient_create(void)
 {
     Display_printf(disp_hdl, 0, 0, "display_client");
     DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
-    if (me != NULL)
-    {
-        DisplayClient_init(me);
-    }
     return me;
 }
 

@@ -16,12 +16,12 @@
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
-    struct TempSensor* itsTempSensor;
-    struct TempData* itsTempData;
+    TempSensor* itsTempSensor;
+    TempData* itsTempData;
     DisplayProxy* itsDisplayProxy;
 };
 
-void DisplayClient_init(DisplayClient* const me);
+void DisplayClient_init(DisplayClient *const me, TempSensor *const ts);
 void DisplayClient_clean(DisplayClient* const me);
 void DisplayClient_accept(DisplayClient* const me, TempData* td);
 void DisplayClient_register(DisplayClient* const me); //it calls the subscribe() function of the sensor

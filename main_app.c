@@ -38,10 +38,13 @@
 #include <stddef.h>
 
 #include <LCDdisplayClient.h>
+#include <TempController.h>
+#include <TempData.h>
 #include <utils.h>
 #include <string.h>
 #include <driverlib.h>
 #include <shared_vars.h>
+
 
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
@@ -78,13 +81,12 @@ void init_Display(void)
 }
 
 //TODO: I2C falla, I2C_Transfer() returns False.
-    //Peta en I2CMSP432.c -> I2CMSP432_transfer()->SemaphoreP_post(object->mutex);
-    //Parece que intenta hacer release del lock del I2C_Handle y no retorna nunca.
-    //dentro del semaphore_post(), peta y se llama a esta sección de codigo: ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I
-    //Ocurre justo cuando se llama a la función de envío de datos a la pantalla a través de I2C después de haber leído los datos del termómetro.
-    //Mirar de hacer close() de capture al acabar de leer el termometro y limpiar las interrupciones
-    //antes de usar el modulo I2C para enviar datos a la pantalla.
-
+//Peta en I2CMSP432.c -> I2CMSP432_transfer()->SemaphoreP_post(object->mutex);
+//Parece que intenta hacer release del lock del I2C_Handle y no retorna nunca.
+//dentro del semaphore_post(), peta y se llama a esta sección de codigo: ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I
+//Ocurre justo cuando se llama a la función de envío de datos a la pantalla a través de I2C después de haber leído los datos del termómetro.
+//Mirar de hacer close() de capture al acabar de leer el termometro y limpiar las interrupciones
+//antes de usar el modulo I2C para enviar datos a la pantalla.
 
 /*
  *  ======== mainThread ========
@@ -109,16 +111,32 @@ void* mainThread(void *arg0)
 
     Display_printf(disp_hdl, 0, 0, "main_app");
 
+    /*Creates target temp variable*/
+    TempData* tgtTemp;
+    tgtTemp = TempData_create();
+
+    /*Create a TempSensor (publisher of temp and humidity) */
+    TempSensor *ts;
+    ts = TempSensor_create();
+
+    /*Create DisplayClient and TempController (subscribers of TempSensor) */
     DisplayClient *dc;
     dc = DisplayClient_create();
-    DisplayClient_register(dc);
+    DisplayClient_init(dc, ts);
+    DisplayClient_register(dc); //subscribe to TempSensor
+
+    TempController *tc;
+    tc = TempController_create();
+    TempController_init(tc, ts);
+    TempController_register(tc); //subscribe to TempSensor
 
     //DisplayClient_show(dc);
 
     while (1)
     {
-        TempSensor_readTemp(dc->itsTempSensor);
-        delay(30);
+        TempSensor_readTemp(ts);
+        DisplayClient_show(dc);
+        sleep(15); //Read temperature every 2 minutes
     }
 }
 

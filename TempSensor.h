@@ -59,6 +59,4 @@ TempSensor* TempSensor_create(void);
 void TempSensor_destroy(TempSensor *const me);
 
 //TODO: Check aPtr argument in subscribe() and unsubscribe() functions. I'm not sure if the type is tempDataAcceptorPtr or tempDataAcceptorPtr*
-//TODO: call TempSensor_newData(...) function periodically every 60s. (configure a Timer in this class)
-
 #endif /* TEMPSENSOR_H_ */
