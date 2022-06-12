@@ -7,9 +7,10 @@
 
 #include "TempController.h"
 
-void TempController_init(TempController *const me, TempSensor *const ts)
+void TempController_init(TempController *const me, TempSensor *const ts, Keypad *const kp)
 {
     me->itsTempSensor = ts;
+    me->itsKeypad = kp;
     me->readTemp = NULL;
     me->targetTemp = 0;
 }
@@ -26,7 +27,7 @@ void TempController_clean(TempController *const me)
     }
 }
 
-void TempController_accept(TempController *const me, TempData *sensedTemp)
+void TempController_acceptSensedTemp(TempController *const me, TempData *sensedTemp)
 {
     if (!me->readTemp)
     {
@@ -39,11 +40,25 @@ void TempController_accept(TempController *const me, TempData *sensedTemp)
     }
 }
 
+void TempController_acceptTargetTemp(TempController *const me, TempData *tgtTemp)
+{
+    if (!me->readTemp)
+    {
+        me->readTemp = TempData_create();
+    }
+    if (me->readTemp)
+    {
+        me->targetTemp->temperature = tgtTemp->temperature;
+        me->targetTemp->humidity = tgtTemp->humidity;
+    }
+}
+
 void TempController_register(TempController *const me)
 {
     if (me->itsTempSensor)
     {
-        TempSensor_subscribe(me->itsTempSensor, me, TempController_accept);
+        TempSensor_subscribe(me->itsTempSensor, me, TempController_acceptSensedTemp);
+        Keypad_subscribe(me->itsKeypad, me, TempController_acceptTargetTemp);
     }
 }
 

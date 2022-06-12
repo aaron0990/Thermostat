@@ -11,18 +11,21 @@
 #include "TempSensor.h"
 #include <stdio.h>
 #include "shared_vars.h"
+#include "Keypad.h"
 
 typedef struct TempController TempController;
 
 struct TempController{
     TempSensor* itsTempSensor;
+    Keypad* itsKeypad;
     TempData* readTemp;
     TempData* targetTemp;
 };
 
-void TempController_init(TempController *const me, TempSensor *const ts);
+void TempController_init(TempController *const me, TempSensor *const ts, Keypad *const kp);
 void TempController_clean(TempController* const me);
-void TempController_accept(TempController* const me, TempData* sensedTemp);
+void TempController_acceptSensedTemp(TempController* const me, TempData* sensedTemp);
+void TempController_acceptTargetTemp(TempController *const me, TempData *tgtTemp);
 void TempController_register(TempController* const me); //it calls the subscribe() function of the sensor
 TempController* TempController_create(void);
 void TempController_destroy(TempController* const me);

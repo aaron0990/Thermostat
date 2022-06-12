@@ -12,8 +12,8 @@
 	<createSlaveProjects value=""/>
 	<ignoreDefaultDeviceSettings value="true"/>
 	<ignoreDefaultCCSSettings value="true"/>
-	<templateProperties value="id=empty_legacy_MSP_EXP432P401R_tirtos_ccs.projectspec.empty_legacy_MSP_EXP432P401R_tirtos_ccs,buildProfile=release,isHybrid=true"/>
-	<origin value="C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\rtos\MSP_EXP432P401R\drivers\empty_legacy\tirtos\ccs\empty_legacy_MSP_EXP432P401R_tirtos_ccs.projectspec"/>
+	<templateProperties value="id=display_MSP_EXP432P401R_freertos_ccs.projectspec.display_MSP_EXP432P401R_freertos_ccs,buildProfile=release,isHybrid=true"/>
+	<origin value="C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\rtos\MSP_EXP432P401R\drivers\display\freertos\ccs\display_MSP_EXP432P401R_freertos_ccs.projectspec"/>
 	<filesToOpen value=""/>
 	<isTargetManual value="false"/>
 </projectOptions>

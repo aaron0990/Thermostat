@@ -9,10 +9,13 @@
 #include "TempData.h"
 #include "TempSensor.h"
 
-void DisplayClient_init(DisplayClient *const me, TempSensor *const ts)
+void DisplayClient_init(DisplayClient *const me, TempSensor *const ts,
+                        Keypad *const kp)
 {
     me->itsDisplayProxy = LCD_create();
-    me->itsTempData = NULL;
+    me->itsKeypad = kp;
+    me->itsTempSensed = NULL;
+    me->itsTempTarget = NULL;
     me->itsTempSensor = ts;
 
     //Initialize LCD
@@ -24,9 +27,13 @@ void DisplayClient_init(DisplayClient *const me, TempSensor *const ts)
 
 void DisplayClient_clean(DisplayClient *const me)
 {
-    if (me->itsTempData != NULL)
+    if (me->itsTempSensed != NULL)
     {
-        me->itsTempData = NULL;
+        me->itsTempSensed = NULL;
+    }
+    if (me->itsTempTarget != NULL)
+    {
+        me->itsTempTarget = NULL;
     }
     if (me->itsTempSensor != NULL)
     {
@@ -40,37 +47,72 @@ void DisplayClient_clean(DisplayClient *const me)
 
 }
 
-void DisplayClient_accept(DisplayClient *const me, TempData *td)
+void DisplayClient_acceptTempSensed(DisplayClient *const me, TempData *td)
 {
-    if (!me->itsTempData)
+    if (!me->itsTempSensed)
     {
-        me->itsTempData = TempData_create();
+        me->itsTempSensed = TempData_create();
     }
-    if (me->itsTempData)
+    if (me->itsTempSensed)
     {
-        me->itsTempData->temperature = td->temperature;
-        me->itsTempData->humidity = td->humidity;
+        me->itsTempSensed->temperature = td->temperature;
+        me->itsTempSensed->humidity = td->humidity;
     }
 }
 
+void DisplayClient_acceptTempTarget(DisplayClient *const me, TempData *td)
+{
+    if (!me->itsTempTarget)
+    {
+        me->itsTempTarget = TempData_create();
+    }
+    if (me->itsTempTarget)
+    {
+        me->itsTempTarget->temperature = td->temperature;
+        me->itsTempTarget->humidity = td->humidity;
+    }
+    //DisplayClient_showTempTarget(me); NO MOLA esta llamada
+}
 void DisplayClient_register(DisplayClient *const me)
 {
     if (me->itsTempSensor)
     {
-        TempSensor_subscribe(me->itsTempSensor, me, DisplayClient_accept);
+        TempSensor_subscribe(me->itsTempSensor, me,
+                             DisplayClient_acceptTempSensed);
+        Keypad_subscribe(me->itsKeypad, me, DisplayClient_acceptTempTarget);
     }
 }
 
-void DisplayClient_show(DisplayClient *const me)
+void DisplayClient_showTempSensed(DisplayClient *const me)
+{
+    char output[50];
+    if (me->itsTempSensed)
+    {
+        LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
+        sprintf(output, "             "); //whitespaces to clear line
+        LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
+        LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
+        sprintf(output, "T. Act:%d'C", me->itsTempSensed->temperature);
+        LCD_write(me->itsDisplayProxy, output, strlen(output)); //Print sensed temperature
+    }
+    else
+    {
+        strcpy(output, "No data available!");
+        LCD_write(me->itsDisplayProxy, output, strlen(output));
+    }
+}
+
+void DisplayClient_showTempTarget(DisplayClient *const me)
 {
     char output[50];
     LCD_clear(me->itsDisplayProxy);
-    if (me->itsTempData)
+    if (me->itsTempSensed)
     {
-        sprintf(output, "T. Act:%d'C", me->itsTempData->temperature);
-        LCD_write(me->itsDisplayProxy, output, strlen(output));
+        LCD_setCursor(me->itsDisplayProxy, 0, 1); //Move to first line in LCD
+        sprintf(output, "             "); //whitespaces to clear line
+        LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
         LCD_setCursor(me->itsDisplayProxy, 0, 1);
-        sprintf(output, "T. Obj:%d'C", 24);
+        sprintf(output, "T. Obj:%d'C", me->itsTempTarget->temperature);
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
     else
@@ -96,13 +138,13 @@ void DisplayClient_destroy(DisplayClient *const me)
     free(me);
 }
 
-TempData* DisplayClient_getItsTempData(DisplayClient *const me)
+TempData* DisplayClient_getItsTempSensed(DisplayClient *const me)
 {
-    return (TempData*) me->itsTempData;
+    return (TempData*) me->itsTempSensed;
 }
-void DisplayClient_setItsTempData(DisplayClient *const me, TempData *p_td)
+void DisplayClient_setItsTempSensed(DisplayClient *const me, TempData *p_td)
 {
-    me->itsTempData = p_td;
+    me->itsTempSensed = p_td;
 }
 TempSensor* DisplayClient_getItsTempSensor(DisplayClient *const me)
 {

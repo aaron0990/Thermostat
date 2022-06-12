@@ -12,10 +12,9 @@
  *  -first param: pointer to instance data of the class
  *  -second param: pointer to the new temp data.
  */
-#include "TempData.h"
 #include "shared_vars.h"
+#include "TempDataAcceptor.h"
 
-typedef void (*tempDataAcceptorPtr)(void*, TempData*);
 typedef struct TempNotificationHandle TempNotificationHandle;
 struct TempNotificationHandle{
     tempDataAcceptorPtr acceptorPtr;

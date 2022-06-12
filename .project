@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Thermostat</name>
+	<name>Thermostat_freertos_ccs</name>
 	<comment></comment>
 	<projects>
-		<project>tirtos_builds_MSP_EXP432P401R_release_ccs</project>
+		<project>freertos_builds_MSP_EXP432P401R_release_ccs</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -30,11 +30,6 @@
 			<name>Board.html</name>
 			<type>1</type>
 			<locationURI>COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR/source/ti/boards/MSP_EXP432P401R/Board.html</locationURI>
-		</link>
-		<link>
-			<name>Board_legacy.html</name>
-			<type>1</type>
-			<locationURI>COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR/source/ti/boards/MSP_EXP432P401R/Board_legacy.html</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

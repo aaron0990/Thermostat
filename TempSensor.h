@@ -27,7 +27,7 @@ typedef struct TempSensor TempSensor;
 struct TempSensor
 {
     TempData *itsTempData;
-    struct TempNotificationHandle *itsTempNH[MAX_SUBSCRIBERS];
+    TempNotificationHandle *itsTempNH[MAX_SUBSCRIBERS];
     TempSensorProxy *itsTempSensorProxy;
 };
 
@@ -50,7 +50,7 @@ void TempSensor_setItsTempData(TempSensor *const me,
 int TempSensor_getItsTempNH(const TempSensor *const me);
 void TempSensor_addItsTempNH(
         TempSensor *const me,
-        struct TempNotificationHandle *p_tempNotificationHandle);
+        TempNotificationHandle *p_tempNotificationHandle);
 void TempSensor_removeItsTempNH(
         TempSensor *const me,
         struct TempNotificationHandle *p_tempNotificationHandle);

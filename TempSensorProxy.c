@@ -27,7 +27,6 @@ void TempSensorProxy_configure(TempSensorProxy *me)
     me->captureParams->callbackFxn = Capture_Callback;
     *(me->captureHandle) = Capture_open(0, me->captureParams);
 
-
     if (*(me->captureHandle) == NULL)
     {
         exit(-1);

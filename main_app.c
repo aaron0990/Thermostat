@@ -52,6 +52,7 @@
 // #include <ti/drivers/SPI.h>
 #include <ti/drivers/UART.h>
 #include <ti/drivers/Watchdog.h>
+#include <TempSensor.h>
 
 /* Board Header file */
 #include "Board.h"
@@ -76,17 +77,26 @@ void init_Display(void)
 {
     Display_Params params;
     Display_Params_init(&params);
-    disp_hdl = Display_open(Display_Type_UART, NULL);
+    disp_hdl = Display_open(0, NULL);
     Display_clear(disp_hdl); //Clear previous execution output of the terminal
 }
 
-//TODO: I2C falla, I2C_Transfer() returns False.
-//Peta en I2CMSP432.c -> I2CMSP432_transfer()->SemaphoreP_post(object->mutex);
-//Parece que intenta hacer release del lock del I2C_Handle y no retorna nunca.
-//dentro del semaphore_post(), peta y se llama a esta sección de codigo: ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I
-//Ocurre justo cuando se llama a la función de envío de datos a la pantalla a través de I2C después de haber leído los datos del termómetro.
-//Mirar de hacer close() de capture al acabar de leer el termometro y limpiar las interrupciones
-//antes de usar el modulo I2C para enviar datos a la pantalla.
+
+/*TODO: en Keypad.h, definir interrupciones de los botones + y -. La ISR no tiene parametros, entonces no le puedo pasar el estado del keypad.
+ * Alternativa 1: Hacer una variable global Keypad* en el fichero Keypad con el estado del keypad. Así la ISR puede acceder a la info.
+ *                Desde la ISR hacer lo que hace newData().
+ *
+ *                Añadir en DisplayClient_acceptTargetTemp() un show() de la temperatura target
+ * Alternativa 2: hacer un thread a parte que gestione el Keypad y que tenga un puntero a TempController y DisplayClient para enviarles
+ *                la nueva temperatura target.
+ *
+ */
+
+/*TODO: En las funciones XXX_acccept(), no le mola que hagamos un show() porque estamos dentro de la ISR y por tema de interrupciones o yo que se
+ *      no va bien el tema de I2C.
+ *      Hacer que la ISR ponga active algun flag para notificar  que se ha de actualizar el valor de la temperatura target.
+ *
+ * */
 
 /*
  *  ======== mainThread ========
@@ -112,8 +122,13 @@ void* mainThread(void *arg0)
     Display_printf(disp_hdl, 0, 0, "main_app");
 
     /*Creates target temp variable*/
-    TempData* tgtTemp;
-    tgtTemp = TempData_create();
+    //TempData* tgtTemp;
+    //tgtTemp = TempData_create();
+
+    /*Creates the keypad*/
+    Keypad* kp;
+    kp = Keypad_create();
+    Keypad_init(kp);
 
     /*Create a TempSensor (publisher of temp and humidity) */
     TempSensor *ts;
@@ -122,20 +137,20 @@ void* mainThread(void *arg0)
     /*Create DisplayClient and TempController (subscribers of TempSensor) */
     DisplayClient *dc;
     dc = DisplayClient_create();
-    DisplayClient_init(dc, ts);
-    DisplayClient_register(dc); //subscribe to TempSensor
+    DisplayClient_init(dc, ts, kp);
+    DisplayClient_register(dc); //subscribe to TempSensor & Keypad
 
     TempController *tc;
     tc = TempController_create();
-    TempController_init(tc, ts);
-    TempController_register(tc); //subscribe to TempSensor
+    TempController_init(tc, ts, kp);
+    TempController_register(tc); //subscribe to TempSensor & Keypad
 
     //DisplayClient_show(dc);
 
     while (1)
     {
         TempSensor_readTemp(ts);
-        DisplayClient_show(dc);
+        DisplayClient_showTempSensed(dc);
         sleep(15); //Read temperature every 2 minutes
     }
 }

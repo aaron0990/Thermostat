@@ -69,7 +69,7 @@ void TempSensor_notify(TempSensor *const me)
 void TempSensor_subscribe(TempSensor *const me, void *instancePtr,
                           const tempDataAcceptorPtr aPtr)
 {
-    struct TempNotificationHandle *tnh;
+    TempNotificationHandle *tnh;
     tnh = TempNotificationHandle_create();
     tnh->instancePtr = instancePtr;
     tnh->acceptorPtr = aPtr;
@@ -112,7 +112,7 @@ int TempSensor_getItsTempNH(const TempSensor *const me)
 
 void TempSensor_addItsTempNH(
         TempSensor *const me,
-        struct TempNotificationHandle *p_tempNotificationHandle)
+        TempNotificationHandle *p_tempNotificationHandle)
 {
     int pos;
     for (pos = 0; pos < MAX_SUBSCRIBERS; ++pos)
