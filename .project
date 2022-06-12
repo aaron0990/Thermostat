@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Thermostat_freertos_ccs</name>
+	<name>Thermostat</name>
 	<comment></comment>
 	<projects>
 		<project>freertos_builds_MSP_EXP432P401R_release_ccs</project>

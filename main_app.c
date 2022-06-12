@@ -119,7 +119,7 @@ void* mainThread(void *arg0)
     //UART_init();
     //Watchdog_init();
 
-    Display_printf(disp_hdl, 0, 0, "main_app");
+    Display_printf(disp_hdl, 0, 0, "main_app\n");
 
     /*Creates target temp variable*/
     //TempData* tgtTemp;
