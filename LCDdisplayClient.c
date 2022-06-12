@@ -12,6 +12,7 @@
 void DisplayClient_init(DisplayClient *const me, TempSensor *const ts,
                         Keypad *const kp)
 {
+    Display_printf(disp_hdl, 0, 0, "DisplayClient_init()\n");
     me->itsDisplayProxy = LCD_create();
     me->itsKeypad = kp;
     me->itsTempSensed = NULL;
@@ -124,7 +125,7 @@ void DisplayClient_showTempTarget(DisplayClient *const me)
 
 DisplayClient* DisplayClient_create(void)
 {
-    Display_printf(disp_hdl, 0, 0, "display_client");
+    Display_printf(disp_hdl, 0, 0, "display_client\n");
     DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
     return me;
 }
