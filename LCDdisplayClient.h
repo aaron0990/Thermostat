@@ -12,7 +12,9 @@
 #include <stdio.h>
 #include "LCDdisplayProxy.h"
 #include "shared_vars.h"
+#include "TempReadToLCDQueue.h"
 #include "Keypad.h"
+#include "ThreadsArgStruct.h"
 
 typedef struct DisplayClient DisplayClient;
 
@@ -22,6 +24,10 @@ struct DisplayClient{
     TempData* itsTempTarget;
     Keypad* itsKeypad;
     DisplayProxy* itsDisplayProxy;
+
+    //These ones are necessary
+    QueueHandle_t qDispConsole;
+    QueueHandle_t qTReadToLCD;
 };
 
 void DisplayClient_init(DisplayClient *const me, TempSensor *const ts, Keypad *const kp);

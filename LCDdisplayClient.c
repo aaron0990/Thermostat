@@ -74,15 +74,7 @@ void DisplayClient_acceptTempTarget(DisplayClient *const me, TempData *td)
     }
     //DisplayClient_showTempTarget(me); NO MOLA esta llamada
 }
-void DisplayClient_register(DisplayClient *const me)
-{
-    if (me->itsTempSensor)
-    {
-        TempSensor_subscribe(me->itsTempSensor, me,
-                             DisplayClient_acceptTempSensed);
-        Keypad_subscribe(me->itsKeypad, me, DisplayClient_acceptTempTarget);
-    }
-}
+
 
 void DisplayClient_showTempSensed(DisplayClient *const me)
 {
@@ -154,4 +146,23 @@ TempSensor* DisplayClient_getItsTempSensor(DisplayClient *const me)
 void DisplayClient_setItsTempSensor(DisplayClient *const me, TempSensor *p_ts)
 {
     me->itsTempSensor = p_ts;
+}
+
+void displayLCDThread(void *arg0){
+    struct displayLCDThreadArgs *args = (struct displayLCDThreadArgs*) arg0;
+    DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
+    me->qDispConsole = args->qDispConsoleArg;
+    me->qTReadToLCD = args->qTReadToLCDArg;
+    //TODO: Initialize the rest of struct "me"
+    void* res;
+    while(1)
+    {
+       if (xQueueReceive(me->qTReadToLCD, res, 0)){
+           xQueueReceive(me->qTReadToLCD, res, 0);
+       }
+       else{
+           sched_yield();
+       }
+       sleep(1);
+    }
 }

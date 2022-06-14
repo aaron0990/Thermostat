@@ -35,6 +35,7 @@
  */
 #include <stdint.h>
 #include <unistd.h>
+#include <stddef.h>
 
 #ifdef __ICCARM__
 #include <DLib_Threads.h>
@@ -46,26 +47,82 @@
 /* RTOS header files */
 #include <FreeRTOS.h>
 #include <task.h>
+#include <queue.h>
 
 /* Driver configuration */
 #include <ti/drivers/Board.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/I2C.h>
+#include <ti/drivers/UART.h>
+#include <ti/drivers/Watchdog.h>
+
+/* Board Header file */
+#include "Board.h"
 
 #include <driverlib.h>
+#include <utils.h>
+#include <string.h>
+#include <shared_vars.h>
+#include "TempReadToTempCtrlQueue.h"
+#include "TempReadToLCDQueue.h"
+#include "DisplayConsoleQueue.h"
+#include "ThreadsArgStruct.h"
 
-extern void *mainThread(void *arg0);
+extern void* displayConsoleThread(void *arg0);
+extern void* displayLCDThread(void *arg0);
+extern void* temperatureReadingThread(void *arg0);
+extern void* keypadThread(void *arg0);
+extern void* temperatureControllerThread(void *arg0);
+
+QueueHandle_t qTReadToLCD;
+QueueHandle_t qTReadToTCtrl;
+QueueHandle_t qDispConsole;
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   1024
+
+#define QUEUE_SIZE 10   //Max num of elements in the queue
+
+Display_Handle disp_hdl;
+
+void init_Clock_System_module()
+{
+    //Configures CS_MCLK clock signal with DCO clock source (3MHz)
+    CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    //Configures CS_SMCLK clock signal with DCO clock source (3MHz)
+    CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+}
+
+void init_Timer32_module()
+{
+    Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
+    TIMER32_PERIODIC_MODE);
+}
+
+void init_Display(void)
+{
+    Display_Params params;
+    Display_Params_init(&params);
+    disp_hdl = Display_open(0, NULL);
+    Display_clear(disp_hdl); //Clear previous execution output of the terminal
+}
+
+void create_Queues(void)
+{
+    qTReadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
+    qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
+    qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayLCDMsg));
+}
 
 /*
  *  ======== main ========
  */
 int main(void)
 {
-    pthread_t           thread;
-    pthread_attr_t      attrs;
-    struct sched_param  priParam;
-    int                 retc;
+    pthread_t thread;
+    pthread_attr_t attrs;
+    struct sched_param priParam;
+    int retc;
 
     /* initialize the system locks */
 #ifdef __ICCARM__
@@ -74,24 +131,135 @@ int main(void)
 
     /* Call driver init functions */
     Board_init();
-
+    /* Create queues for inter-thread communication */
+    create_Queues();
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
-    /* Set priority, detach state, and stack size attributes */
+    /************************** Display Console Thread ******************************/
+    struct displayConsoleThreadArgs *args_dcon = (struct displayConsoleThreadArgs *)malloc(sizeof(struct displayConsoleThreadArgs));
+    args_dcon->qDispConsoleArg = qDispConsole;
+
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0) {
+    if (retc != 0)
+    {
         /* failed to set attributes */
-        while (1) {}
+        while (1)
+        {
+        }
+    }
+    retc = pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
+    if (retc != 0)
+    {
+        /* pthread_create() failed */
+        while (1)
+        {
+        }
     }
 
-    retc = pthread_create(&thread, &attrs, mainThread, NULL);
-    if (retc != 0) {
+    /************************** Display LCD Thread ******************************/
+    struct displayLCDThreadArgs *args_dlcd = (struct displayLCDThreadArgs *)malloc(sizeof(struct displayLCDThreadArgs));
+    args_dlcd->qDispConsoleArg = qDispConsole;
+    args_dlcd->qTReadToLCDArg = qTReadToLCD;
+
+    priParam.sched_priority = 1;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    if (retc != 0)
+    {
+        /* failed to set attributes */
+        while (1)
+        {
+        }
+    }
+    retc = pthread_create(&thread, &attrs, displayLCDThread, (void *)args_dlcd);
+    if (retc != 0)
+    {
         /* pthread_create() failed */
-        while (1) {}
+        while (1)
+        {
+        }
+    }
+
+    /************************** Temperature reading Thread ******************************/
+    struct temperatureReadingThreadArgs *args_tread = (struct temperatureReadingThreadArgs *)malloc(sizeof(struct temperatureReadingThreadArgs));
+    args_tread->qDispConsoleArg = qDispConsole;
+    args_tread->qTReadToLCDArg = qTReadToLCD;
+    args_tread->qTReadToTCtrlArg = qTReadToTCtrl;
+
+    priParam.sched_priority = 1;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    if (retc != 0)
+    {
+        /* failed to set attributes */
+        while (1)
+        {
+        }
+    }
+    retc = pthread_create(&thread, &attrs, temperatureReadingThread,
+                          (void *)args_tread);
+    if (retc != 0)
+    {
+        /* pthread_create() failed */
+        while (1)
+        {
+        }
+    }
+
+    /************************** Temperature control Thread ******************************/
+    struct temperatureControllerThreadArgs *args_tctrl = (struct temperatureControllerThreadArgs *)malloc(sizeof(struct temperatureControllerThreadArgs));
+    args_tctrl->qDispConsoleArg = qDispConsole;
+    args_tctrl->qTReadToTCtrlArg = qTReadToTCtrl;
+
+    priParam.sched_priority = 1;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    if (retc != 0)
+    {
+        /* failed to set attributes */
+        while (1)
+        {
+        }
+    }
+    retc = pthread_create(&thread, &attrs, temperatureControllerThread,
+                          (void *)args_tctrl);
+    if (retc != 0)
+    {
+        /* pthread_create() failed */
+        while (1)
+        {
+        }
+    }
+
+    /************************** Keypad Thread ******************************/
+    struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs *)malloc(sizeof(struct keypadThreadArgs));
+    args_kpad->qDispConsoleArg = qDispConsole;
+
+    priParam.sched_priority = 1;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    if (retc != 0)
+    {
+        /* failed to set attributes */
+        while (1)
+        {
+        }
+    }
+    retc = pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
+    if (retc != 0)
+    {
+        /* pthread_create() failed */
+        while (1)
+        {
+        }
     }
 
     /* Start the FreeRTOS scheduler */
@@ -112,7 +280,7 @@ int main(void)
 void vApplicationMallocFailedHook()
 {
     /* Handle Memory Allocation Errors */
-    while(1)
+    while (1)
     {
     }
 }
@@ -129,7 +297,7 @@ void vApplicationMallocFailedHook()
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
 {
     //Handle FreeRTOS Stack Overflow
-    while(1)
+    while (1)
     {
     }
 }

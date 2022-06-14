@@ -53,15 +53,6 @@ void TempController_acceptTargetTemp(TempController *const me, TempData *tgtTemp
     }
 }
 
-void TempController_register(TempController *const me)
-{
-    if (me->itsTempSensor)
-    {
-        TempSensor_subscribe(me->itsTempSensor, me, TempController_acceptSensedTemp);
-        Keypad_subscribe(me->itsKeypad, me, TempController_acceptTargetTemp);
-    }
-}
-
 TempController* TempController_create(void)
 {
     TempController *me = (TempController*) malloc(sizeof(TempController));
@@ -96,5 +87,16 @@ void TempController_setItsTempSensor(TempController *const me, TempSensor *p_ts)
 void TempController_setTargetTemp(TempController* const me, TempData* tgtTmp)
 {
     me->targetTemp = tgtTmp;
+}
+
+void temperatureControllerThread(void *arg0){
+    struct temperatureControllerThreadArgs *args = (struct temperatureControllerThreadArgs*) arg0;
+    TempController *me = (TempController*) malloc(sizeof(TempController));
+    me->qDispConsole = args->qDispConsoleArg;
+    me->qTReadToTCtrl = args->qTReadToTCtrlArg;
+    while(1){
+        sched_yield();
+    }
+
 }
 

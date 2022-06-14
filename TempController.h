@@ -10,8 +10,10 @@
 
 #include "TempSensor.h"
 #include <stdio.h>
+#include "TempReadToTempCtrlQueue.h"
 #include "shared_vars.h"
 #include "Keypad.h"
+#include "ThreadsArgStruct.h"
 
 typedef struct TempController TempController;
 
@@ -20,6 +22,10 @@ struct TempController{
     Keypad* itsKeypad;
     TempData* readTemp;
     TempData* targetTemp;
+
+    //These ones are necessary
+    QueueHandle_t qDispConsole;
+    QueueHandle_t qTReadToTCtrl;
 };
 
 void TempController_init(TempController *const me, TempSensor *const ts, Keypad *const kp);

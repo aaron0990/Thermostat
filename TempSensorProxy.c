@@ -81,7 +81,7 @@ void TempSensorProxy_access(TempSensorProxy *me)
     for (i = 0; i < MAX_TICK_VALUES; ++i)
     {
         // time less than 100us -> logic 0. Otherwise logic 1
-        uint32_t period_us = capturedIntervals[i] / 4;
+        uint32_t period_us = capturedIntervals[i];
         sensorData |= (((uint64_t) (period_us < 100 ? 0 : 1))
                 << MAX_TICK_VALUES - i - 1);
     }
