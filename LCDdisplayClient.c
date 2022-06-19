@@ -117,7 +117,6 @@ void DisplayClient_showTempTarget(DisplayClient *const me)
 
 DisplayClient* DisplayClient_create(void)
 {
-    Display_printf(disp_hdl, 0, 0, "display_client\n");
     DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
     return me;
 }
@@ -148,21 +147,34 @@ void DisplayClient_setItsTempSensor(DisplayClient *const me, TempSensor *p_ts)
     me->itsTempSensor = p_ts;
 }
 
-void displayLCDThread(void *arg0){
+void *displayLCDThread(void *arg0){
+
+    I2C_init();
+
     struct displayLCDThreadArgs *args = (struct displayLCDThreadArgs*) arg0;
-    DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
+
+    //Creates DisplayClient "instance"
+    DisplayClient *me = DisplayClient_create();
+
+    TempData tSensed; //where to store the dequed elem
+    TempData tTarget; //where to store the dequed elem
+
+    me->itsDisplayProxy = LCD_create();
     me->qDispConsole = args->qDispConsoleArg;
     me->qTReadToLCD = args->qTReadToLCDArg;
     //TODO: Initialize the rest of struct "me"
-    void* res;
+
     while(1)
     {
-       if (xQueueReceive(me->qTReadToLCD, res, 0)){
-           xQueueReceive(me->qTReadToLCD, res, 0);
+       if (xQueueReceive(me->qTReadToLCD, &tSensed, 0)){
+           //Print value in LCD
+           me->itsTempSensed = &tSensed;
+           DisplayClient_showTempSensed(me);
        }
        else{
            sched_yield();
        }
        sleep(1);
     }
+    //vTaskDelete(NULL);
 }

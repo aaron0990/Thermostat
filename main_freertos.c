@@ -99,13 +99,14 @@ void init_Timer32_module()
     TIMER32_PERIODIC_MODE);
 }
 
+/* EL DISPLAY HANDLE YA NO ES UNA VARIABLE GLOBAL. CADA THREAD METE EN UNA COLA DEDICADA LO QUE QUIERA PRINTAR POR CONSOLA.
 void init_Display(void)
 {
     Display_Params params;
     Display_Params_init(&params);
     disp_hdl = Display_open(0, NULL);
     Display_clear(disp_hdl); //Clear previous execution output of the terminal
-}
+}*/
 
 void create_Queues(void)
 {
@@ -113,6 +114,10 @@ void create_Queues(void)
     qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
     qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayLCDMsg));
 }
+
+/* TODO:
+ *
+ */
 
 /*
  *  ======== main ========
@@ -131,34 +136,14 @@ int main(void)
 
     /* Call driver init functions */
     Board_init();
+
+    init_Clock_System_module();
+    init_Timer32_module();
+
     /* Create queues for inter-thread communication */
     create_Queues();
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
-
-    /************************** Display Console Thread ******************************/
-    struct displayConsoleThreadArgs *args_dcon = (struct displayConsoleThreadArgs *)malloc(sizeof(struct displayConsoleThreadArgs));
-    args_dcon->qDispConsoleArg = qDispConsole;
-
-    priParam.sched_priority = 1;
-    retc = pthread_attr_setschedparam(&attrs, &priParam);
-    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
-    retc = pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
 
     /************************** Display LCD Thread ******************************/
     struct displayLCDThreadArgs *args_dlcd = (struct displayLCDThreadArgs *)malloc(sizeof(struct displayLCDThreadArgs));
@@ -185,6 +170,31 @@ int main(void)
         }
     }
 
+    /************************** Display Console Thread ******************************/
+    struct displayConsoleThreadArgs *args_dcon = (struct displayConsoleThreadArgs *)malloc(sizeof(struct displayConsoleThreadArgs));
+    args_dcon->qDispConsoleArg = qDispConsole;
+
+    priParam.sched_priority = 1;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    if (retc != 0)
+    {
+        /* failed to set attributes */
+        while (1)
+        {
+        }
+    }
+    retc = 0;//pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
+    if (retc != 0)
+    {
+        /* pthread_create() failed */
+        while (1)
+        {
+        }
+    }
+
+
     /************************** Temperature reading Thread ******************************/
     struct temperatureReadingThreadArgs *args_tread = (struct temperatureReadingThreadArgs *)malloc(sizeof(struct temperatureReadingThreadArgs));
     args_tread->qDispConsoleArg = qDispConsole;
@@ -203,7 +213,7 @@ int main(void)
         }
     }
     retc = pthread_create(&thread, &attrs, temperatureReadingThread,
-                          (void *)args_tread);
+                         (void *)args_tread);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -228,8 +238,8 @@ int main(void)
         {
         }
     }
-    retc = pthread_create(&thread, &attrs, temperatureControllerThread,
-                          (void *)args_tctrl);
+    retc = 0;//pthread_create(&thread, &attrs, temperatureControllerThread,
+                //          (void *)args_tctrl);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -253,7 +263,7 @@ int main(void)
         {
         }
     }
-    retc = pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
+    retc = 0;//pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
     if (retc != 0)
     {
         /* pthread_create() failed */

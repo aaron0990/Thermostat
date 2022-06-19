@@ -15,6 +15,7 @@
 #include <LCDdisplayI2C.h>
 #include <utils.h>
 #include "shared_vars.h"
+#include <interrupt.h>
 
 // commands
 #define LCD_CLEARDISPLAY 0x01

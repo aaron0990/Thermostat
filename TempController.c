@@ -89,7 +89,7 @@ void TempController_setTargetTemp(TempController* const me, TempData* tgtTmp)
     me->targetTemp = tgtTmp;
 }
 
-void temperatureControllerThread(void *arg0){
+void *temperatureControllerThread(void *arg0){
     struct temperatureControllerThreadArgs *args = (struct temperatureControllerThreadArgs*) arg0;
     TempController *me = (TempController*) malloc(sizeof(TempController));
     me->qDispConsole = args->qDispConsoleArg;

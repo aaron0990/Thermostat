@@ -61,7 +61,7 @@ void Keypad_destroy(Keypad *const me)
     free(me);
 }
 
-void keypadThread(void *arg0){
+void *keypadThread(void *arg0){
     struct keypadThreadArgs *args = (struct keypadThreadArgs*) arg0;
     Keypad *me = (Keypad*) malloc(sizeof(Keypad));
     me->qDispConsole = args->qDispConsoleArg;

@@ -8,7 +8,7 @@
 #include "shared_vars.h"
 #include "ThreadsArgStruct.h"
 
-void displayConsoleThread(void *arg0){
+void *displayConsoleThread(void *arg0){
     while(1){
             sched_yield();
         }

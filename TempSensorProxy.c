@@ -17,7 +17,6 @@ void TempSensorProxy_init(TempSensorProxy *me)
 
 void TempSensorProxy_configure(TempSensorProxy *me)
 {
-
     Capture_init();
     me->captureHandle = (Capture_Handle*) malloc(sizeof(Capture_Handle));
     me->captureParams = (Capture_Params*) malloc(sizeof(Capture_Params));
@@ -31,7 +30,6 @@ void TempSensorProxy_configure(TempSensorProxy *me)
     {
         exit(-1);
     }
-
 }
 
 void TempSensorProxy_access(TempSensorProxy *me)
@@ -41,23 +39,27 @@ void TempSensorProxy_access(TempSensorProxy *me)
     readingData = 0;
     memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
 
+    //Disable task switching for temp reading
+    //vTaskSuspendAll();
+
     //Use pin P3.0 for debugging
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
     GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
 
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
-    usleep(1000);
+    delay_us(1000);
+    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
 
     //MCU start signal ~18ms
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
     GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-    usleep(20000);
+    delay_us(20000);
 
     //MCU waits for DHT response (~20-40us)
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
-    delay_us(80); //not using usleep() because it doesn't work well with so small values.
     GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
+    delay_us(80); //not using usleep() because it doesn't work well with so small values.
+    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
     //Set timer for capture
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN6,
                                                GPIO_PRIMARY_MODULE_FUNCTION);
@@ -76,12 +78,15 @@ void TempSensorProxy_access(TempSensorProxy *me)
 
     Capture_stop(*(me->captureHandle));
 
+    //Reenable task switching once finished
+    //xTaskResumeAll();
+
     uint64_t sensorData = 0;
     int i;
     for (i = 0; i < MAX_TICK_VALUES; ++i)
     {
         // time less than 100us -> logic 0. Otherwise logic 1
-        uint32_t period_us = capturedIntervals[i];
+        uint32_t period_us = capturedIntervals[i] / 4;
         sensorData |= (((uint64_t) (period_us < 100 ? 0 : 1))
                 << MAX_TICK_VALUES - i - 1);
     }
