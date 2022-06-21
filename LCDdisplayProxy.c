@@ -178,7 +178,6 @@ void LCD_write(DisplayProxy *lcd_config, const char *msg, uint8_t size)
 void mutate(DisplayProxy *lcd_config, uint8_t value, uint8_t mode)
 {
     //Disable task switching while sending
-    //vTaskSuspendAll();
 
     uint8_t highnib = value & 0xf0;
     uint8_t lownib = (value << 4) & 0xf0;
@@ -202,7 +201,6 @@ void mutate(DisplayProxy *lcd_config, uint8_t value, uint8_t mode)
                     (int) (((lownib) | mode) & ~En) | lcd_config->backlightval); // En low
     delay_us(100);
 
-    //Reenable task switching when finished sending
-    //xTaskResumeAll();
+
 }
 

@@ -20,8 +20,7 @@
 #include "shared_vars.h"
 #include <sysctl.h>
 #include "ThreadsArgStruct.h"
-
-#define TEMP_UPDATE_INT 15 //seconds
+#include "InterThreadQueues.h"
 
 #define INC_TEMP_PIN_IDX 0
 #define DEC_TEMP_PIN_IDX 1
@@ -30,9 +29,8 @@
 typedef struct Keypad Keypad;
 struct Keypad
 {
-    TempData *itsTargetTemp;
-    //This one is necessary
     QueueHandle_t qDispConsole;
+    QueueHandle_t qKeypadToTCtrl;
 };
 extern Keypad* kp;
 

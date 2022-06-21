@@ -32,11 +32,13 @@ struct temperatureControllerThreadArgs
 {
     QueueHandle_t qDispConsoleArg;
     QueueHandle_t qTReadToTCtrlArg;
+    QueueHandle_t qKeypadToTCtrl;
 };
 
 struct keypadThreadArgs
 {
     QueueHandle_t qDispConsoleArg;
+    QueueHandle_t qKeypadToTCtrl;
 };
 
 #endif /* THREADSARGSTRUCT_H_ */

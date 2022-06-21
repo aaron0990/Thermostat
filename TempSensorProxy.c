@@ -40,7 +40,7 @@ void TempSensorProxy_access(TempSensorProxy *me)
     memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
 
     //Disable task switching for temp reading
-    //vTaskSuspendAll();
+    vTaskSuspendAll();
 
     //Use pin P3.0 for debugging
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
@@ -79,7 +79,7 @@ void TempSensorProxy_access(TempSensorProxy *me)
     Capture_stop(*(me->captureHandle));
 
     //Reenable task switching once finished
-    //xTaskResumeAll();
+    xTaskResumeAll();
 
     uint64_t sensorData = 0;
     int i;

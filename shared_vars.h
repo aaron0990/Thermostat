@@ -15,7 +15,7 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <sched.h>
-#include "DisplayConsoleQueue.h"
+#include "InterThreadQueues.h"
 
 extern Display_Handle disp_hdl;
 

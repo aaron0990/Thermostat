@@ -5,6 +5,8 @@
  *      Author: aaron
  */
 
+#include <stdio.h>
+#include <string.h>
 #include "TempSensor.h"
 
 void TempSensor_init(TempSensor *const me)
@@ -14,9 +16,22 @@ void TempSensor_init(TempSensor *const me)
 
 void TempSensor_readTemp(TempSensor *const me)
 {
-    TempSensorProxy_access(me->itsTempSensorProxy);
-    xQueueSend(me->qTReadToLCD, (void *)(me->itsTempSensorProxy->itsTempData), 0);
-    //Insert new data to queue
+    TempSensorProxy_access(me->itsTempSensorProxy); //Read temperature
+    xQueueSend(me->qTReadToLCD, (void *)(me->itsTempSensorProxy->itsTempData), 0); //Push data to LCD queue
+
+    //Print to console
+    char buff[128];
+    sprintf(buff, "T: %dºC, H: %d%% \n", me->itsTempSensorProxy->itsTempData->temperature,
+                                         me->itsTempSensorProxy->itsTempData->humidity); //whitespaces to clear line
+    DisplayConsoleMsg msg;
+    msg.buff = buff;
+    msg.len = strlen(buff);
+    xQueueSend(me->qDispConsole, (void *)&msg, 0);
+
+    TempData td;
+    td.temperature = me->itsTempSensorProxy->itsTempData->temperature;
+    td.humidity = me->itsTempSensorProxy->itsTempData->humidity;
+    xQueueSend(me->qTReadToTCtrl, (void *)&td, 0);
 }
 
 
@@ -50,7 +65,7 @@ void *temperatureReadingThread(void *arg0){
     while(1){
         TempSensor_readTemp(me);
         //sched_yield();
-        vTaskDelay(15000);
+        sleep(15);
 
     }
 }

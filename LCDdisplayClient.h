@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "LCDdisplayProxy.h"
 #include "shared_vars.h"
-#include "TempReadToLCDQueue.h"
+#include "InterThreadQueues.h"
 #include "Keypad.h"
 #include "ThreadsArgStruct.h"
 

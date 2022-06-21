@@ -18,8 +18,7 @@
 #include <gpio.h>
 #include <stdlib.h>
 #include "shared_vars.h"
-#include "TempReadToLCDQueue.h"
-#include "TempReadToTempCtrlQueue.h"
+#include "InterThreadQueues.h"
 #include "ThreadsArgStruct.h"
 
 #define TEMP_UPDATE_INT 15 //seconds
@@ -44,5 +43,4 @@ void TempSensor_newData(TempSensor *const me);
 TempSensor* TempSensor_create(TempSensor *const me);
 void TempSensor_destroy(TempSensor *const me);
 
-//TODO: Check aPtr argument in subscribe() and unsubscribe() functions. I'm not sure if the type is tempDataAcceptorPtr or tempDataAcceptorPtr*
 #endif /* TEMPSENSOR_H_ */

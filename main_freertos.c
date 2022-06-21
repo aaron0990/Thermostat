@@ -63,9 +63,7 @@
 #include <utils.h>
 #include <string.h>
 #include <shared_vars.h>
-#include "TempReadToTempCtrlQueue.h"
-#include "TempReadToLCDQueue.h"
-#include "DisplayConsoleQueue.h"
+#include "InterThreadQueues.h"
 #include "ThreadsArgStruct.h"
 
 extern void* displayConsoleThread(void *arg0);
@@ -77,6 +75,7 @@ extern void* temperatureControllerThread(void *arg0);
 QueueHandle_t qTReadToLCD;
 QueueHandle_t qTReadToTCtrl;
 QueueHandle_t qDispConsole;
+QueueHandle_t qKeypadToTCtrl;
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   1024
@@ -112,7 +111,8 @@ void create_Queues(void)
 {
     qTReadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
     qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
-    qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayLCDMsg));
+    qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayConsoleMsg));
+    qKeypadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(KeypadMsg));
 }
 
 /* TODO:
@@ -185,7 +185,7 @@ int main(void)
         {
         }
     }
-    retc = 0;//pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
+    retc = pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -226,6 +226,7 @@ int main(void)
     struct temperatureControllerThreadArgs *args_tctrl = (struct temperatureControllerThreadArgs *)malloc(sizeof(struct temperatureControllerThreadArgs));
     args_tctrl->qDispConsoleArg = qDispConsole;
     args_tctrl->qTReadToTCtrlArg = qTReadToTCtrl;
+    args_tctrl->qKeypadToTCtrl = qKeypadToTCtrl;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
@@ -238,8 +239,8 @@ int main(void)
         {
         }
     }
-    retc = 0;//pthread_create(&thread, &attrs, temperatureControllerThread,
-                //          (void *)args_tctrl);
+    retc = pthread_create(&thread, &attrs, temperatureControllerThread,
+                          (void *)args_tctrl);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -251,6 +252,7 @@ int main(void)
     /************************** Keypad Thread ******************************/
     struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs *)malloc(sizeof(struct keypadThreadArgs));
     args_kpad->qDispConsoleArg = qDispConsole;
+    args_kpad->qKeypadToTCtrl = qKeypadToTCtrl;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
@@ -263,7 +265,7 @@ int main(void)
         {
         }
     }
-    retc = 0;//pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
+    retc = pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
     if (retc != 0)
     {
         /* pthread_create() failed */

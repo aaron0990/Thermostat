@@ -11,9 +11,6 @@ Keypad *kp;
 
 void Keypad_init(Keypad *const me)
 {
-    me->itsTargetTemp = TempData_create();
-    kp = me;
-
     /* Initialize + and - buttons to control target temperature*/
     GPIO_setConfig(INC_TEMP_PIN_IDX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
     GPIO_setConfig(DEC_TEMP_PIN_IDX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
@@ -25,25 +22,17 @@ void Keypad_init(Keypad *const me)
 
 void Keypad_clean(Keypad *const me)
 {
-    if (me->itsTargetTemp != NULL)
-    {
-        me->itsTargetTemp = NULL;
-    }
+
 }
 
 void Keypad_readTemp(Keypad *const me)
 {
-    Keypad_newData(me);
+
 }
 
 void Keypad_newData(Keypad *const me)
 {
-    if (!me->itsTargetTemp)
-    {
-        me->itsTargetTemp = TempData_create();
-    }
-    me->itsTargetTemp->humidity = me->itsTargetTemp->humidity;
-    me->itsTargetTemp->temperature = me->itsTargetTemp->temperature;
+
 }
 
 Keypad* Keypad_create(void)
@@ -63,8 +52,12 @@ void Keypad_destroy(Keypad *const me)
 
 void *keypadThread(void *arg0){
     struct keypadThreadArgs *args = (struct keypadThreadArgs*) arg0;
-    Keypad *me = (Keypad*) malloc(sizeof(Keypad));
+    GPIO_init();
+    Keypad *me = Keypad_create();
     me->qDispConsole = args->qDispConsoleArg;
+    me->qKeypadToTCtrl = args->qKeypadToTCtrl;
+    Keypad_init(me);
+    kp = me;
     while(1){
         sched_yield();
     }
@@ -76,13 +69,16 @@ void Keypad_InterruptHandler(uint_least8_t idx)
 {
     GPIO_clearInt(idx);
     GPIO_disableInt(idx);
+    KeypadMsg kp_msg;
     if (idx == INC_TEMP_PIN_IDX)
     {
-        ++kp->itsTargetTemp->temperature;
+        kp_msg.cmd = INC_TARGET_T;
+        xQueueSendFromISR(kp->qKeypadToTCtrl, (void *)&kp_msg, NULL);
     }
     if (idx == DEC_TEMP_PIN_IDX)
     {
-        --kp->itsTargetTemp->temperature;
+        kp_msg.cmd = DEC_TARGET_T;
+        xQueueSendFromISR(kp->qKeypadToTCtrl, (void *)&kp_msg, NULL);
     }
     GPIO_enableInt(idx);
 

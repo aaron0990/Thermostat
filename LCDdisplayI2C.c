@@ -21,13 +21,13 @@ void DisplayI2C_initialize(DisplayI2C *const me)
     me->i2cParams->transferMode = I2C_MODE_BLOCKING;
     me->i2cParams->bitRate = I2C_100kHz;
 
+    //Open I2C bus for usage
+    *(me->i2cHandle) = I2C_open(0, me->i2cParams);
+
 }
 
 void DisplayI2C_send(DisplayI2C *const me, uint8_t data)
 {
-
-    //Open I2C bus for usage
-    *(me->i2cHandle) = I2C_open(0, me->i2cParams);
     uint8_t buf[1];
     buf[0] = data;
     me->i2cTransaction->slaveAddress = SLAVE_ADDR;
@@ -41,7 +41,7 @@ void DisplayI2C_send(DisplayI2C *const me, uint8_t data)
     }
     while (!ret);
 
-    I2C_close(*(me->i2cHandle));
+    //I2C_close(*(me->i2cHandle));
 
     if (ret == I2C_STATUS_TIMEOUT)
     {
