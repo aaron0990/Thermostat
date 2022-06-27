@@ -76,6 +76,7 @@ QueueHandle_t qTReadToLCD;
 QueueHandle_t qTReadToTCtrl;
 QueueHandle_t qDispConsole;
 QueueHandle_t qKeypadToTCtrl;
+QueueHandle_t qTCtrlToLCD;
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   1024
@@ -113,6 +114,7 @@ void create_Queues(void)
     qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
     qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayConsoleMsg));
     qKeypadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(KeypadMsg));
+    qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));;
 }
 
 /* TODO:
@@ -149,6 +151,7 @@ int main(void)
     struct displayLCDThreadArgs *args_dlcd = (struct displayLCDThreadArgs *)malloc(sizeof(struct displayLCDThreadArgs));
     args_dlcd->qDispConsoleArg = qDispConsole;
     args_dlcd->qTReadToLCDArg = qTReadToLCD;
+    args_dlcd->qTCtrlToLCDArg = qTCtrlToLCD;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
@@ -226,7 +229,8 @@ int main(void)
     struct temperatureControllerThreadArgs *args_tctrl = (struct temperatureControllerThreadArgs *)malloc(sizeof(struct temperatureControllerThreadArgs));
     args_tctrl->qDispConsoleArg = qDispConsole;
     args_tctrl->qTReadToTCtrlArg = qTReadToTCtrl;
-    args_tctrl->qKeypadToTCtrl = qKeypadToTCtrl;
+    args_tctrl->qKeypadToTCtrlArg = qKeypadToTCtrl;
+    args_tctrl->qTCtrlToLCDArg = qTCtrlToLCD;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);

@@ -16,7 +16,6 @@
 //Queue element is TempData
 extern QueueHandle_t qTReadToTCtrl;
 
-
 //********************************* ALL ==> displayConsole queue ********************************************************//
 
 #define MSG_SIZE 256
@@ -33,6 +32,11 @@ extern QueueHandle_t qDispConsole;
 
 //Queue element is TempData
 extern QueueHandle_t qTReadToLCD;
+
+//********************************* temperatureController ==> displayLCD queue ********************************************************//
+
+//Queue element is TempData
+extern QueueHandle_t qTCtrlToLCD;
 
 
 //********************************* keypad  ==> temperatureController queue ********************************************************//

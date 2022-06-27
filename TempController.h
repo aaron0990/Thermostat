@@ -19,18 +19,16 @@
 typedef struct TempController TempController;
 
 struct TempController{
-    TempSensor* itsTempSensor;
-    Keypad* itsKeypad;
+    TempData targetTemp;
     TempData readTemp;
-    TempData* targetTemp;
-
     //These ones are necessary
     QueueHandle_t qDispConsole;
     QueueHandle_t qTReadToTCtrl;
     QueueHandle_t qKeypadToTCtrl;
+    QueueHandle_t qTCtrlToLCD;
 };
 
-void TempController_init(TempController *const me, TempSensor *const ts, Keypad *const kp);
+void TempController_init(TempController *const me);
 void TempController_clean(TempController* const me);
 TempController* TempController_create(void);
 void TempController_destroy(TempController* const me);

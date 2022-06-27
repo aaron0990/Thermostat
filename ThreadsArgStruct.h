@@ -19,6 +19,7 @@ struct displayLCDThreadArgs
 {
     QueueHandle_t qDispConsoleArg;
     QueueHandle_t qTReadToLCDArg;
+    QueueHandle_t qTCtrlToLCDArg;
 };
 
 struct temperatureReadingThreadArgs
@@ -32,7 +33,8 @@ struct temperatureControllerThreadArgs
 {
     QueueHandle_t qDispConsoleArg;
     QueueHandle_t qTReadToTCtrlArg;
-    QueueHandle_t qKeypadToTCtrl;
+    QueueHandle_t qKeypadToTCtrlArg;
+    QueueHandle_t qTCtrlToLCDArg;
 };
 
 struct keypadThreadArgs

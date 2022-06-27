@@ -19,18 +19,17 @@
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
-    TempSensor* itsTempSensor;
-    TempData* itsTempSensed;
-    TempData* itsTempTarget;
-    Keypad* itsKeypad;
+    TempData itsTempSensed;
+    TempData itsTempTarget;
     DisplayProxy* itsDisplayProxy;
 
     //These ones are necessary
     QueueHandle_t qDispConsole;
     QueueHandle_t qTReadToLCD;
+    QueueHandle_t qTCtrlToLCD;
 };
 
-void DisplayClient_init(DisplayClient *const me, TempSensor *const ts, Keypad *const kp);
+void DisplayClient_init(DisplayClient *const me);
 void DisplayClient_clean(DisplayClient* const me);
 void DisplayClient_acceptTempSensed(DisplayClient* const me, TempData* td);
 void DisplayClient_acceptTempTarget(DisplayClient* const me, TempData* td);
