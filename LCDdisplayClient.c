@@ -35,11 +35,12 @@ void DisplayClient_showTempSensed(DisplayClient *const me)
     char output[50];
     if (me->itsTempSensed.temperature)
     {
+        float temp = (float)(me->itsTempSensed.temperature)/10.0;
         LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
         sprintf(output, "             "); //whitespaces to clear line
         LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
         LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
-        sprintf(output, "T. Act:%d'C", me->itsTempSensed.temperature);
+        sprintf(output, "T. Act:%.1f'C", temp); //DIVIDE BY 10 TO GET REAL TEMPERATURE!
         LCD_write(me->itsDisplayProxy, output, strlen(output)); //Print sensed temperature
     }
     else

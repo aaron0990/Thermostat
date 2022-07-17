@@ -55,7 +55,7 @@ void *keypadThread(void *arg0){
     GPIO_init();
     Keypad *me = Keypad_create();
     me->qDispConsole = args->qDispConsoleArg;
-    me->qKeypadToTCtrl = args->qKeypadToTCtrl;
+    me->qKeypadToTCtrl = args->qKeypadToTCtrlArg;
     Keypad_init(me);
     kp = me;
     while(1){
@@ -73,12 +73,12 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     if (idx == INC_TEMP_PIN_IDX)
     {
         kp_msg.cmd = INC_TARGET_T;
-        xQueueSendFromISR(kp->qKeypadToTCtrl, (void *)&kp_msg, NULL);
+        xQueueSendFromISR(kp->qKeypadToTCtrl, &kp_msg, NULL);
     }
     if (idx == DEC_TEMP_PIN_IDX)
     {
         kp_msg.cmd = DEC_TARGET_T;
-        xQueueSendFromISR(kp->qKeypadToTCtrl, (void *)&kp_msg, NULL);
+        xQueueSendFromISR(kp->qKeypadToTCtrl, &kp_msg, NULL);
     }
     GPIO_enableInt(idx);
 

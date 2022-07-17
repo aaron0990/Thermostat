@@ -65,7 +65,7 @@ void *temperatureReadingThread(void *arg0){
     while(1){
         TempSensor_readTemp(me);
         //sched_yield();
-        sleep(15);
+        sleep(3);
 
     }
 }

@@ -24,17 +24,16 @@ void TempSensorProxy_configure(TempSensorProxy *me)
     me->captureParams->mode = Capture_FALLING_EDGE;
     me->captureParams->periodUnit = Capture_PERIOD_US;
     me->captureParams->callbackFxn = Capture_Callback;
-    *(me->captureHandle) = Capture_open(0, me->captureParams);
-
-    if (*(me->captureHandle) == NULL)
-    {
-        exit(-1);
-    }
 }
 
 void TempSensorProxy_access(TempSensorProxy *me)
 {
 
+    *(me->captureHandle) = Capture_open(0, me->captureParams);
+    if (*(me->captureHandle) == NULL)
+    {
+        exit(-1);
+    }
     capturedIntervalsPtr = 0;
     readingData = 0;
     memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
@@ -62,21 +61,24 @@ void TempSensorProxy_access(TempSensorProxy *me)
     GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
     //Set timer for capture
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN6,
-                                               GPIO_PRIMARY_MODULE_FUNCTION);
+    GPIO_PRIMARY_MODULE_FUNCTION);
     readingData = 1;
 
     int32_t ret = Capture_start(*(me->captureHandle));
 
     if (ret != Capture_STATUS_SUCCESS)
     {
-        Display_printf(disp_hdl,0,0,"TempSensorProxy.access()::Capture_start() failed!\n");
+        Display_printf(disp_hdl, 0, 0,
+                       "TempSensorProxy.access()::Capture_start() failed!\n");
         readingData = 0;
     }
 
     // Wait until sensor data are read
-    while (readingData);
+    while (readingData)
+        ;
 
     Capture_stop(*(me->captureHandle));
+    Capture_close(*(me->captureHandle));
 
     //Reenable task switching once finished
     xTaskResumeAll();
@@ -91,8 +93,8 @@ void TempSensorProxy_access(TempSensorProxy *me)
                 << MAX_TICK_VALUES - i - 1);
     }
 
-    me->itsTempData->humidity = (uint8_t) ((sensorData >> 32) & 0xFF);
-    me->itsTempData->temperature = (uint8_t) ((sensorData >> 16) & 0xFF);
+    me->itsTempData->humidity = (uint16_t) ((sensorData >> 24) & 0xFFFF);
+    me->itsTempData->temperature = (uint16_t) ((sensorData >> 8) & 0xFFFF);
 
     //Checksum
     /*if (me->humidityInt + me->humidityDec + me->temperatureInt + me->temperatureDec == (sensorData & 0xFF)){

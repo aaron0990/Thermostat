@@ -79,7 +79,7 @@ QueueHandle_t qKeypadToTCtrl;
 QueueHandle_t qTCtrlToLCD;
 
 /* Stack size in bytes */
-#define THREADSTACKSIZE   1024
+#define THREADSTACKSIZE   4096
 
 #define QUEUE_SIZE 10   //Max num of elements in the queue
 
@@ -100,13 +100,13 @@ void init_Timer32_module()
 }
 
 /* EL DISPLAY HANDLE YA NO ES UNA VARIABLE GLOBAL. CADA THREAD METE EN UNA COLA DEDICADA LO QUE QUIERA PRINTAR POR CONSOLA.
-void init_Display(void)
-{
-    Display_Params params;
-    Display_Params_init(&params);
-    disp_hdl = Display_open(0, NULL);
-    Display_clear(disp_hdl); //Clear previous execution output of the terminal
-}*/
+ void init_Display(void)
+ {
+ Display_Params params;
+ Display_Params_init(&params);
+ disp_hdl = Display_open(0, NULL);
+ Display_clear(disp_hdl); //Clear previous execution output of the terminal
+ }*/
 
 void create_Queues(void)
 {
@@ -114,7 +114,7 @@ void create_Queues(void)
     qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
     qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayConsoleMsg));
     qKeypadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(KeypadMsg));
-    qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));;
+    qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
 }
 
 /* TODO:
@@ -148,7 +148,9 @@ int main(void)
     pthread_attr_init(&attrs);
 
     /************************** Display LCD Thread ******************************/
-    struct displayLCDThreadArgs *args_dlcd = (struct displayLCDThreadArgs *)malloc(sizeof(struct displayLCDThreadArgs));
+    struct displayLCDThreadArgs *args_dlcd =
+            (struct displayLCDThreadArgs*) malloc(
+                    sizeof(struct displayLCDThreadArgs));
     args_dlcd->qDispConsoleArg = qDispConsole;
     args_dlcd->qTReadToLCDArg = qTReadToLCD;
     args_dlcd->qTCtrlToLCDArg = qTCtrlToLCD;
@@ -164,7 +166,7 @@ int main(void)
         {
         }
     }
-    retc = pthread_create(&thread, &attrs, displayLCDThread, (void *)args_dlcd);
+    retc = pthread_create(&thread, &attrs, displayLCDThread, (void*) args_dlcd);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -174,7 +176,9 @@ int main(void)
     }
 
     /************************** Display Console Thread ******************************/
-    struct displayConsoleThreadArgs *args_dcon = (struct displayConsoleThreadArgs *)malloc(sizeof(struct displayConsoleThreadArgs));
+    struct displayConsoleThreadArgs *args_dcon =
+            (struct displayConsoleThreadArgs*) malloc(
+                    sizeof(struct displayConsoleThreadArgs));
     args_dcon->qDispConsoleArg = qDispConsole;
 
     priParam.sched_priority = 1;
@@ -188,7 +192,8 @@ int main(void)
         {
         }
     }
-    retc = pthread_create(&thread, &attrs, displayConsoleThread, (void *)args_dcon);
+    retc = pthread_create(&thread, &attrs, displayConsoleThread,
+                          (void*) args_dcon);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -197,9 +202,10 @@ int main(void)
         }
     }
 
-
     /************************** Temperature reading Thread ******************************/
-    struct temperatureReadingThreadArgs *args_tread = (struct temperatureReadingThreadArgs *)malloc(sizeof(struct temperatureReadingThreadArgs));
+    struct temperatureReadingThreadArgs *args_tread =
+            (struct temperatureReadingThreadArgs*) malloc(
+                    sizeof(struct temperatureReadingThreadArgs));
     args_tread->qDispConsoleArg = qDispConsole;
     args_tread->qTReadToLCDArg = qTReadToLCD;
     args_tread->qTReadToTCtrlArg = qTReadToTCtrl;
@@ -216,7 +222,7 @@ int main(void)
         }
     }
     retc = pthread_create(&thread, &attrs, temperatureReadingThread,
-                         (void *)args_tread);
+                          (void*) args_tread);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -226,7 +232,9 @@ int main(void)
     }
 
     /************************** Temperature control Thread ******************************/
-    struct temperatureControllerThreadArgs *args_tctrl = (struct temperatureControllerThreadArgs *)malloc(sizeof(struct temperatureControllerThreadArgs));
+    struct temperatureControllerThreadArgs *args_tctrl =
+            (struct temperatureControllerThreadArgs*) malloc(
+                    sizeof(struct temperatureControllerThreadArgs));
     args_tctrl->qDispConsoleArg = qDispConsole;
     args_tctrl->qTReadToTCtrlArg = qTReadToTCtrl;
     args_tctrl->qKeypadToTCtrlArg = qKeypadToTCtrl;
@@ -244,7 +252,7 @@ int main(void)
         }
     }
     retc = pthread_create(&thread, &attrs, temperatureControllerThread,
-                          (void *)args_tctrl);
+                          (void*) args_tctrl);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -254,9 +262,10 @@ int main(void)
     }
 
     /************************** Keypad Thread ******************************/
-    struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs *)malloc(sizeof(struct keypadThreadArgs));
+    struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs*) malloc(
+            sizeof(struct keypadThreadArgs));
     args_kpad->qDispConsoleArg = qDispConsole;
-    args_kpad->qKeypadToTCtrl = qKeypadToTCtrl;
+    args_kpad->qKeypadToTCtrlArg = qKeypadToTCtrl;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
@@ -269,7 +278,7 @@ int main(void)
         {
         }
     }
-    retc = pthread_create(&thread, &attrs, keypadThread, (void *)args_kpad);
+    retc = pthread_create(&thread, &attrs, keypadThread, (void*) args_kpad);
     if (retc != 0)
     {
         /* pthread_create() failed */
@@ -280,6 +289,8 @@ int main(void)
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
+
+    while(1);
 
     return (0);
 }

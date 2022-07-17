@@ -60,6 +60,7 @@ void* temperatureControllerThread(void *arg0)
         }
         if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, 0))
         {
+
             //New temperature reading available
             switch (kpMsg.cmd)
             {
@@ -71,9 +72,9 @@ void* temperatureControllerThread(void *arg0)
                     break;
             }
             xQueueSend(me->qTCtrlToLCD, (void *)&me->targetTemp, 0);
+
         }
         sched_yield();
-        sleep(1);
     }
 
 }
