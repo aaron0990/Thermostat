@@ -21,6 +21,7 @@ typedef struct TempController TempController;
 struct TempController{
     TempData targetTemp;
     TempData readTemp;
+    uint8_t heatingOn;
     //These ones are necessary
     QueueHandle_t qDispConsole;
     QueueHandle_t qTReadToTCtrl;

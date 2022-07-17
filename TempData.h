@@ -14,8 +14,8 @@
 typedef struct TempData TempData;
 struct TempData
 {
-    uint16_t temperature;    //when temp sensed, real temperature = temperature/10.0
-    uint16_t humidity;      //when humidity sensed, real humidity = humidity/10.0
+    float temperature;    //when temp sensed, real temperature = temperature/10.0
+    float humidity;      //when humidity sensed, real humidity = humidity/10.0
 };
 
 void TempData_init(TempData *const me);

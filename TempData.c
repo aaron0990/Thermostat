@@ -9,8 +9,8 @@
 #include <stdlib.h>
 
 void TempData_init(TempData* const me){
-    me->temperature = 0;
-    me->humidity = 0;
+    me->temperature = 0.0;
+    me->humidity = 0.0;
 }
 
 void TempData_clean(TempData* const me){

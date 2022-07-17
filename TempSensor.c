@@ -21,7 +21,7 @@ void TempSensor_readTemp(TempSensor *const me)
 
     //Print to console
     char buff[128];
-    sprintf(buff, "T: %dºC, H: %d%% \n", me->itsTempSensorProxy->itsTempData->temperature,
+    sprintf(buff, "T: %.1fºC, H: %.1f%% \n", me->itsTempSensorProxy->itsTempData->temperature,
                                          me->itsTempSensorProxy->itsTempData->humidity); //whitespaces to clear line
     DisplayConsoleMsg msg;
     msg.buff = buff;

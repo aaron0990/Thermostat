@@ -93,8 +93,8 @@ void TempSensorProxy_access(TempSensorProxy *me)
                 << MAX_TICK_VALUES - i - 1);
     }
 
-    me->itsTempData->humidity = (uint16_t) ((sensorData >> 24) & 0xFFFF);
-    me->itsTempData->temperature = (uint16_t) ((sensorData >> 8) & 0xFFFF);
+    me->itsTempData->humidity = (float) (((sensorData >> 24) & 0xFFFF)/10.0);
+    me->itsTempData->temperature = (float) (((sensorData >> 8) & 0xFFFF)/10.0);
 
     //Checksum
     /*if (me->humidityInt + me->humidityDec + me->temperatureInt + me->temperatureDec == (sensorData & 0xFF)){
