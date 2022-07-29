@@ -117,7 +117,7 @@ void create_Queues(void)
     qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
 }
 
-/* TODO:
+/* TODO: Check why relay closes circuit when targetTemp < readTemp
  *
  */
 

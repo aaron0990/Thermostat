@@ -16,10 +16,11 @@ void TempController_init(TempController *const me)
     me->readTemp.temperature = 0.0;
     me->readTemp.humidity = 0.0;
 
-    me->heatingOn = 1; //Heating is ON when system starts up.
-
     //Relay control pin
     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN5);
+
+    me->heatingOn = 1; //Heating is ON when system starts up.
+    GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
 
     xQueueSend(me->qTCtrlToLCD, (void* )&me->targetTemp, 0);
 }
@@ -79,25 +80,28 @@ void* temperatureControllerThread(void *arg0)
             xQueueSend(me->qTCtrlToLCD, (void* )&me->targetTemp, 0);
 
         }
-        if (me->targetTemp.temperature > me->readTemp.temperature)
+        if (me->readTemp.temperature != 0.0)
         {
-            //Heating has to be turned ON
-            if (me->heatingOn == 0)
+            if (me->targetTemp.temperature > me->readTemp.temperature)
             {
-                //If heating is OFF, turn it ON
-                GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
-                me->heatingOn = 1;
+                //Heating has to be turned ON
+                if (me->heatingOn == 0)
+                {
+                    //If heating is OFF, turn it ON
+                    GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
+                    me->heatingOn = 1;
+                }
+                //else, do nothing because it was already ON
             }
-            //else, do nothing because it was already ON
-        }
-        else
-        {
-            //Heating has to be turned OFF
-            if (me->heatingOn == 1)
+            else
             {
-                //If heating is ON, turn it OFF
-                GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN5);
-                me->heatingOn = 0;
+                //Heating has to be turned OFF
+                if (me->heatingOn == 1)
+                {
+                    //If heating is ON, turn it OFF
+                    GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN5);
+                    me->heatingOn = 0;
+                }
             }
         }
         sched_yield();
