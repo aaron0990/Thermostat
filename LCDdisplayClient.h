@@ -16,6 +16,8 @@
 #include "Keypad.h"
 #include "ThreadsArgStruct.h"
 
+#define LCD_ON_BACKLIGHT_T  5000 //ms
+
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
@@ -34,8 +36,7 @@ void DisplayClient_clean(DisplayClient* const me);
 void DisplayClient_acceptTempSensed(DisplayClient* const me, TempData* td);
 void DisplayClient_acceptTempTarget(DisplayClient* const me, TempData* td);
 void DisplayClient_register(DisplayClient* const me); //it calls the subscribe() function of the sensor
-void DisplayClient_showTempSensed(DisplayClient* const me);
-void DisplayClient_showTempTarget(DisplayClient *const me);
+void DisplayClient_showInfo(DisplayClient *const me);
 DisplayClient* DisplayClient_create(void);
 void DisplayClient_destroy(DisplayClient* const me);
 

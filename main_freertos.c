@@ -87,10 +87,54 @@ Display_Handle disp_hdl;
 
 void init_Clock_System_module()
 {
-    //Configures CS_MCLK clock signal with DCO clock source (3MHz)
+    /*******************************************************************************************/
+    /***************************** OSCILLATORS CONFIGURATION ***********************************/
+    /*******************************************************************************************/
+
+    /* Before we start we have to change VCORE to 1 to support the 48MHz frequency
+     * SI NO, SE QUEDA EL MICRO BRICKEADO Y HAY QUE HACER UN RESET DE FABRICA DEL FW EN LA FLASH
+     * USANDO EL SCRIPT QUE HAY EN EL DOCUMENTO "MSP-EXP432P401R_LaunchPad_Evaluation_Kit" EN
+     * LA PAGINA 28*/
+    FPU_enableModule();
+    PCM_setCoreVoltageLevel(PCM_AM_LDO_VCORE1);
+    FlashCtl_setWaitState(FLASH_BANK0, 1);
+    FlashCtl_setWaitState(FLASH_BANK1, 1);
+
+    /*: Internal digitally controlled oscillator (DCO) with programmable frequencies and 3-MHz
+     frequency by default.*/
+    //CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_1_5);
+    CS_setDCOFrequency(CS_48MHZ);
+    /* Internal, low-power low-frequency oscillator (REFO) with selectable 32.768-kHz or 128-
+     kHz typical frequencies*/
+    CS_setReferenceOscillatorFrequency(CS_REFO_128KHZ);
+    //MODCLK: Internal low-power oscillator with 25-MHz typical frequency.
+    //SYSOSC: Internal oscillator with 5MHz typical frequency.
+    //VLOCLK: Internal very-low-power low-frequency oscillator (VLO) with 9.4-kHz typical frequency
+    FPU_disableModule(); //Module used to calculate DCO frequency
+    /*******************************************************************************************/
+    /***************************** CLOCK SIGNALS CONFIGURATION *********************************/
+    /*******************************************************************************************/
+
+    /*: Master clock. MCLK is software selectable as LFXTCLK, VLOCLK, REFOCLK, DCOCLK,
+     MODCLK, or HFXTCLK. MCLK can be divided by 1, 2, 4, 8, 16, 32, 64, or 128. MCLK is used by the
+     CPU and peripheral module interfaces, as well as, used directly by some peripheral modules.*/
     CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    //Configures CS_SMCLK clock signal with DCO clock source (3MHz)
+    /*Subsystem master clock. HSMCLK is software selectable as LFXTCLK, VLOCLK,
+     REFOCLK, DCOCLK, MODCLK, HFXTCLK. HSMCLK can be divided by 1, 2, 4, 8, 16, 32, 64, or 128.
+     HSMCLK is software selectable by individual peripheral modules.*/
+    CS_initClockSignal(CS_HSMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    /*Low-speed subsystem master clock. SMCLK uses the HSMCLK clock resource selection for
+     its clock resource. SMCLK can be divided independently from HSMCLK by 1, 2, 4, 8, 16, 32, 64, or
+     128. SMCLK is limited in frequency to half of the rated maximum frequency of HSMCLK. SMCLK is
+     software selectable by individual peripheral modules.*/
     CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    /*Auxiliary clock. ACLK is software selectable as LFXTCLK, VLOCLK, or REFOCLK. ACLK can
+     be divided by 1, 2, 4, 8, 16, 32, 64 or 128. ACLK is software selectable by individual peripheral
+     modules. ACLK is restricted to maximum frequency of operation of 128 kHz.*/
+    CS_initClockSignal(CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    /*Low-speed backup domain clock. BCLK is software selectable as LFXTCLK and REFOCLK and
+     it is primarily used in the backup domain. BCLK is restricted to a maximum frequency of 32.768 kHz.*/
+    CS_initClockSignal(CS_BCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 }
 
 void init_Timer32_module()
@@ -98,15 +142,6 @@ void init_Timer32_module()
     Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
     TIMER32_PERIODIC_MODE);
 }
-
-/* EL DISPLAY HANDLE YA NO ES UNA VARIABLE GLOBAL. CADA THREAD METE EN UNA COLA DEDICADA LO QUE QUIERA PRINTAR POR CONSOLA.
- void init_Display(void)
- {
- Display_Params params;
- Display_Params_init(&params);
- disp_hdl = Display_open(0, NULL);
- Display_clear(disp_hdl); //Clear previous execution output of the terminal
- }*/
 
 void create_Queues(void)
 {
@@ -117,7 +152,7 @@ void create_Queues(void)
     qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
 }
 
-/* TODO: Check why relay closes circuit when targetTemp < readTemp
+/* TODO: Intentar que el FW funcione a 1MHz (se deberia de poder, no?)
  *
  */
 
@@ -138,6 +173,8 @@ int main(void)
 
     /* Call driver init functions */
     Board_init();
+    //Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
+    //Power_enablePolicy();
 
     init_Clock_System_module();
     init_Timer32_module();
@@ -290,9 +327,14 @@ int main(void)
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
 
-    while(1);
+    //while (1);
 
     return (0);
+}
+
+void vApplicationIdleHook(void)
+{
+    //Power_idleFunc();
 }
 
 //*****************************************************************************

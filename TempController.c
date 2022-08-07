@@ -104,6 +104,7 @@ void* temperatureControllerThread(void *arg0)
                 }
             }
         }
+        usleep(100000);
         sched_yield();
     }
 

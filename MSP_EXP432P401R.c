@@ -531,7 +531,7 @@ PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_DCDC_VCORE0,
 const PowerMSP432_ConfigV1 PowerMSP432_config = {
         .policyInitFxn = &PowerMSP432_initPolicy, .policyFxn =
                 &PowerMSP432_sleepPolicy,
-        .initialPerfLevel = 2, .enablePolicy = true, .enablePerf = true,
+        .initialPerfLevel = 2, .enablePolicy = false, .enablePerf = false,
         .enableParking = true, .customPerfLevels = myPerfLevels, .numCustom =
                 sizeof(myPerfLevels) / sizeof(PowerMSP432_PerfLevel) };
 
@@ -694,15 +694,15 @@ const TimerMSP432_HWAttrs timerMSP432HWAttrs[MSP_EXP432P401R_TIMERCOUNT] = {
           .intPriority = ~0 },
         /* Timer_A1 */
         { .timerBaseAddress = TIMER_A1_BASE, .clockSource =
-                  TIMER_A_CLOCKSOURCE_ACLK,
+                TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA1_0, .intPriority = ~0 },
         /* Timer_A2 */
         { .timerBaseAddress = TIMER_A2_BASE, .clockSource =
-                  TIMER_A_CLOCKSOURCE_ACLK,
+                TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA2_0, .intPriority = ~0 },
         /* Timer_A3 */
         { .timerBaseAddress = TIMER_A3_BASE, .clockSource =
-                  TIMER_A_CLOCKSOURCE_ACLK,
+                TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA3_0, .intPriority = ~0 } };
 
 const Timer_Config Timer_config[MSP_EXP432P401R_TIMERCOUNT] = {

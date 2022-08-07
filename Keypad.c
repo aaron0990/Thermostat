@@ -81,6 +81,4 @@ void Keypad_InterruptHandler(uint_least8_t idx)
         xQueueSendFromISR(kp->qKeypadToTCtrl, &kp_msg, NULL);
     }
     GPIO_enableInt(idx);
-
-
 }
