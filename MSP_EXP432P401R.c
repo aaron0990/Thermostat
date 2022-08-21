@@ -151,14 +151,14 @@ const CaptureMSP432_HWAttrs captureMSP432HWAttrs[MSP_EXP432P401R_CAPTURECOUNT] =
         {
         /* Timer_A0 */
         { .timerBaseAddress = TIMER_A1_BASE, .clockSource =
-                  TIMER_A_CLOCKSOURCE_SMCLK,
+        TIMER_A_CLOCKSOURCE_SMCLK,
           .clockDivider = TIMER_A_CLOCKSOURCE_DIVIDER_8, .capturePort =
-                  CaptureMSP432_P3_6_TA1,
+          CaptureMSP432_P3_6_TA1,
           .intPriority = 0xFFFFFFFF },
           { .timerBaseAddress = TIMER_A1_BASE, .clockSource =
-                    TIMER_A_CLOCKSOURCE_SMCLK,
+          TIMER_A_CLOCKSOURCE_SMCLK,
             .clockDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1, .capturePort =
-                    CaptureMSP432_P2_7_TA1,
+            CaptureMSP432_P2_7_TA1,
             .intPriority = ~0 } };
 
 const Capture_Config Capture_config[MSP_EXP432P401R_CAPTURECOUNT] = {
@@ -235,7 +235,7 @@ const DisplaySharp_HWAttrsV1 displaySharpHWattrs = {
         .powerPin = MSP_EXP432P401R_LCD_POWER, .enablePin =
                 MSP_EXP432P401R_LCD_ENABLE,
         .pixelWidth = BOARD_DISPLAY_SHARP_SIZE, .pixelHeight =
-                BOARD_DISPLAY_SHARP_SIZE,
+        BOARD_DISPLAY_SHARP_SIZE,
         .displayBuf = sharpDisplayBuf, };
 
 #ifndef BOARD_DISPLAY_USE_UART
@@ -264,11 +264,10 @@ const Display_Config Display_config[] = { {
         .hwAttrs = &displayUartHWAttrs },
 #endif
 #if (BOARD_DISPLAY_USE_LCD)
-    {
-        .fxnTablePtr = &DisplaySharp_fxnTable,
-        .object      = &displaySharpObject,
-        .hwAttrs     = &displaySharpHWattrs
-    },
+                                          { .fxnTablePtr =
+                                                    &DisplaySharp_fxnTable,
+                                            .object = &displaySharpObject,
+                                            .hwAttrs = &displaySharpHWattrs },
 #endif
         };
 
@@ -402,11 +401,11 @@ I2CMSP432_Object i2cMSP432Objects[MSP_EXP432P401R_I2CCOUNT];
 const I2CMSP432_HWAttrsV1 i2cMSP432HWAttrs[MSP_EXP432P401R_I2CCOUNT] = {
         { .baseAddr = EUSCI_B0_BASE, .intNum = INT_EUSCIB0, .intPriority = (~0),
           .clockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK, .dataPin =
-                  I2CMSP432_P1_6_UCB0SDA,
+          I2CMSP432_P1_6_UCB0SDA,
           .clkPin = I2CMSP432_P1_7_UCB0SCL },
         { .baseAddr = EUSCI_B1_BASE, .intNum = INT_EUSCIB1, .intPriority = (~0),
           .clockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK, .dataPin =
-                  I2CMSP432_P6_4_UCB1SDA,
+          I2CMSP432_P6_4_UCB1SDA,
           .clkPin = I2CMSP432_P6_5_UCB1SCL } };
 
 const I2C_Config I2C_config[MSP_EXP432P401R_I2CCOUNT] = {
@@ -506,20 +505,22 @@ const uint_least8_t NVS_count = MSP_EXP432P401R_NVSCOUNT;
 #include <ti/devices/msp432p4xx/driverlib/pcm.h>
 
 /* Custom performance level for SPI Master Example */
-PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_DCDC_VCORE0,
-                                           .VCORE = 0, .clockSource =
-                                                   CS_DCOCLK_SELECT,
-                                           .DCORESEL = CS_DCO_TUNE_FREQ,
-                                           .tuneFreqDCO = 10000000, .SELM =
-                                                   CS_DCOCLK_SELECT,
+PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_LDO_VCORE1,
+                                           .VCORE = 1, .clockSource =
+                                           CS_DCOCLK_SELECT,
+                                           .DCORESEL = CS_DCO_FREQUENCY_48,
+                                           .SELM =
+                                           CS_DCOCLK_SELECT,
                                            .DIVM = CS_CLOCK_DIVIDER_1, .SELS =
-                                                   CS_DCOCLK_SELECT,
+                                           CS_DCOCLK_SELECT,
                                            .DIVHS = CS_CLOCK_DIVIDER_1, .DIVS =
-                                                   CS_CLOCK_DIVIDER_1,
+                                           CS_CLOCK_DIVIDER_1,
                                            .SELB = CS_REFOCLK_SELECT, .SELA =
-                                                   CS_REFOCLK_SELECT,
+                                           CS_REFOCLK_SELECT,
                                            .DIVA = CS_CLOCK_DIVIDER_1,
-                                           .flashWaitStates = 0,
+                                           //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
+                                           //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
+                                           .flashWaitStates = 1,
                                            .enableFlashBuffer = true, .MCLK =
                                                    10000000,
                                            .HSMCLK = 10000000,
@@ -531,7 +532,7 @@ PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_DCDC_VCORE0,
 const PowerMSP432_ConfigV1 PowerMSP432_config = {
         .policyInitFxn = &PowerMSP432_initPolicy, .policyFxn =
                 &PowerMSP432_sleepPolicy,
-        .initialPerfLevel = 2, .enablePolicy = false, .enablePerf = false,
+        .initialPerfLevel = 4, .enablePolicy = true, .enablePerf = true,
         .enableParking = true, .customPerfLevels = myPerfLevels, .numCustom =
                 sizeof(myPerfLevels) / sizeof(PowerMSP432_PerfLevel) };
 
@@ -545,9 +546,9 @@ PWMTimerMSP432_Object pwmTimerMSP432Objects[MSP_EXP432P401R_PWMCOUNT];
 
 const PWMTimerMSP432_HWAttrsV2 pwmTimerMSP432HWAttrs[MSP_EXP432P401R_PWMCOUNT] =
         { { .clockSource = TIMER_A_CLOCKSOURCE_SMCLK, .pwmPin =
-                    PWMTimerMSP432_P2_1_TA1CCR1A },
+        PWMTimerMSP432_P2_1_TA1CCR1A },
           { .clockSource = TIMER_A_CLOCKSOURCE_SMCLK, .pwmPin =
-                    PWMTimerMSP432_P2_2_TA1CCR2A } };
+          PWMTimerMSP432_P2_2_TA1CCR2A } };
 
 const PWM_Config PWM_config[MSP_EXP432P401R_PWMCOUNT] = {
         { .fxnTablePtr = &PWMTimerMSP432_fxnTable, .object =
@@ -619,47 +620,47 @@ const SPIMSP432DMA_HWAttrsV1 spiMSP432DMAHWAttrs[MSP_EXP432P401R_SPICOUNT] = {
           .clockSource = EUSCI_B_SPI_CLOCKSOURCE_SMCLK, .defaultTxBufValue =
                   0xFF,
           .dmaIntNum = INT_DMA_INT1, .intPriority = (~0), .rxDMAChannelIndex =
-                  DMA_CH1_EUSCIB0RX0,
+          DMA_CH1_EUSCIB0RX0,
           .txDMAChannelIndex = DMA_CH0_EUSCIB0TX0, .clkPin =
-                  SPIMSP432DMA_P1_5_UCB0CLK,
+          SPIMSP432DMA_P1_5_UCB0CLK,
           .simoPin = SPIMSP432DMA_P1_6_UCB0SIMO, .somiPin =
-                  SPIMSP432DMA_P1_7_UCB0SOMI,
+          SPIMSP432DMA_P1_7_UCB0SOMI,
           .stePin = SPIMSP432DMA_P1_4_UCB0STE, .pinMode = EUSCI_SPI_3PIN,
           .minDmaTransferSize = 10 },
         { .baseAddr = EUSCI_B2_BASE, .bitOrder = EUSCI_B_SPI_MSB_FIRST,
           .clockSource = EUSCI_B_SPI_CLOCKSOURCE_SMCLK, .defaultTxBufValue =
                   0xFF,
           .dmaIntNum = INT_DMA_INT2, .intPriority = (~0), .rxDMAChannelIndex =
-                  DMA_CH5_EUSCIB2RX0,
+          DMA_CH5_EUSCIB2RX0,
           .txDMAChannelIndex = DMA_CH4_EUSCIB2TX0, .clkPin =
-                  SPIMSP432DMA_P3_5_UCB2CLK,
+          SPIMSP432DMA_P3_5_UCB2CLK,
           .simoPin = SPIMSP432DMA_P3_6_UCB2SIMO, .somiPin =
-                  SPIMSP432DMA_P3_7_UCB2SOMI,
+          SPIMSP432DMA_P3_7_UCB2SOMI,
           .stePin = SPIMSP432DMA_P3_4_UCB2STE, .pinMode = EUSCI_SPI_3PIN,
           .minDmaTransferSize = 10 },
         { .baseAddr = EUSCI_A1_BASE, .bitOrder = EUSCI_A_SPI_MSB_FIRST,
           .clockSource = EUSCI_A_SPI_CLOCKSOURCE_SMCLK, .defaultTxBufValue =
                   0xFF,
           .dmaIntNum = INT_DMA_INT2, .intPriority = (~0), .rxDMAChannelIndex =
-                  DMA_CH3_EUSCIA1RX,
+          DMA_CH3_EUSCIA1RX,
           .txDMAChannelIndex = DMA_CH2_EUSCIA1TX, .clkPin =
-                  SPIMSP432DMA_P2_5_UCA1CLK,
+          SPIMSP432DMA_P2_5_UCA1CLK,
           .simoPin = SPIMSP432DMA_P2_6_UCA1SIMO, .somiPin =
-                  SPIMSP432DMA_P2_7_UCA1SOMI,
+          SPIMSP432DMA_P2_7_UCA1SOMI,
           .stePin = SPIMSP432DMA_P2_3_UCA1STE, .pinMode =
-                  EUSCI_SPI_4PIN_UCxSTE_ACTIVE_LOW,
+          EUSCI_SPI_4PIN_UCxSTE_ACTIVE_LOW,
           .minDmaTransferSize = 10 },
         { .baseAddr = EUSCI_B2_BASE, .bitOrder = EUSCI_B_SPI_MSB_FIRST,
           .clockSource = EUSCI_B_SPI_CLOCKSOURCE_SMCLK, .defaultTxBufValue =
                   0xFF,
           .dmaIntNum = INT_DMA_INT3, .intPriority = (~0), .rxDMAChannelIndex =
-                  DMA_CH5_EUSCIB2RX0,
+          DMA_CH5_EUSCIB2RX0,
           .txDMAChannelIndex = DMA_CH4_EUSCIB2TX0, .clkPin =
-                  SPIMSP432DMA_P3_5_UCB2CLK,
+          SPIMSP432DMA_P3_5_UCB2CLK,
           .simoPin = SPIMSP432DMA_P3_6_UCB2SIMO, .somiPin =
-                  SPIMSP432DMA_P3_7_UCB2SOMI,
+          SPIMSP432DMA_P3_7_UCB2SOMI,
           .stePin = SPIMSP432DMA_P2_4_UCB2STE, .pinMode =
-                  EUSCI_SPI_4PIN_UCxSTE_ACTIVE_LOW,
+          EUSCI_SPI_4PIN_UCxSTE_ACTIVE_LOW,
           .minDmaTransferSize = 10 } };
 
 const SPI_Config SPI_config[MSP_EXP432P401R_SPICOUNT] = {
@@ -694,15 +695,15 @@ const TimerMSP432_HWAttrs timerMSP432HWAttrs[MSP_EXP432P401R_TIMERCOUNT] = {
           .intPriority = ~0 },
         /* Timer_A1 */
         { .timerBaseAddress = TIMER_A1_BASE, .clockSource =
-                TIMER_A_CLOCKSOURCE_SMCLK,
+        TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA1_0, .intPriority = ~0 },
         /* Timer_A2 */
         { .timerBaseAddress = TIMER_A2_BASE, .clockSource =
-                TIMER_A_CLOCKSOURCE_SMCLK,
+        TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA2_0, .intPriority = ~0 },
         /* Timer_A3 */
         { .timerBaseAddress = TIMER_A3_BASE, .clockSource =
-                TIMER_A_CLOCKSOURCE_SMCLK,
+        TIMER_A_CLOCKSOURCE_SMCLK,
           .intNum = INT_TA3_0, .intPriority = ~0 } };
 
 const Timer_Config Timer_config[MSP_EXP432P401R_TIMERCOUNT] = {
@@ -742,8 +743,8 @@ const UARTMSP432_BaudrateConfig uartMSP432Baudrates[] = {
 /* {baudrate, input clock, prescalar, UCBRFx, UCBRSx, oversampling} */
 { .outputBaudrate = 115200, .inputClockFreq = 24000000, .prescalar = 13,
   .hwRegUCBRFx = 0, .hwRegUCBRSx = 37, .oversampling = 1 },
-                                                          { 115200, 12000000, 26,
-                                                            0, 111, 1 },
+                                                          { 115200, 12000000,
+                                                            26, 0, 111, 1 },
                                                           { 115200, 10000000, 5,
                                                             7, 0, 1 },
                                                           { 115200, 6000000, 3,
@@ -766,7 +767,7 @@ const UARTMSP432_BaudrateConfig uartMSP432Baudrates[] = {
 const UARTMSP432_HWAttrsV1 uartMSP432HWAttrs[MSP_EXP432P401R_UARTCOUNT] = {
         { .baseAddr = EUSCI_A0_BASE, .intNum = INT_EUSCIA0, .intPriority = (~0),
           .clockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK, .bitOrder =
-                  EUSCI_A_UART_LSB_FIRST,
+          EUSCI_A_UART_LSB_FIRST,
           .numBaudrateEntries = sizeof(uartMSP432Baudrates)
                   / sizeof(UARTMSP432_BaudrateConfig),
           .baudrateLUT = uartMSP432Baudrates, .ringBufPtr =
@@ -776,7 +777,7 @@ const UARTMSP432_HWAttrsV1 uartMSP432HWAttrs[MSP_EXP432P401R_UARTCOUNT] = {
           .errorFxn = NULL },
         { .baseAddr = EUSCI_A2_BASE, .intNum = INT_EUSCIA2, .intPriority = (~0),
           .clockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK, .bitOrder =
-                  EUSCI_A_UART_LSB_FIRST,
+          EUSCI_A_UART_LSB_FIRST,
           .numBaudrateEntries = sizeof(uartMSP432Baudrates)
                   / sizeof(UARTMSP432_BaudrateConfig),
           .baudrateLUT = uartMSP432Baudrates, .ringBufPtr =
@@ -806,7 +807,7 @@ WatchdogMSP432_Object watchdogMSP432Objects[MSP_EXP432P401R_WATCHDOGCOUNT];
 const WatchdogMSP432_HWAttrs watchdogMSP432HWAttrs[MSP_EXP432P401R_WATCHDOGCOUNT] =
         { { .baseAddr = WDT_A_BASE, .intNum = INT_WDT_A, .intPriority = (~0),
             .clockSource = WDT_A_CLOCKSOURCE_SMCLK, .clockDivider =
-                    WDT_A_CLOCKDIVIDER_8192K } };
+            WDT_A_CLOCKDIVIDER_8192K } };
 
 const Watchdog_Config Watchdog_config[MSP_EXP432P401R_WATCHDOGCOUNT] = { {
         .fxnTablePtr = &WatchdogMSP432_fxnTable, .object =

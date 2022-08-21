@@ -85,6 +85,12 @@ QueueHandle_t qTCtrlToLCD;
 
 Display_Handle disp_hdl;
 
+/*
+ * THERMOSTAT MODULES CLOCK INFO
+ * On MCU init
+ *  - Temp. sensor -> Capture Module ->
+ */
+
 void init_Clock_System_module()
 {
     /*******************************************************************************************/
@@ -176,7 +182,7 @@ int main(void)
     //Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
     //Power_enablePolicy();
 
-    init_Clock_System_module();
+    //init_Clock_System_module();
     init_Timer32_module();
 
     /* Create queues for inter-thread communication */
