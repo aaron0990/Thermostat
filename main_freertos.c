@@ -86,9 +86,16 @@ QueueHandle_t qTCtrlToLCD;
 Display_Handle disp_hdl;
 
 /*
- * THERMOSTAT MODULES CLOCK INFO
+ * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
+ *
  * On MCU init
- *  - Temp. sensor -> Capture Module ->
+ *
+ *  - Temp. sensor      -> Capture Module   -> TIMER_A1     -> SMCLK / 8
+ *  - LCD Screen        -> I2C module       -> EUSCI_B0     -> SMCLK / 1
+ *  - Console display   -> UART Module      -> EUSCI_A0     -> SMCLK / 1
+ *  - delay() timer     -> Timer module     -> TIMER32_0    -> MCLK / 1 (only supports MCLK src)
+ *
+ * On some LPM
  */
 
 void init_Clock_System_module()
@@ -159,7 +166,9 @@ void create_Queues(void)
 }
 
 /* TODO: Intentar que el FW funcione a 1MHz (se deberia de poder, no?)
- *
+ *  Seguramente, hay que ir añadiendo custom performance levels en MSP_EXP432P401R.c
+ *  con la configuracion de los LPM a los que se quiera transicionar a lo largo de la ejecucion
+ *  y debe haber alguna funcion del driver que permita cambiar de un perf level a otro
  */
 
 /*
