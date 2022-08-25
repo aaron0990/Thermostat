@@ -59,6 +59,7 @@ void *keypadThread(void *arg0){
     Keypad_init(me);
     kp = me;
     while(1){
+        sleep(5);
         sched_yield();
     }
 }

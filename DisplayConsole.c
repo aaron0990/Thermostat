@@ -27,7 +27,7 @@ void *displayConsoleThread(void *arg0){
     while(1)
     {
        DisplayConsoleMsg msg;
-       if (xQueueReceive(qDispConsole, &msg, 0)){
+       if (xQueueReceive(qDispConsole, &msg, (TickType_t) MAX_WAIT_QUEUE)){
            //Print value in LCD
            char text[msg.len];
            strcpy(text, msg.buff);

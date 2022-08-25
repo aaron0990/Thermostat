@@ -8,6 +8,8 @@
 #ifndef SHARED_VARS_H_
 #define SHARED_VARS_H_
 
+#define MAX_WAIT_QUEUE 200 //in FreeRTOS ticks. 1 tick <=> 1ms
+
 #include <ti/display/Display.h>
 
 /* POSIX Header files */

@@ -121,7 +121,7 @@ void* displayLCDThread(void *arg0)
 
     while (1)
     {
-        if (xQueueReceive(me->qTReadToLCD, &tSensed, (TickType_t) 0))
+        if (xQueueReceive(me->qTReadToLCD, &tSensed, (TickType_t) MAX_WAIT_QUEUE))
         {
             //Print value in LCD
             me->itsTempSensed = tSensed;
@@ -134,7 +134,7 @@ void* displayLCDThread(void *arg0)
                 xTimerStart(lcdOFFBl_tmr, 0);
             }*/
         }
-        if (xQueueReceive(me->qTCtrlToLCD, &tTarget, (TickType_t) 0))
+        if (xQueueReceive(me->qTCtrlToLCD, &tTarget, (TickType_t) MAX_WAIT_QUEUE))
         {
             //Print value in LCD
             me->itsTempTarget = tTarget;
