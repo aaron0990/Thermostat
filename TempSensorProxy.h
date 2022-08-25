@@ -20,6 +20,7 @@
 #include <interrupt.h>
 #include <sysctl.h>
 #include <pcm.h>
+#include <cs.h>
 #include "TempData.h"
 #include <ti/drivers/Capture.h>
 #include <ti/drivers/GPIO.h>

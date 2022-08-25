@@ -88,9 +88,9 @@ Display_Handle disp_hdl;
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
  *
- * On MCU init
+ * On MCU init -> DCO=12MHz
  *
- *  - Temp. sensor      -> Capture Module   -> TIMER_A1     -> SMCLK / 8
+ *  - Temp. sensor      -> Capture Module   -> TIMER_A1     -> SMCLK / 1
  *  - LCD Screen        -> I2C module       -> EUSCI_B0     -> SMCLK / 1
  *  - Console display   -> UART Module      -> EUSCI_A0     -> SMCLK / 1
  *  - delay() timer     -> Timer module     -> TIMER32_0    -> MCLK / 1 (only supports MCLK src)
@@ -165,6 +165,16 @@ void create_Queues(void)
     qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
 }
 
+void queryClockFreqs(void){
+    uint32_t SMCLKfreq, MCLKfreq, HSMCLKfreq, BCLKfreq, ACLKfreq;
+    MCLKfreq = CS_getMCLK();
+    HSMCLKfreq = CS_getHSMCLK();
+    SMCLKfreq = CS_getSMCLK();
+    ACLKfreq = CS_getACLK();
+    BCLKfreq = CS_getBCLK();
+    return;
+}
+
 /* TODO: Intentar que el FW funcione a 1MHz (se deberia de poder, no?)
  *  Seguramente, hay que ir añadiendo custom performance levels en MSP_EXP432P401R.c
  *  con la configuracion de los LPM a los que se quiera transicionar a lo largo de la ejecucion
@@ -190,7 +200,7 @@ int main(void)
     Board_init();
     //Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
     //Power_enablePolicy();
-
+    queryClockFreqs();
     //init_Clock_System_module();
     init_Timer32_module();
 
@@ -342,14 +352,12 @@ int main(void)
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
 
-    //while (1);
-
     return (0);
 }
 
 void vApplicationIdleHook(void)
 {
-    //Power_idleFunc();
+    Power_idleFunc();
 }
 
 //*****************************************************************************

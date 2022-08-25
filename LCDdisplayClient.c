@@ -45,35 +45,37 @@ void DisplayClient_showInfo(DisplayClient *const me)
     LCD_backlight(me->itsDisplayProxy);
     LCD_display(me->itsDisplayProxy);
 
+    LCD_setCursor(me->itsDisplayProxy, 0, 1); //Move to second line in LCD
+    sprintf(output, "                "); //whitespaces to clear line
+    LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
+    LCD_setCursor(me->itsDisplayProxy, 0, 1);
+
     //Update target temperature in the screen
     if (me->itsTempTarget.temperature)
     {
-        LCD_setCursor(me->itsDisplayProxy, 0, 1); //Move to first line in LCD
-        sprintf(output, "                "); //whitespaces to clear line
-        LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
-        LCD_setCursor(me->itsDisplayProxy, 0, 1);
         sprintf(output, "T. Obj:%.1f'C", me->itsTempTarget.temperature);
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
     else
     {
-        strcpy(output, "No data yet!");
+        strcpy(output, "No data");
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
-    memset(output, 0x00, 50);
+
+    memset(output, 0x00, 50); //Clear output buffer
+    LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
+    sprintf(output, "                "); //whitespaces to clear line
+    LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
+    LCD_setCursor(me->itsDisplayProxy, 0, 0);
     //Update sensed temperature in the screen
     if (me->itsTempSensed.temperature)
     {
-        LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
-        sprintf(output, "                "); //whitespaces to clear line
-        LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
-        LCD_setCursor(me->itsDisplayProxy, 0, 0); //Move to first line in LCD
         sprintf(output, "T. Act:%.1f'C", me->itsTempSensed.temperature); //DIVIDE BY 10 TO GET REAL TEMPERATURE!
         LCD_write(me->itsDisplayProxy, output, strlen(output)); //Print sensed temperature
     }
     else
     {
-        strcpy(output, "No data available!");
+        strcpy(output, "No data");
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
 }

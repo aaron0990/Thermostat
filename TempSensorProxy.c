@@ -22,7 +22,7 @@ void TempSensorProxy_configure(TempSensorProxy *me)
     me->captureParams = (Capture_Params*) malloc(sizeof(Capture_Params));
     Capture_Params_init(me->captureParams);
     me->captureParams->mode = Capture_FALLING_EDGE;
-    me->captureParams->periodUnit = Capture_PERIOD_US;
+    me->captureParams->periodUnit = Capture_PERIOD_COUNTS;
     me->captureParams->callbackFxn = Capture_Callback;
 }
 
@@ -85,11 +85,12 @@ void TempSensorProxy_access(TempSensorProxy *me)
 
     uint64_t sensorData = 0;
     int i;
+    uint32_t captureFreq = CS_getSMCLK();
     for (i = 0; i < MAX_TICK_VALUES; ++i)
     {
         // time less than 100us -> logic 0. Otherwise logic 1
-        uint32_t period_us = capturedIntervals[i] / 4;
-        sensorData |= (((uint64_t) (period_us < 100 ? 0 : 1))
+        float period_us = (capturedIntervals[i]*1000000) / captureFreq;
+        sensorData |= (((uint64_t) (period_us < 100.0 ? 0 : 1))
                 << MAX_TICK_VALUES - i - 1);
     }
 
@@ -111,14 +112,14 @@ void TempSensorProxy_access(TempSensorProxy *me)
 
 void Capture_Callback(Capture_Handle handle, uint32_t interval)
 {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
     capturedIntervals[capturedIntervalsPtr] = interval;
     ++capturedIntervalsPtr;
     if (capturedIntervalsPtr == MAX_TICK_VALUES)
     {
         readingData = 0;
     }
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
+    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
 }
 
 TempSensorProxy* TempSensorProxy_create(void)
