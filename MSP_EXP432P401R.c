@@ -530,29 +530,8 @@ const uint_least8_t NVS_count = MSP_EXP432P401R_NVSCOUNT;
 #include <ti/devices/msp432p4xx/driverlib/pcm.h>
 
 /* Custom performance level for SPI Master Example */
-PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_LDO_VCORE1,
-                                           .VCORE = 1,
-                                           .clockSource = CS_DCOCLK_SELECT,
-                                           .DCORESEL = CS_DCO_FREQUENCY_48,
-                                           .SELM = CS_DCOCLK_SELECT,
-                                           .DIVM = CS_CLOCK_DIVIDER_1,
-                                           .SELS = CS_DCOCLK_SELECT, //SMCLK & HSMCLK
-                                           .DIVHS = CS_CLOCK_DIVIDER_1,
-                                           .DIVS = CS_CLOCK_DIVIDER_1,
-                                           .SELB = CS_REFOCLK_SELECT,
-                                           .SELA = CS_REFOCLK_SELECT,
-                                           .DIVA = CS_CLOCK_DIVIDER_1,
-                                           //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
-                                           //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
-                                           .flashWaitStates = 1,
-                                           .enableFlashBuffer = true,
-                                           .MCLK = 48000000, //Only informational
-                                           .HSMCLK = 48000000, //Only informational
-                                           .SMCLK = 48000000, //Only informational
-                                           .BCLK = 32768, //Only informational
-                                           .ACLK = 32768, //Only informational
-                                         },
-                                         {  .activeState = PCM_AM_LDO_VCORE0,
+PowerMSP432_PerfLevel myPerfLevels[] = {
+                                        {   .activeState = PCM_AM_LDO_VCORE0,
                                             .VCORE = 0,
                                             .clockSource = CS_DCOCLK_SELECT,
                                             .DCORESEL = CS_DCO_FREQUENCY_12,
@@ -573,13 +552,35 @@ PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_LDO_VCORE1,
                                             .SMCLK = 12000000, //Only informational
                                             .BCLK = 32768, //Only informational
                                             .ACLK = 32768, //Only informational
+                                         },
+                                         {  .activeState = PCM_AM_LDO_VCORE0,
+                                            .VCORE = 0,
+                                            .clockSource = CS_REFOCLK_SELECT,
+                                            .DCORESEL = CS_DCO_FREQUENCY_12,
+                                            .SELM = CS_REFOCLK_SELECT,
+                                            .DIVM = CS_CLOCK_DIVIDER_1,
+                                            .SELS = CS_REFOCLK_SELECT, //SMCLK & HSMCLK
+                                            .DIVHS = CS_CLOCK_DIVIDER_1,
+                                            .DIVS = CS_CLOCK_DIVIDER_1,
+                                            .SELB = CS_REFOCLK_SELECT,
+                                            .SELA = CS_REFOCLK_SELECT,
+                                            .DIVA = CS_CLOCK_DIVIDER_1,
+                                            //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
+                                            //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
+                                            .flashWaitStates = 0,
+                                            .enableFlashBuffer = true,
+                                            .MCLK = 32768, //Only informational
+                                            .HSMCLK = 32768, //Only informational
+                                            .SMCLK = 32768, //Only informational
+                                            .BCLK = 32768, //Only informational
+                                            .ACLK = 32768, //Only informational
                                           }
 };
 
 const PowerMSP432_ConfigV1 PowerMSP432_config = {
         .policyInitFxn = &PowerMSP432_initPolicy, .policyFxn =
                 &PowerMSP432_sleepPolicy,
-        .initialPerfLevel = 5, // default perf levels -> 0-3; custom perf levels -> 4-inf
+        .initialPerfLevel = 4, // default perf levels -> 0-3; custom perf levels -> 4-inf
         .enablePolicy = false,
         .enablePerf = true,
         .enableParking = true, .customPerfLevels = myPerfLevels, .numCustom =

@@ -13,6 +13,8 @@ uint8_t capturedIntervalsPtr;
 void TempSensorProxy_init(TempSensorProxy *me)
 {
     me->itsTempData = TempData_create();
+    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN2); //DHT22 VCC
+    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN3); //DHT22 GND
 }
 
 void TempSensorProxy_configure(TempSensorProxy *me)
@@ -37,6 +39,11 @@ void TempSensorProxy_access(TempSensorProxy *me)
     capturedIntervalsPtr = 0;
     readingData = 0;
     memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
+
+    //Send 3.3V to temp sensor to power it ON.
+    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN2);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN3);
+    sleep(1); //stabilization time
 
     //Disable task switching for temp reading
     vTaskSuspendAll();
@@ -74,11 +81,12 @@ void TempSensorProxy_access(TempSensorProxy *me)
     }
 
     // Wait until sensor data are read
-    while (readingData)
-        ;
+    while (readingData);
 
     Capture_stop(*(me->captureHandle));
     Capture_close(*(me->captureHandle));
+    //Set DHT22 GND to high so that VCC-GND = 0V -> temp sensor is powered OFF.
+    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN3);
 
     //Reenable task switching once finished
     xTaskResumeAll();

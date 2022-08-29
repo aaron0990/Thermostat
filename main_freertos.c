@@ -73,11 +73,15 @@ extern void* temperatureReadingThread(void *arg0);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
 
+unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg, unsigned int clientArg);
+
 QueueHandle_t qTReadToLCD;
 QueueHandle_t qTReadToTCtrl;
 QueueHandle_t qDispConsole;
 QueueHandle_t qKeypadToTCtrl;
 QueueHandle_t qTCtrlToLCD;
+
+Power_NotifyObj notifyObj;
 
 int LPM3status = -1;
 
@@ -178,8 +182,9 @@ void queryClockFreqs(void){
     return;
 }
 
-/* TODO: Intentar que el FW funcione a 1MHz (se deberia de poder, no?)
- *  La opcion "allow power transition on debug..." esta DESACTIVADA -> si la activo el Energytrace se vuelve loco y no da bien la info
+/* TODO:
+ *  - Setear un timeout para cuando falle la lectura de la temperatura (cuando se queda en el while (readingData) ad infinitum). De esta manera
+ *    se permite abortar la lectura y probar más tarde (y no se queda en active mode todo el rato)
  *
  */
 
@@ -204,7 +209,15 @@ int main(void)
      * Turn off PSS high-side supervisors to consume lower power in deep sleep
      */
     MAP_PSS_disableHighSide();
-    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
+   /* Power_registerNotify(&notifyObj,
+            PowerMSP432_ENTERING_SLEEP |
+            PowerMSP432_ENTERING_DEEPSLEEP |
+            PowerMSP432_AWAKE_SLEEP |
+            PowerMSP432_AWAKE_DEEPSLEEP |
+            PowerMSP432_START_CHANGE_PERF_LEVEL |
+            PowerMSP432_DONE_CHANGE_PERF_LEVEL,
+            (Power_NotifyFxn) notifyFxn, 0x1);
+    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);*/
     Power_enablePolicy();
 
     /* Enabling SRAM Bank Retention for all banks */
@@ -213,14 +226,11 @@ int main(void)
                     | SYSCTL_SRAM_BANK4 | SYSCTL_SRAM_BANK5 | SYSCTL_SRAM_BANK6
                     | SYSCTL_SRAM_BANK7);
     /* Initialize clocks frequencies*/
-    //init_Clock_System_module();
     queryClockFreqs();
     init_Timer32_module();
 
     /* Create queues for inter-thread communication */
     create_Queues();
-
-    //Interrupt_enableSleepOnIsrExit();
 
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
@@ -371,9 +381,42 @@ int main(void)
     return (0);
 }
 
+/*
+ *  ======== notifyFxn ========
+ *  Notification function to call as the CPU is being transitioned to sleep
+ */
+unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg,
+    unsigned int clientArg)
+{
+    if( (eventType == PowerMSP432_ENTERING_SLEEP) ||
+        (eventType == PowerMSP432_ENTERING_DEEPSLEEP))
+    {
+        //CS_setDCOFrequency(CS_4MHZ);
+    }
+    else if((eventType == PowerMSP432_AWAKE_SLEEP) ||
+            (eventType == PowerMSP432_AWAKE_DEEPSLEEP))
+    {
+        //CS_setDCOFrequency(CS_12MHZ);
+    }
+    else if(eventType == PowerMSP432_START_CHANGE_PERF_LEVEL)
+    {
+
+    }
+    else if(eventType == PowerMSP432_DONE_CHANGE_PERF_LEVEL)
+    {
+
+    }
+    else
+    {
+
+    }
+    return(Power_NOTIFYDONE);
+}
+
+/* MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK. */
 void vApplicationIdleHook(void)
 {
-    Power_idleFunc();
+
 }
 
 //*****************************************************************************
