@@ -60,12 +60,12 @@ void* temperatureControllerThread(void *arg0)
     KeypadMsg kpMsg;    //to store the dequed elem
     while (1)
     {
-        if (xQueueReceive(me->qTReadToTCtrl, &tSensed, 0))
+        if (xQueueReceive(me->qTReadToTCtrl, &tSensed, MAX_WAIT_QUEUE))
         {
             //New temperature reading available
             me->readTemp = tSensed;
         }
-        if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, 0))
+        if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, MAX_WAIT_QUEUE))
         {
             //New target temperature available
             switch (kpMsg.cmd)
@@ -104,7 +104,6 @@ void* temperatureControllerThread(void *arg0)
                 }
             }
         }
-        usleep(100000);
         sched_yield();
     }
 

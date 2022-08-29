@@ -273,6 +273,42 @@ const uint_least8_t Display_count = sizeof(Display_config)
  */
 void MSP_EXP432P401R_initGeneral(void)
 {
+    /*
+     * Put all GPIOs in their lowest power configuration.
+     */
+    GPIO_init();
+    GPIO_setOutputLowOnPin(GPIO_PORT_PA, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PB, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PC, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PD, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PE, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PJ, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P2, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P3, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P4, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P5, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P6, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P7, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P8, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P9, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P10, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PA, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PB, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PC, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PD, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PE, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_PJ, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P1, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P2, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P3, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P4, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P5, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P6, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P7, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P8, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P9, PIN_ALL16);
+    GPIO_setAsOutputPin(GPIO_PORT_P10, PIN_ALL16);
     Power_init();
 }
 
@@ -544,7 +580,7 @@ const PowerMSP432_ConfigV1 PowerMSP432_config = {
         .policyInitFxn = &PowerMSP432_initPolicy, .policyFxn =
                 &PowerMSP432_sleepPolicy,
         .initialPerfLevel = 5, // default perf levels -> 0-3; custom perf levels -> 4-inf
-        .enablePolicy = true,
+        .enablePolicy = false,
         .enablePerf = true,
         .enableParking = true, .customPerfLevels = myPerfLevels, .numCustom =
                 sizeof(myPerfLevels) / sizeof(PowerMSP432_PerfLevel) };

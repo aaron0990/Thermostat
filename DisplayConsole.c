@@ -37,7 +37,7 @@ void *displayConsoleThread(void *arg0){
        else{
            sched_yield();
        }
-       sleep(1);
+       sleep(50);
     }
 
 }

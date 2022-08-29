@@ -60,6 +60,7 @@
 #include "Board.h"
 
 #include <driverlib.h>
+#include <pcm.h>
 #include <utils.h>
 #include <string.h>
 #include <shared_vars.h>
@@ -77,6 +78,8 @@ QueueHandle_t qTReadToTCtrl;
 QueueHandle_t qDispConsole;
 QueueHandle_t qKeypadToTCtrl;
 QueueHandle_t qTCtrlToLCD;
+
+int LPM3status = -1;
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   4096
@@ -109,17 +112,17 @@ void init_Clock_System_module()
      * USANDO EL SCRIPT QUE HAY EN EL DOCUMENTO "MSP-EXP432P401R_LaunchPad_Evaluation_Kit" EN
      * LA PAGINA 28*/
     FPU_enableModule();
-    PCM_setCoreVoltageLevel(PCM_AM_LDO_VCORE1);
-    FlashCtl_setWaitState(FLASH_BANK0, 1);
-    FlashCtl_setWaitState(FLASH_BANK1, 1);
+    PCM_setCoreVoltageLevel(PCM_AM_LDO_VCORE0);
+    FlashCtl_setWaitState(FLASH_BANK0, 0);
+    FlashCtl_setWaitState(FLASH_BANK1, 0);
 
     /*: Internal digitally controlled oscillator (DCO) with programmable frequencies and 3-MHz
      frequency by default.*/
     //CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_1_5);
-    CS_setDCOFrequency(CS_48MHZ);
+    CS_setDCOFrequency(CS_12MHZ);
     /* Internal, low-power low-frequency oscillator (REFO) with selectable 32.768-kHz or 128-
      kHz typical frequencies*/
-    CS_setReferenceOscillatorFrequency(CS_REFO_128KHZ);
+    CS_setReferenceOscillatorFrequency(CS_REFO_32KHZ);
     //MODCLK: Internal low-power oscillator with 25-MHz typical frequency.
     //SYSOSC: Internal oscillator with 5MHz typical frequency.
     //VLOCLK: Internal very-low-power low-frequency oscillator (VLO) with 9.4-kHz typical frequency
@@ -176,9 +179,8 @@ void queryClockFreqs(void){
 }
 
 /* TODO: Intentar que el FW funcione a 1MHz (se deberia de poder, no?)
- *  Seguramente, hay que ir añadiendo custom performance levels en MSP_EXP432P401R.c
- *  con la configuracion de los LPM a los que se quiera transicionar a lo largo de la ejecucion
- *  y debe haber alguna funcion del driver que permita cambiar de un perf level a otro
+ *  La opcion "allow power transition on debug..." esta DESACTIVADA -> si la activo el Energytrace se vuelve loco y no da bien la info
+ *
  */
 
 /*
@@ -198,14 +200,28 @@ int main(void)
 
     /* Call driver init functions */
     Board_init();
-    //Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
-    //Power_enablePolicy();
-    queryClockFreqs();
+    /*
+     * Turn off PSS high-side supervisors to consume lower power in deep sleep
+     */
+    MAP_PSS_disableHighSide();
+    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
+    Power_enablePolicy();
+
+    /* Enabling SRAM Bank Retention for all banks */
+    MAP_SysCtl_enableSRAMBankRetention(
+            SYSCTL_SRAM_BANK1 | SYSCTL_SRAM_BANK2 | SYSCTL_SRAM_BANK3
+                    | SYSCTL_SRAM_BANK4 | SYSCTL_SRAM_BANK5 | SYSCTL_SRAM_BANK6
+                    | SYSCTL_SRAM_BANK7);
+    /* Initialize clocks frequencies*/
     //init_Clock_System_module();
+    queryClockFreqs();
     init_Timer32_module();
 
     /* Create queues for inter-thread communication */
     create_Queues();
+
+    //Interrupt_enableSleepOnIsrExit();
+
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
