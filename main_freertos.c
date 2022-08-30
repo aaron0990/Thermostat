@@ -216,8 +216,8 @@ int main(void)
             PowerMSP432_AWAKE_DEEPSLEEP |
             PowerMSP432_START_CHANGE_PERF_LEVEL |
             PowerMSP432_DONE_CHANGE_PERF_LEVEL,
-            (Power_NotifyFxn) notifyFxn, 0x1);
-    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);*/
+            (Power_NotifyFxn) notifyFxn, 0x1);*/
+    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
     Power_enablePolicy();
 
     /* Enabling SRAM Bank Retention for all banks */
@@ -391,12 +391,12 @@ unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg,
     if( (eventType == PowerMSP432_ENTERING_SLEEP) ||
         (eventType == PowerMSP432_ENTERING_DEEPSLEEP))
     {
-        //CS_setDCOFrequency(CS_4MHZ);
+        CS_setDCOFrequency(CS_6MHZ);
     }
     else if((eventType == PowerMSP432_AWAKE_SLEEP) ||
             (eventType == PowerMSP432_AWAKE_DEEPSLEEP))
     {
-        //CS_setDCOFrequency(CS_12MHZ);
+        CS_setDCOFrequency(CS_12MHZ);
     }
     else if(eventType == PowerMSP432_START_CHANGE_PERF_LEVEL)
     {

@@ -531,7 +531,7 @@ const uint_least8_t NVS_count = MSP_EXP432P401R_NVSCOUNT;
 
 /* Custom performance level for SPI Master Example */
 PowerMSP432_PerfLevel myPerfLevels[] = {
-                                        {   .activeState = PCM_AM_LDO_VCORE0,
+                                        {   .activeState = PCM_AM_DCDC_VCORE0,
                                             .VCORE = 0,
                                             .clockSource = CS_DCOCLK_SELECT,
                                             .DCORESEL = CS_DCO_FREQUENCY_12,
