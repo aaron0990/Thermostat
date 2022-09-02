@@ -11,6 +11,7 @@
 #include "shared_vars.h"
 #include "ThreadsArgStruct.h"
 
+#pragma CODE_SECTION(displayConsoleThread, ".TI.ramfunc")
 void *displayConsoleThread(void *arg0){
 
     struct displayConsoleThreadArgs *args = (struct displayConsoleThreadArgs*) arg0;

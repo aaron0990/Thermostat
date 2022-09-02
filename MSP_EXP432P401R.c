@@ -48,6 +48,7 @@
 
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerMSP432.h>
+#include <ti/drivers/GPIO.h>
 
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/rom.h>
@@ -277,22 +278,6 @@ void MSP_EXP432P401R_initGeneral(void)
      * Put all GPIOs in their lowest power configuration.
      */
     GPIO_init();
-    GPIO_setOutputLowOnPin(GPIO_PORT_PA, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_PB, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_PC, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_PD, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_PE, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_PJ, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P2, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P4, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P5, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P6, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P7, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P8, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P9, PIN_ALL16);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P10, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PA, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PB, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PC, PIN_ALL16);
@@ -309,6 +294,22 @@ void MSP_EXP432P401R_initGeneral(void)
     GPIO_setAsOutputPin(GPIO_PORT_P8, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_P9, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_P10, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PA, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PB, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PC, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PD, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PE, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_PJ, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P2, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P3, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P4, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P5, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P6, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P7, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P8, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P9, PIN_ALL16);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P10, PIN_ALL16);
     Power_init();
 }
 
@@ -323,7 +324,6 @@ void Board_init(void)
 /*
  *  =============================== GPIO ===============================
  */
-#include <ti/drivers/GPIO.h>
 #include <ti/drivers/gpio/GPIOMSP432.h>
 
 /*
@@ -546,7 +546,7 @@ PowerMSP432_PerfLevel myPerfLevels[] = {
                                             //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
                                             //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
                                             .flashWaitStates = 0,
-                                            .enableFlashBuffer = true,
+                                            .enableFlashBuffer = false,
                                             .MCLK = 12000000, //Only informational
                                             .HSMCLK = 12000000, //Only informational
                                             .SMCLK = 12000000, //Only informational
@@ -583,7 +583,7 @@ const PowerMSP432_ConfigV1 PowerMSP432_config = {
         .initialPerfLevel = 4, // default perf levels -> 0-3; custom perf levels -> 4-inf
         .enablePolicy = false,
         .enablePerf = true,
-        .enableParking = true, .customPerfLevels = myPerfLevels, .numCustom =
+        .enableParking = false, .customPerfLevels = myPerfLevels, .numCustom =
                 sizeof(myPerfLevels) / sizeof(PowerMSP432_PerfLevel) };
 
 /*

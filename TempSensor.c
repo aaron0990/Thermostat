@@ -54,6 +54,7 @@ void TempSensor_destroy(TempSensor *const me)
     free(me);
 }
 
+#pragma CODE_SECTION(temperatureReadingThread, ".TI.ramfunc")
 void *temperatureReadingThread(void *arg0){
     struct temperatureReadingThreadArgs *args = (struct temperatureReadingThreadArgs*) arg0;
     TempSensor *me = (TempSensor*) malloc(sizeof(TempSensor));

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <timer_a.h>
 #include <interrupt.h>
+#include <unistd.h>
 #include <gpio.h>
 #include <stdlib.h>
 #include "shared_vars.h"

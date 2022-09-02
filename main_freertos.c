@@ -185,6 +185,10 @@ void queryClockFreqs(void){
 /* TODO:
  *  - Setear un timeout para cuando falle la lectura de la temperatura (cuando se queda en el while (readingData) ad infinitum). De esta manera
  *    se permite abortar la lectura y probar más tarde (y no se queda en active mode todo el rato)
+ *  - Consejos para reducir consumo
+ *      - Probar a pasar el codigo de Flash a SRAM
+ *      -aplicar optimizaciones en Release (he probado con O3 y se queda en el while(readingData) )
+ *
  *
  */
 

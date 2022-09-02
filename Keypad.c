@@ -50,6 +50,7 @@ void Keypad_destroy(Keypad *const me)
     free(me);
 }
 
+#pragma CODE_SECTION(keypadThread, ".TI.ramfunc")
 void *keypadThread(void *arg0){
     struct keypadThreadArgs *args = (struct keypadThreadArgs*) arg0;
     GPIO_init();

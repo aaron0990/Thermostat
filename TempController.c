@@ -45,6 +45,7 @@ void TempController_destroy(TempController *const me)
     free(me);
 }
 
+#pragma CODE_SECTION(temperatureControllerThread, ".TI.ramfunc")
 void* temperatureControllerThread(void *arg0)
 {
     struct temperatureControllerThreadArgs *args =

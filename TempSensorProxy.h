@@ -34,8 +34,6 @@ typedef struct {
 
 extern uint32_t capturedIntervals[MAX_TICK_VALUES];
 extern uint8_t capturedIntervalsPtr;
-uint8_t readingData;
-Capture_Handle capHandle;
 
 TempSensorProxy* TempSensorProxy_create(void);
 void TempSensorProxy_destroy(TempSensorProxy* me);

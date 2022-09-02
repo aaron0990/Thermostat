@@ -6,9 +6,6 @@
  */
 
 #include "LCDdisplayClient.h"
-#include "TempData.h"
-#include "TempSensor.h"
-#include <timers.h>
 
 DisplayClient *gObj; //global DisplayClient "object" reference
 
@@ -95,6 +92,7 @@ void DisplayClient_destroy(DisplayClient *const me)
     free(me);
 }
 
+#pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
 void* displayLCDThread(void *arg0)
 {
 

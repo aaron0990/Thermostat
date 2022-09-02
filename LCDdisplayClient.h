@@ -10,9 +10,9 @@
 #include "TempSensor.h"
 #include "TempData.h"
 #include <stdio.h>
+#include <timers.h>
 #include "LCDdisplayProxy.h"
 #include "shared_vars.h"
-#include "InterThreadQueues.h"
 #include "Keypad.h"
 #include "ThreadsArgStruct.h"
 

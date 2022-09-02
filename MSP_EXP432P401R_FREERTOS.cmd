@@ -40,11 +40,11 @@
 
 MEMORY
 {
-    MAIN       (RX) : origin = 0x00000000, length = 0x00040000
-    INFO       (RX) : origin = 0x00200000, length = 0x00004000
+    MAIN       (RX) : origin = 0x00000000, length = 0x00040000 /* Flash main memory region*/
+    INFO       (RX) : origin = 0x00200000, length = 0x00004000 /* Flash information memory region*/
     ALIAS
     {
-    SRAM_CODE  (RWX): origin = 0x01000000
+    SRAM_CODE  (RWX): origin = 0x01000000 /*SRAM code region*/
     SRAM_DATA  (RW) : origin = 0x20000000
     } length = 0x00010000
 }

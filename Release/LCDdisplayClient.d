@@ -78,6 +78,7 @@ LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
 LCDdisplayClient.obj: ../ThreadsArgStruct.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h
 LCDdisplayClient.obj: ../LCDdisplayProxy.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/LCDdisplayI2C.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/i2c.h
@@ -86,7 +87,6 @@ LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
 LCDdisplayClient.obj: ../Keypad.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h
 
 ../LCDdisplayClient.c:
 
@@ -244,6 +244,8 @@ C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h:
 
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h:
+
 ../LCDdisplayProxy.h:
 
 C:/ti/ccs1110/ccs/workspace/Thermostat/LCDdisplayI2C.h:
@@ -259,6 +261,4 @@ C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
 ../Keypad.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h:
 

@@ -9,6 +9,8 @@
 
 uint32_t capturedIntervals[MAX_TICK_VALUES];
 uint8_t capturedIntervalsPtr;
+uint8_t readingData;
+Capture_Handle capHandle;
 
 void TempSensorProxy_init(TempSensorProxy *me)
 {
@@ -46,7 +48,7 @@ void TempSensorProxy_access(TempSensorProxy *me)
     sleep(1); //stabilization time
 
     //Disable task switching for temp reading
-    vTaskSuspendAll();
+    //vTaskSuspendAll();
 
     //Use pin P3.0 for debugging
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
@@ -81,7 +83,10 @@ void TempSensorProxy_access(TempSensorProxy *me)
     }
 
     // Wait until sensor data are read
-    while (readingData);
+    /*while (readingData){
+        sched_yield();
+    }*/
+    usleep(5000); //wait 5ms for the sensor reading to be done
 
     Capture_stop(*(me->captureHandle));
     Capture_close(*(me->captureHandle));
@@ -89,7 +94,8 @@ void TempSensorProxy_access(TempSensorProxy *me)
     GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN3);
 
     //Reenable task switching once finished
-    xTaskResumeAll();
+    //xTaskResumeAll();
+
 
     uint64_t sensorData = 0;
     int i;
@@ -101,7 +107,6 @@ void TempSensorProxy_access(TempSensorProxy *me)
         sensorData |= (((uint64_t) (period_us < 100.0 ? 0 : 1))
                 << MAX_TICK_VALUES - i - 1);
     }
-
     me->itsTempData->humidity = (float) (((sensorData >> 24) & 0xFFFF)/10.0);
     me->itsTempData->temperature = (float) (((sensorData >> 8) & 0xFFFF)/10.0);
 
@@ -125,6 +130,7 @@ void Capture_Callback(Capture_Handle handle, uint32_t interval)
     ++capturedIntervalsPtr;
     if (capturedIntervalsPtr == MAX_TICK_VALUES)
     {
+        //Last bit has been read. Reading finished.
         readingData = 0;
     }
     GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);

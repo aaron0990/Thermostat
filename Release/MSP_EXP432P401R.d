@@ -17,6 +17,7 @@ MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
+MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp432p401r.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp_compatibility.h
@@ -63,7 +64,6 @@ MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/display/
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/SPI.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h
 MSP_EXP432P401R.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/assert.h
-MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/gpio/GPIOMSP432.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/I2C.h
 MSP_EXP432P401R.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/i2c/I2CMSP432.h
@@ -122,6 +122,8 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/inc/msp.h:
 
@@ -214,8 +216,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/SPI.h:
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/grlib/grlib.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/assert.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/gpio/GPIOMSP432.h:
 
