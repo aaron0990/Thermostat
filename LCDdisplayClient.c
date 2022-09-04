@@ -36,6 +36,7 @@ void DisplayClient_acceptTempTarget(DisplayClient *const me, TempData *td)
 
 }
 
+#pragma CODE_SECTION(DisplayClient_showInfo, ".TI.ramfunc")
 void DisplayClient_showInfo(DisplayClient *const me)
 {
     char output[50];
@@ -95,6 +96,7 @@ void DisplayClient_destroy(DisplayClient *const me)
 #pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
 void* displayLCDThread(void *arg0)
 {
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
     I2C_init();
 
@@ -117,6 +119,7 @@ void* displayLCDThread(void *arg0)
             "LCDBacklightOFF", pdMS_TO_TICKS(LCD_ON_BACKLIGHT_T), pdFALSE,
             (void*) 0, DisplayClient_turnOffLCDbacklight);
 
+    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while (1)
     {
         if (xQueueReceive(me->qTReadToLCD, &tSensed, (TickType_t) MAX_WAIT_QUEUE))

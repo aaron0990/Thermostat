@@ -14,6 +14,7 @@ void TempSensor_init(TempSensor *const me)
     me->itsTempSensorProxy = TempSensorProxy_create();
 }
 
+#pragma CODE_SECTION(TempSensor_readTemp, ".TI.ramfunc")
 void TempSensor_readTemp(TempSensor *const me)
 {
     TempSensorProxy_access(me->itsTempSensorProxy); //Read temperature
@@ -56,6 +57,8 @@ void TempSensor_destroy(TempSensor *const me)
 
 #pragma CODE_SECTION(temperatureReadingThread, ".TI.ramfunc")
 void *temperatureReadingThread(void *arg0){
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+
     struct temperatureReadingThreadArgs *args = (struct temperatureReadingThreadArgs*) arg0;
     TempSensor *me = (TempSensor*) malloc(sizeof(TempSensor));
     me->qDispConsole = args->qDispConsoleArg;
@@ -63,8 +66,12 @@ void *temperatureReadingThread(void *arg0){
     me->qTReadToTCtrl = args->qTReadToTCtrlArg;
     TempSensor_init(me);
 
+    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+
     while(1){
+        Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         TempSensor_readTemp(me);
+        Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         sleep(30);
     }
 }

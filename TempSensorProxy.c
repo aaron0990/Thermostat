@@ -83,10 +83,10 @@ void TempSensorProxy_access(TempSensorProxy *me)
     }
 
     // Wait until sensor data are read
-    /*while (readingData){
+    while (readingData){
         sched_yield();
-    }*/
-    usleep(5000); //wait 5ms for the sensor reading to be done
+    }
+    //usleep(5000); //wait 5ms for the sensor reading to be done
 
     Capture_stop(*(me->captureHandle));
     Capture_close(*(me->captureHandle));

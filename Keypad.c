@@ -52,6 +52,7 @@ void Keypad_destroy(Keypad *const me)
 
 #pragma CODE_SECTION(keypadThread, ".TI.ramfunc")
 void *keypadThread(void *arg0){
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     struct keypadThreadArgs *args = (struct keypadThreadArgs*) arg0;
     GPIO_init();
     Keypad *me = Keypad_create();
@@ -59,6 +60,7 @@ void *keypadThread(void *arg0){
     me->qKeypadToTCtrl = args->qKeypadToTCtrlArg;
     Keypad_init(me);
     kp = me;
+    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while(1){
         sleep(10);
         sched_yield();

@@ -48,6 +48,8 @@ void TempController_destroy(TempController *const me)
 #pragma CODE_SECTION(temperatureControllerThread, ".TI.ramfunc")
 void* temperatureControllerThread(void *arg0)
 {
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+
     struct temperatureControllerThreadArgs *args =
             (struct temperatureControllerThreadArgs*) arg0;
     TempController *me = (TempController*) malloc(sizeof(TempController));
@@ -59,6 +61,8 @@ void* temperatureControllerThread(void *arg0)
 
     TempData tSensed;   //to store the dequed elem
     KeypadMsg kpMsg;    //to store the dequed elem
+
+    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while (1)
     {
         if (xQueueReceive(me->qTReadToTCtrl, &tSensed, MAX_WAIT_QUEUE))

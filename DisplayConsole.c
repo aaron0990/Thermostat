@@ -13,7 +13,7 @@
 
 #pragma CODE_SECTION(displayConsoleThread, ".TI.ramfunc")
 void *displayConsoleThread(void *arg0){
-
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     struct displayConsoleThreadArgs *args = (struct displayConsoleThreadArgs*) arg0;
     QueueHandle_t qDispConsole = args->qDispConsoleArg;
     uint32_t row = 0; //for printing to console in a new line;
@@ -25,6 +25,7 @@ void *displayConsoleThread(void *arg0){
     disp_hdl = Display_open(0, NULL);
     Display_clear(disp_hdl); //Clear previous execution output of the terminal
 
+    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while(1)
     {
        DisplayConsoleMsg msg;

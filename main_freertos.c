@@ -183,11 +183,29 @@ void queryClockFreqs(void){
 }
 
 /* TODO:
- *  - Setear un timeout para cuando falle la lectura de la temperatura (cuando se queda en el while (readingData) ad infinitum). De esta manera
- *    se permite abortar la lectura y probar más tarde (y no se queda en active mode todo el rato)
+ *  - Fix: despues de cada lectura del sensor, se apaga el LED y se vuelve a encender. (seguramente relacionado con el sleep que hago mientras se
+ *          capturan los datos del sensor, ya que ya no suspendo el scheduler y el thread de TempController se ejecuta)
  *  - Consejos para reducir consumo
- *      - Probar a pasar el codigo de Flash a SRAM
- *      -aplicar optimizaciones en Release (he probado con O3 y se queda en el while(readingData) )
+ *      - Probar a poner el GND del relé en un GPIO
+ *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
+ *  - Probar a hacer el enablePolicy() dentro de un thread y no en el main (instanciarlo despues de vTaskStartScheduler)
+ *
+ *  - Si se está en LPM3, el timer interno del MSP432 se suspende tambien:
+        Note: Clock ticks halt during MSP432 deep sleep states. This is a significant consequence in
+        that timeouts scheduled by the Clock module are suspended during deep sleep, and
+        so will not be able to wake up the device.
+        For example, when Task_sleep() is called, it blocks the execution of the Task for a
+        number of system ticks. But if the power policy puts the device into deep sleep, the
+        Clock ticking is suspended while the device is in deep sleep. In other words, the timer
+        generating Clock ticks is halted. So the timeout that would normally trigger resumption
+        of the Task_sleep() call is suspended too, and the device will not be able to wake to
+        service the timeout at the anticipated time. Instead, the device will need to be awoken
+        by another source. When awoken, the Clock module will start ticking again, but the time
+        spent in deep sleep will not be factored in to future timeouts.
+        In summary, on MSP432, if timeouts via the Clock module are needed, then the default,
+        lighter-weight sleep policy Power_sleepPolicy() should be used. If wakeups from deep
+        sleep are triggered by other sources (such as a GPIO line changing state), then the
+        PowerMSP432_deepSleepPolicy() allows much better power savings.
  *
  *
  */
@@ -213,7 +231,11 @@ int main(void)
      * Turn off PSS high-side supervisors to consume lower power in deep sleep
      */
     MAP_PSS_disableHighSide();
-   /* Power_registerNotify(&notifyObj,
+
+    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
+    Power_enablePolicy();
+    /*Comment out the notification registering to save power*/
+   /*Power_registerNotify(&notifyObj,
             PowerMSP432_ENTERING_SLEEP |
             PowerMSP432_ENTERING_DEEPSLEEP |
             PowerMSP432_AWAKE_SLEEP |
@@ -221,8 +243,7 @@ int main(void)
             PowerMSP432_START_CHANGE_PERF_LEVEL |
             PowerMSP432_DONE_CHANGE_PERF_LEVEL,
             (Power_NotifyFxn) notifyFxn, 0x1);*/
-    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
-    Power_enablePolicy();
+   Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
 
     /* Enabling SRAM Bank Retention for all banks */
     MAP_SysCtl_enableSRAMBankRetention(
@@ -395,12 +416,12 @@ unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg,
     if( (eventType == PowerMSP432_ENTERING_SLEEP) ||
         (eventType == PowerMSP432_ENTERING_DEEPSLEEP))
     {
-        CS_setDCOFrequency(CS_6MHZ);
+        //CS_initClockSignal(CS_MCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     }
     else if((eventType == PowerMSP432_AWAKE_SLEEP) ||
             (eventType == PowerMSP432_AWAKE_DEEPSLEEP))
     {
-        CS_setDCOFrequency(CS_12MHZ);
+        //CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     }
     else if(eventType == PowerMSP432_START_CHANGE_PERF_LEVEL)
     {
@@ -418,10 +439,10 @@ unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg,
 }
 
 /* MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK. */
-void vApplicationIdleHook(void)
+/*void vApplicationIdleHook(void)
 {
 
-}
+}*/
 
 //*****************************************************************************
 //
