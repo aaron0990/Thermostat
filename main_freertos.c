@@ -33,9 +33,11 @@
 /*
  *  ======== main_freertos.c ========
  */
+#include <LCDdisplayClient.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stddef.h>
+#include <TempController.h>
 
 #ifdef __ICCARM__
 #include <DLib_Threads.h>
@@ -91,6 +93,9 @@ int LPM3status = -1;
 #define QUEUE_SIZE 10   //Max num of elements in the queue
 
 Display_Handle disp_hdl;
+
+TempController *tempController;
+DisplayClient *displayClient;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -257,63 +262,12 @@ int main(void)
     /* Create queues for inter-thread communication */
     create_Queues();
 
+    tempController = TempController_create();
+    displayClient = DisplayClient_create();
+
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
-    /************************** Display LCD Thread ******************************/
-    struct displayLCDThreadArgs *args_dlcd =
-            (struct displayLCDThreadArgs*) malloc(
-                    sizeof(struct displayLCDThreadArgs));
-    args_dlcd->qDispConsoleArg = qDispConsole;
-    args_dlcd->qTReadToLCDArg = qTReadToLCD;
-    args_dlcd->qTCtrlToLCDArg = qTCtrlToLCD;
-
-    priParam.sched_priority = 1;
-    retc = pthread_attr_setschedparam(&attrs, &priParam);
-    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
-    retc = pthread_create(&thread, &attrs, displayLCDThread, (void*) args_dlcd);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
-
-    /************************** Display Console Thread ******************************/
-    struct displayConsoleThreadArgs *args_dcon =
-            (struct displayConsoleThreadArgs*) malloc(
-                    sizeof(struct displayConsoleThreadArgs));
-    args_dcon->qDispConsoleArg = qDispConsole;
-
-    priParam.sched_priority = 1;
-    retc = pthread_attr_setschedparam(&attrs, &priParam);
-    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
-    retc = pthread_create(&thread, &attrs, displayConsoleThread,
-                          (void*) args_dcon);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
 
     /************************** Temperature reading Thread ******************************/
     struct temperatureReadingThreadArgs *args_tread =
@@ -327,22 +281,8 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
     retc = pthread_create(&thread, &attrs, temperatureReadingThread,
                           (void*) args_tread);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
 
     /************************** Temperature control Thread ******************************/
     struct temperatureControllerThreadArgs *args_tctrl =
@@ -357,22 +297,8 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
     retc = pthread_create(&thread, &attrs, temperatureControllerThread,
                           (void*) args_tctrl);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
 
     /************************** Keypad Thread ******************************/
     struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs*) malloc(
@@ -384,21 +310,7 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0)
-    {
-        /* failed to set attributes */
-        while (1)
-        {
-        }
-    }
     retc = pthread_create(&thread, &attrs, keypadThread, (void*) args_kpad);
-    if (retc != 0)
-    {
-        /* pthread_create() failed */
-        while (1)
-        {
-        }
-    }
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();

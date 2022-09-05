@@ -9,6 +9,7 @@
 
 DisplayClient *gObj; //global DisplayClient "object" reference
 
+
 void DisplayClient_turnOffLCDbacklight(TimerHandle_t xTimer)
 {
     LCD_noDisplay(gObj->itsDisplayProxy);
@@ -97,7 +98,6 @@ void DisplayClient_destroy(DisplayClient *const me)
 void* displayLCDThread(void *arg0)
 {
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-
     I2C_init();
 
     struct displayLCDThreadArgs *args = (struct displayLCDThreadArgs*) arg0;

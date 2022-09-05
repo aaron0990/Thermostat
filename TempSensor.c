@@ -9,6 +9,9 @@
 #include <string.h>
 #include "TempSensor.h"
 
+extern TempController *tempController;
+extern DisplayClient *displayClient;
+
 void TempSensor_init(TempSensor *const me)
 {
     me->itsTempSensorProxy = TempSensorProxy_create();
@@ -59,12 +62,7 @@ void TempSensor_destroy(TempSensor *const me)
 void *temperatureReadingThread(void *arg0){
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
-    struct temperatureReadingThreadArgs *args = (struct temperatureReadingThreadArgs*) arg0;
-    TempSensor *me = (TempSensor*) malloc(sizeof(TempSensor));
-    me->qDispConsole = args->qDispConsoleArg;
-    me->qTReadToLCD = args->qTReadToLCDArg;
-    me->qTReadToTCtrl = args->qTReadToTCtrlArg;
-    TempSensor_init(me);
+    TempSensor *tempSensor = TempSensor_create();
 
     Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
