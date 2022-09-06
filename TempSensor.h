@@ -40,7 +40,7 @@ void TempSensor_clean(TempSensor *const me);
 /*Operations*/
 void TempSensor_readTemp(TempSensor *const me);
 void TempSensor_newData(TempSensor *const me);
-TempSensor* TempSensor_create(TempSensor *const me);
+TempSensor* TempSensor_create();
 void TempSensor_destroy(TempSensor *const me);
 
 #endif /* TEMPSENSOR_H_ */

@@ -71,19 +71,15 @@
 
 extern void* displayConsoleThread(void *arg0);
 extern void* displayLCDThread(void *arg0);
-extern void* temperatureReadingThread(void *arg0);
+extern void* temperatureReadingThread(void* arg);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
-
-unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg, unsigned int clientArg);
 
 QueueHandle_t qTReadToLCD;
 QueueHandle_t qTReadToTCtrl;
 QueueHandle_t qDispConsole;
 QueueHandle_t qKeypadToTCtrl;
 QueueHandle_t qTCtrlToLCD;
-
-Power_NotifyObj notifyObj;
 
 int LPM3status = -1;
 
@@ -232,13 +228,7 @@ int main(void)
 
     /* Call driver init functions */
     Board_init();
-    /*
-     * Turn off PSS high-side supervisors to consume lower power in deep sleep
-     */
-    MAP_PSS_disableHighSide();
 
-    Power_setPolicy((Power_PolicyFxn) PowerMSP432_sleepPolicy);
-    Power_enablePolicy();
     /*Comment out the notification registering to save power*/
    /*Power_registerNotify(&notifyObj,
             PowerMSP432_ENTERING_SLEEP |
@@ -268,21 +258,14 @@ int main(void)
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
-
     /************************** Temperature reading Thread ******************************/
-    struct temperatureReadingThreadArgs *args_tread =
-            (struct temperatureReadingThreadArgs*) malloc(
-                    sizeof(struct temperatureReadingThreadArgs));
-    args_tread->qDispConsoleArg = qDispConsole;
-    args_tread->qTReadToLCDArg = qTReadToLCD;
-    args_tread->qTReadToTCtrlArg = qTReadToTCtrl;
 
     priParam.sched_priority = 1;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, temperatureReadingThread,
-                          (void*) args_tread);
+                          NULL);
 
     /************************** Temperature control Thread ******************************/
     struct temperatureControllerThreadArgs *args_tctrl =
@@ -297,8 +280,8 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    retc = pthread_create(&thread, &attrs, temperatureControllerThread,
-                          (void*) args_tctrl);
+    //retc = pthread_create(&thread, &attrs, temperatureControllerThread,
+    //                      (void*) args_tctrl);
 
     /************************** Keypad Thread ******************************/
     struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs*) malloc(
@@ -310,7 +293,7 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    retc = pthread_create(&thread, &attrs, keypadThread, (void*) args_kpad);
+    //retc = pthread_create(&thread, &attrs, keypadThread, (void*) args_kpad);
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
@@ -318,37 +301,7 @@ int main(void)
     return (0);
 }
 
-/*
- *  ======== notifyFxn ========
- *  Notification function to call as the CPU is being transitioned to sleep
- */
-unsigned int notifyFxn(unsigned int eventType, unsigned int eventArg,
-    unsigned int clientArg)
-{
-    if( (eventType == PowerMSP432_ENTERING_SLEEP) ||
-        (eventType == PowerMSP432_ENTERING_DEEPSLEEP))
-    {
-        //CS_initClockSignal(CS_MCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    }
-    else if((eventType == PowerMSP432_AWAKE_SLEEP) ||
-            (eventType == PowerMSP432_AWAKE_DEEPSLEEP))
-    {
-        //CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    }
-    else if(eventType == PowerMSP432_START_CHANGE_PERF_LEVEL)
-    {
 
-    }
-    else if(eventType == PowerMSP432_DONE_CHANGE_PERF_LEVEL)
-    {
-
-    }
-    else
-    {
-
-    }
-    return(Power_NOTIFYDONE);
-}
 
 /* MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK. */
 /*void vApplicationIdleHook(void)
