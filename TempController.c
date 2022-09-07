@@ -21,8 +21,6 @@ void TempController_init(TempController *const me)
 
     me->heatingOn = 1; //Heating is ON when system starts up.
     GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
-
-    xQueueSend(me->qTCtrlToLCD, (void* )&me->targetTemp, 0);
 }
 
 void TempController_clean(TempController *const me)
@@ -33,6 +31,10 @@ void TempController_clean(TempController *const me)
 TempController* TempController_create(void)
 {
     TempController *me = (TempController*) malloc(sizeof(TempController));
+    if (me != NULL)
+    {
+        TempController_init(me);
+    }
     return me;
 }
 

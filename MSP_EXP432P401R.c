@@ -278,6 +278,7 @@ void MSP_EXP432P401R_initGeneral(void)
      * Put all GPIOs in their lowest power configuration.
      */
     GPIO_init();
+    I2C_init();
     GPIO_setAsOutputPin(GPIO_PORT_PA, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PB, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PC, PIN_ALL16);

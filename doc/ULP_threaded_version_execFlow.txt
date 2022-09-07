@@ -1,0 +1,18 @@
+ULPthreaded_version
+
+Thread 1: lectura temperatura
+	FLUJO DE EJECUCION:
+		-Cada X segundos (el RTC determinará cuándo han pasado X segundos)
+			-se pide la temperatura al DHT22
+			-se pasa la temperatura LEÍDA al temperatureController para que decida qué hacer
+			-se imprime en la LCD la nueva temperatura leída
+
+Thread 2: Keypad
+	FLUJO DE EJECUCIÓN:
+		-Cuando se haga click en algun boton:
+			-Si es '+':
+				-incrementar la temperatura 0.5ºC
+			-Si es '-':
+				-decrementar la temperatura 0.5ºC
+			-se pasa la temperatura CONSIGNA al temperatureController para que decida qué hacer
+			-Imprimir en la LCD la nueva temperatura consigna (no se si hacer esto en la ISR es muy sano)

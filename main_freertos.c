@@ -33,11 +33,7 @@
 /*
  *  ======== main_freertos.c ========
  */
-#include <LCDdisplayClient.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <stddef.h>
-#include <TempController.h>
+
 
 #ifdef __ICCARM__
 #include <DLib_Threads.h>
@@ -50,6 +46,12 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
+
+#include <LCDdisplayClient.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <stddef.h>
+#include <TempController.h>
 
 /* Driver configuration */
 #include <ti/drivers/Board.h>
@@ -89,9 +91,6 @@ int LPM3status = -1;
 #define QUEUE_SIZE 10   //Max num of elements in the queue
 
 Display_Handle disp_hdl;
-
-TempController *tempController;
-DisplayClient *displayClient;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -238,7 +237,9 @@ int main(void)
             PowerMSP432_START_CHANGE_PERF_LEVEL |
             PowerMSP432_DONE_CHANGE_PERF_LEVEL,
             (Power_NotifyFxn) notifyFxn, 0x1);*/
+
    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
+   //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
     /* Enabling SRAM Bank Retention for all banks */
     MAP_SysCtl_enableSRAMBankRetention(
@@ -251,9 +252,6 @@ int main(void)
 
     /* Create queues for inter-thread communication */
     create_Queues();
-
-    tempController = TempController_create();
-    displayClient = DisplayClient_create();
 
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);

@@ -7,7 +7,6 @@
 
 #include <interrupt.h>
 #include <LCDdisplayClient.h>
-#include <rom_map.h>
 #include <rtc_c.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -16,8 +15,9 @@
 #include <TempController.h>
 #include "TempSensor.h"
 
-extern TempController *tempController;
-extern DisplayClient *displayClient;
+TempController *tempController;
+DisplayClient *displayClient;
+TempSensor *tempSensor;
 
 sem_t startReadingTemp;
 Power_NotifyObj notifyObj;
@@ -77,7 +77,10 @@ void TempSensor_destroy(TempSensor *const me)
 //#pragma CODE_SECTION(temperatureReadingThread, ".TI.ramfunc")
 void *temperatureReadingThread(void* arg){
 
-    TempSensor *tempSensor = TempSensor_create();
+    tempSensor = TempSensor_create();
+    tempController = TempController_create();
+    displayClient = DisplayClient_create();
+
     int retc;
     retc = sem_init(&startReadingTemp, 0, 0);
     if (retc == -1) {
@@ -87,9 +90,12 @@ void *temperatureReadingThread(void* arg){
     GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
 
     RTC_C_Init();
+    TempSensor_readTemp(tempSensor);
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
+        DisplayClient_setItsTempSensed(displayClient, tempSensor->itsTempSensorProxy->itsTempData);
+        DisplayClient_showInfo(displayClient);
         Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     }
 }
@@ -115,7 +121,6 @@ void RTC_C_Init(void)
     RTC_C_setPrescaleValue(RTC_C_PRESCALE_1,0x00);
     RTC_C->PS1CTL = RTC_C_PS1CTL_RT1IP_7;
     RTC_C_enableInterrupt(RTC_C_PRESCALE_TIMER1_INTERRUPT);
-    //Interrupt_registerInterrupt(INT_RTC_C, RTC_C_IRQHandler);
     Interrupt_enableInterrupt(INT_RTC_C);
 
     HwiP_Params hwiParams;
@@ -123,7 +128,7 @@ void RTC_C_Init(void)
     HwiP_Params_init(&hwiParams);
     hwiParams.arg=5;
     hwiParams.priority=0x40;
-    //hwiParams.enableInt
+
     myHwi = HwiP_create(INT_RTC_C, RTC_C_IRQHandler, &hwiParams);
 
     if (myHwi == NULL)

@@ -18,8 +18,10 @@ void DisplayClient_turnOffLCDbacklight(TimerHandle_t xTimer)
 
 void DisplayClient_init(DisplayClient *const me)
 {
+
     me->itsTempTarget.temperature = 21.0;
     me->itsTempTarget.humidity = 0.0;
+    me->itsDisplayProxy = LCD_create();
 }
 
 void DisplayClient_clean(DisplayClient *const me)
@@ -79,9 +81,18 @@ void DisplayClient_showInfo(DisplayClient *const me)
     }
 }
 
+void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td){
+    if (me != NULL){
+        me->itsTempSensed = *p_td;
+    }
+}
+
 DisplayClient* DisplayClient_create(void)
 {
     DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
+    if (me != NULL){
+        DisplayClient_init(me);
+    }
     return me;
 }
 
@@ -98,7 +109,7 @@ void DisplayClient_destroy(DisplayClient *const me)
 void* displayLCDThread(void *arg0)
 {
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-    I2C_init();
+    //I2C_init();
 
     struct displayLCDThreadArgs *args = (struct displayLCDThreadArgs*) arg0;
 

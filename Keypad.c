@@ -54,7 +54,6 @@ void Keypad_destroy(Keypad *const me)
 void *keypadThread(void *arg0){
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     struct keypadThreadArgs *args = (struct keypadThreadArgs*) arg0;
-    GPIO_init();
     Keypad *me = Keypad_create();
     me->qDispConsole = args->qDispConsoleArg;
     me->qKeypadToTCtrl = args->qKeypadToTCtrlArg;

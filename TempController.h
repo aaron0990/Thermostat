@@ -8,10 +8,9 @@
 #ifndef TEMPCONTROLLER_H_
 #define TEMPCONTROLLER_H_
 
-#include "TempSensor.h"
+#include "shared_vars.h"
 #include <stdio.h>
 #include "InterThreadQueues.h"
-#include "shared_vars.h"
 #include "Keypad.h"
 #include "ThreadsArgStruct.h"
 
