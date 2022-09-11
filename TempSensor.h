@@ -27,9 +27,6 @@
 typedef struct TempSensor TempSensor;
 struct TempSensor
 {
-    QueueHandle_t qDispConsole;
-    QueueHandle_t qTReadToLCD;
-    QueueHandle_t qTReadToTCtrl;
     TempSensorProxy *itsTempSensorProxy;
 };
 

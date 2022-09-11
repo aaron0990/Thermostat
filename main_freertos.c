@@ -73,7 +73,7 @@
 
 extern void* displayConsoleThread(void *arg0);
 extern void* displayLCDThread(void *arg0);
-extern void* temperatureReadingThread(void* arg);
+extern void* mainThread(void* arg);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
 
@@ -210,6 +210,13 @@ void queryClockFreqs(void){
  *
  */
 
+/* NOTES:
+ *      -Do not call I2C API functions before scheduler had started (calling vTaskStartScheduler()). If this is done, you'll get a fault interrupt
+ *
+ *
+ *
+ */
+
 /*
  *  ======== main ========
  */
@@ -238,7 +245,7 @@ int main(void)
             PowerMSP432_DONE_CHANGE_PERF_LEVEL,
             (Power_NotifyFxn) notifyFxn, 0x1);*/
 
-   Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
+   //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
     /* Enabling SRAM Bank Retention for all banks */
@@ -262,7 +269,7 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    retc = pthread_create(&thread, &attrs, temperatureReadingThread,
+    retc = pthread_create(&thread, &attrs, mainThread,
                           NULL);
 
     /************************** Temperature control Thread ******************************/

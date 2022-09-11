@@ -21,15 +21,13 @@ struct TempController{
     TempData targetTemp;
     TempData readTemp;
     uint8_t heatingOn;
-    //These ones are necessary
-    QueueHandle_t qDispConsole;
-    QueueHandle_t qTReadToTCtrl;
-    QueueHandle_t qKeypadToTCtrl;
-    QueueHandle_t qTCtrlToLCD;
 };
 
 void TempController_init(TempController *const me);
 void TempController_clean(TempController* const me);
+void TempController_setReadTemp(TempController *const me, TempData* td);
+void TempController_setTargetTemp(TempController *const me, TempData* td);
+void TempController_updateHeatingState(TempController *const me);
 TempController* TempController_create(void);
 void TempController_destroy(TempController* const me);
 

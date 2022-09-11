@@ -47,33 +47,62 @@ void TempController_destroy(TempController *const me)
     free(me);
 }
 
+void TempController_setReadTemp(TempController *const me, TempData* td)
+{
+    if (me != NULL)
+    {
+        me->readTemp = *td;
+    }
+}
+
+void TempController_setTargetTemp(TempController *const me, TempData* td)
+{
+    if (me != NULL)
+    {
+        me->targetTemp = *td;
+    }
+}
+
+void TempController_updateHeatingState(TempController *const me)
+{
+    if (me->readTemp.temperature != 0.0)
+    {
+        if (me->targetTemp.temperature > me->readTemp.temperature)
+        {
+            //Heating has to be turned ON
+            if (me->heatingOn == 0)
+            {
+                //If heating is OFF, turn it ON
+                GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
+                me->heatingOn = 1;
+            }
+            //else, do nothing because it was already ON
+        }
+        else
+        {
+            //Heating has to be turned OFF
+            if (me->heatingOn == 1)
+            {
+                //If heating is ON, turn it OFF
+                GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN5);
+                me->heatingOn = 0;
+            }
+        }
+    }
+}
+
 #pragma CODE_SECTION(temperatureControllerThread, ".TI.ramfunc")
 void* temperatureControllerThread(void *arg0)
 {
-    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-
-    struct temperatureControllerThreadArgs *args =
-            (struct temperatureControllerThreadArgs*) arg0;
-    TempController *me = (TempController*) malloc(sizeof(TempController));
-    me->qDispConsole = args->qDispConsoleArg;
-    me->qTReadToTCtrl = args->qTReadToTCtrlArg;
-    me->qKeypadToTCtrl = args->qKeypadToTCtrlArg;
-    me->qTCtrlToLCD = args->qTCtrlToLCDArg;
-    TempController_init(me);
-
     TempData tSensed;   //to store the dequed elem
     KeypadMsg kpMsg;    //to store the dequed elem
 
     Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while (1)
     {
-        if (xQueueReceive(me->qTReadToTCtrl, &tSensed, MAX_WAIT_QUEUE))
-        {
-            //New temperature reading available
-            me->readTemp = tSensed;
-        }
-        if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, MAX_WAIT_QUEUE))
-        {
+        //if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, MAX_WAIT_QUEUE))
+
+            /*
             //New target temperature available
             switch (kpMsg.cmd)
             {
@@ -84,34 +113,9 @@ void* temperatureControllerThread(void *arg0)
                 me->targetTemp.temperature -= 0.5;
                 break;
             }
-            xQueueSend(me->qTCtrlToLCD, (void* )&me->targetTemp, 0);
+        }
 
-        }
-        if (me->readTemp.temperature != 0.0)
-        {
-            if (me->targetTemp.temperature > me->readTemp.temperature)
-            {
-                //Heating has to be turned ON
-                if (me->heatingOn == 0)
-                {
-                    //If heating is OFF, turn it ON
-                    GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);
-                    me->heatingOn = 1;
-                }
-                //else, do nothing because it was already ON
-            }
-            else
-            {
-                //Heating has to be turned OFF
-                if (me->heatingOn == 1)
-                {
-                    //If heating is ON, turn it OFF
-                    GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN5);
-                    me->heatingOn = 0;
-                }
-            }
-        }
-        sched_yield();
+        sched_yield();*/
     }
 
 }

@@ -96,7 +96,6 @@ void TempSensorProxy_access(TempSensorProxy *me)
     //Reenable task switching once finished
     //xTaskResumeAll();
 
-
     uint64_t sensorData = 0;
     int i;
     uint32_t captureFreq = CS_getSMCLK();
