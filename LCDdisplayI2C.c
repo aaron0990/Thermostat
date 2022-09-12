@@ -5,7 +5,7 @@ DisplayI2C* DisplayI2C_create(void)
     DisplayI2C *displayI2C = (DisplayI2C*) malloc(sizeof(DisplayI2C));
     if (displayI2C != NULL)
     {
-        DisplayI2C_initialize(displayI2C);
+        //DisplayI2C_initialize(displayI2C);
     }
     return displayI2C;
 }

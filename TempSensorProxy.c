@@ -12,22 +12,24 @@ uint8_t capturedIntervalsPtr;
 uint8_t readingData;
 Capture_Handle capHandle;
 
-void TempSensorProxy_init(TempSensorProxy *me)
-{
-    me->itsTempData = TempData_create();
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN2); //DHT22 VCC
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN3); //DHT22 GND
-}
-
-void TempSensorProxy_configure(TempSensorProxy *me)
+void TempSensorProxy_init(TempSensorProxy *me, TempData* readTemp)
 {
     Capture_init();
+    me->itsTempData = readTemp;
     me->captureHandle = (Capture_Handle*) malloc(sizeof(Capture_Handle));
     me->captureParams = (Capture_Params*) malloc(sizeof(Capture_Params));
     Capture_Params_init(me->captureParams);
     me->captureParams->mode = Capture_FALLING_EDGE;
     me->captureParams->periodUnit = Capture_PERIOD_COUNTS;
     me->captureParams->callbackFxn = Capture_Callback;
+
+    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN2); //DHT22 VCC
+    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN3); //DHT22 GND
+}
+
+void TempSensorProxy_configure(TempSensorProxy *me)
+{
+
 }
 
 void TempSensorProxy_access(TempSensorProxy *me)
@@ -140,8 +142,7 @@ TempSensorProxy* TempSensorProxy_create(void)
     TempSensorProxy *me = (TempSensorProxy*) malloc(sizeof(TempSensorProxy));
     if (me != NULL)
     {
-        TempSensorProxy_configure(me);
-        TempSensorProxy_init(me);
+
     }
     return me;
 }

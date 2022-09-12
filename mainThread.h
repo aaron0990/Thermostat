@@ -13,6 +13,8 @@
 #include <TempController.h>
 #include <TempSensor.h>
 #include <RTC.h>
+#include <Keypad.h>
+#include <TempData.h>
 
 /*Driverlib includes*/
 #include <interrupt.h>

@@ -13,9 +13,6 @@
 
 #pragma CODE_SECTION(displayConsoleThread, ".TI.ramfunc")
 void *displayConsoleThread(void *arg0){
-    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-    struct displayConsoleThreadArgs *args = (struct displayConsoleThreadArgs*) arg0;
-    QueueHandle_t qDispConsole = args->qDispConsoleArg;
     uint32_t row = 0; //for printing to console in a new line;
 
     Display_Handle disp_hdl;
@@ -28,18 +25,11 @@ void *displayConsoleThread(void *arg0){
     Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     while(1)
     {
-       DisplayConsoleMsg msg;
-       if (xQueueReceive(qDispConsole, &msg, (TickType_t) MAX_WAIT_QUEUE)){
-           //Print value in LCD
-           char text[msg.len];
-           strcpy(text, msg.buff);
-           Display_printf(disp_hdl, row, 0, text);
-           ++row;
-       }
-       else{
-           sched_yield();
-       }
-       sleep(50);
+       //Print value in LCD
+       char text[msg.len];
+       strcpy(text, msg.buff);
+       Display_printf(disp_hdl, row, 0, text);
+       ++row;
     }
 
 }

@@ -20,8 +20,6 @@
 #include <stdlib.h>
 #include "shared_vars.h"
 #include <sysctl.h>
-#include "ThreadsArgStruct.h"
-#include "InterThreadQueues.h"
 
 #define INC_TEMP_PIN_IDX 0
 #define DEC_TEMP_PIN_IDX 1
@@ -30,22 +28,20 @@
 typedef struct Keypad Keypad;
 struct Keypad
 {
-    QueueHandle_t qDispConsole;
-    QueueHandle_t qKeypadToTCtrl;
+    uint8_t padding;
 };
-extern Keypad* kp;
+
 
 /*Constructors and destructors*/
+Keypad* Keypad_create(void);
 void Keypad_init(Keypad *const me);
 void Keypad_clean(Keypad *const me);
 
 /*Operations*/
 void Keypad_readTemp(Keypad *const me);
 void Keypad_newData(Keypad *const me);
-Keypad* Keypad_create(void);
 void Keypad_destroy(Keypad *const me);
 void Keypad_InterruptHandler(uint_least8_t idx);
 
-//TODO: Check aPtr argument in subscribe() and unsubscribe() functions. I'm not sure if the type is tempDataAcceptorPtr or tempDataAcceptorPtr*
 
 #endif /* KEYPAD_H_ */

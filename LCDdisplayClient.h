@@ -21,8 +21,8 @@
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
-    TempData itsTempSensed;
-    TempData itsTempTarget;
+    TempData* itsTempSensed;
+    TempData* itsTempTarget;
     DisplayProxy* itsDisplayProxy;
 
     //These ones are necessary
@@ -31,7 +31,7 @@ struct DisplayClient{
     QueueHandle_t qTCtrlToLCD;
 };
 
-void DisplayClient_init(DisplayClient *const me);
+void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp);
 void DisplayClient_clean(DisplayClient* const me);
 void DisplayClient_acceptTempSensed(DisplayClient* const me, TempData* td);
 void DisplayClient_acceptTempTarget(DisplayClient* const me, TempData* td);
@@ -41,6 +41,8 @@ DisplayClient* DisplayClient_create(void);
 void DisplayClient_destroy(DisplayClient* const me);
 
 //Getters and setters
+TempData* DisplayClient_getItsTempSensed(DisplayClient* const me);
+void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td);
 TempData* DisplayClient_getItsTempSensed(DisplayClient* const me);
 void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td);
 TempSensor* DisplayClient_getItsTempSensor(DisplayClient* const me);

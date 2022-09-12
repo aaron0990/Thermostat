@@ -18,7 +18,7 @@ struct TempData
     float humidity;      //when humidity sensed, real humidity = humidity/10.0
 };
 
-void TempData_init(TempData *const me);
+void TempData_init(TempData *const me, float temp, float hum);
 void TempData_clean(TempData *const me);
 TempData* TempData_create(void);
 void TempData_destroy(TempData *const me);

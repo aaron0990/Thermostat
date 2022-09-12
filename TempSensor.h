@@ -18,7 +18,6 @@
 #include <gpio.h>
 #include <stdlib.h>
 #include "shared_vars.h"
-#include "InterThreadQueues.h"
 #include "ThreadsArgStruct.h"
 
 #define TEMP_UPDATE_INT 15 //seconds
@@ -31,12 +30,13 @@ struct TempSensor
 };
 
 /*Constructors and destructors*/
-void TempSensor_init(TempSensor *const me);
+void TempSensor_init(TempSensor *const me, TempData* readTemp);
 void TempSensor_clean(TempSensor *const me);
 
 /*Operations*/
 void TempSensor_readTemp(TempSensor *const me);
 void TempSensor_newData(TempSensor *const me);
+void TempSensor_configure(TempSensor *const me, TempData* readTemp);
 TempSensor* TempSensor_create();
 void TempSensor_destroy(TempSensor *const me);
 

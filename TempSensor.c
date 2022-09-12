@@ -8,9 +8,9 @@
 #include "TempSensor.h"
 
 
-void TempSensor_init(TempSensor *const me)
+void TempSensor_init(TempSensor *const me, TempData* readTemp)
 {
-    me->itsTempSensorProxy = TempSensorProxy_create();
+    TempSensorProxy_init(me->itsTempSensorProxy, readTemp);
 }
 
 //#pragma CODE_SECTION(TempSensor_readTemp, ".TI.ramfunc")
@@ -19,13 +19,17 @@ void TempSensor_readTemp(TempSensor *const me)
     TempSensorProxy_access(me->itsTempSensorProxy); //Read temperature
 }
 
+void TempSensor_configure(TempSensor *const me, TempData* readTemp)
+{
+    TempSensorProxy_configure(me->itsTempSensorProxy);
+}
 
 TempSensor* TempSensor_create()
 {
     TempSensor* me = (TempSensor*) malloc(sizeof(TempSensor));
     if (me != NULL)
     {
-        TempSensor_init(me);
+        me->itsTempSensorProxy = TempSensorProxy_create();
     }
     return me;
 }

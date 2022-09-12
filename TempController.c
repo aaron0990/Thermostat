@@ -8,13 +8,10 @@
 #include <gpio.h>
 #include "TempController.h"
 
-void TempController_init(TempController *const me)
+void TempController_init(TempController *const me, TempData* readTemp, TempData* targetTemp)
 {
-    me->targetTemp.temperature = 21.0;
-    me->targetTemp.humidity = 0.0;
-
-    me->readTemp.temperature = 0.0;
-    me->readTemp.humidity = 0.0;
+    me->readTemp = readTemp;
+    me->targetTemp = targetTemp;
 
     //Relay control pin
     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN5);
@@ -33,7 +30,7 @@ TempController* TempController_create(void)
     TempController *me = (TempController*) malloc(sizeof(TempController));
     if (me != NULL)
     {
-        TempController_init(me);
+
     }
     return me;
 }
@@ -51,23 +48,25 @@ void TempController_setReadTemp(TempController *const me, TempData* td)
 {
     if (me != NULL)
     {
-        me->readTemp = *td;
+        me->readTemp = td;
     }
+    TempController_updateHeatingState(me);
 }
 
 void TempController_setTargetTemp(TempController *const me, TempData* td)
 {
     if (me != NULL)
     {
-        me->targetTemp = *td;
+        me->targetTemp = td;
     }
+    TempController_updateHeatingState(me);
 }
 
 void TempController_updateHeatingState(TempController *const me)
 {
-    if (me->readTemp.temperature != 0.0)
+    if (me->readTemp->temperature != 0.0)
     {
-        if (me->targetTemp.temperature > me->readTemp.temperature)
+        if (me->targetTemp->temperature > me->readTemp->temperature)
         {
             //Heating has to be turned ON
             if (me->heatingOn == 0)
@@ -91,32 +90,4 @@ void TempController_updateHeatingState(TempController *const me)
     }
 }
 
-#pragma CODE_SECTION(temperatureControllerThread, ".TI.ramfunc")
-void* temperatureControllerThread(void *arg0)
-{
-    TempData tSensed;   //to store the dequed elem
-    KeypadMsg kpMsg;    //to store the dequed elem
-
-    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-    while (1)
-    {
-        //if (xQueueReceive(me->qKeypadToTCtrl, &kpMsg, MAX_WAIT_QUEUE))
-
-            /*
-            //New target temperature available
-            switch (kpMsg.cmd)
-            {
-            case INC_TARGET_T: //Increment target temperature value
-                me->targetTemp.temperature += 0.5;
-                break;
-            case DEC_TARGET_T: //Decrement target temperature value
-                me->targetTemp.temperature -= 0.5;
-                break;
-            }
-        }
-
-        sched_yield();*/
-    }
-
-}
 

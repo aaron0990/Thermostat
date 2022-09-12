@@ -13,6 +13,7 @@
  *      Author: aaron
  */
 
+
 #include "mainThread.h"
 
 #define TEMP_READ_PERIOD    0.2 //minutes
@@ -20,7 +21,10 @@
 TempController *tempController;
 DisplayClient *displayClient;
 TempSensor *tempSensor;
-RTC* rtc;
+Keypad *keypad;
+RTC *rtc;
+TempData* readTemp;
+TempData* targetTemp;
 
 uint32_t secondsCount;
 
@@ -38,12 +42,28 @@ void *mainThread(void* arg)
     GPIO_setAsOutputPin(GPIO_PORT_P5, GPIO_PIN1);
     GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
 
-    Power_registerNotify(&notifyObj, PowerMSP432_ENTERING_DEEPSLEEP | PowerMSP432_AWAKE_DEEPSLEEP,
-            (Power_NotifyFxn)notifyFxn, 0);
+    /*Power_registerNotify(&notifyObj, PowerMSP432_ENTERING_DEEPSLEEP | PowerMSP432_AWAKE_DEEPSLEEP,
+            (Power_NotifyFxn)notifyFxn, 0);*/
+
+    //Initialize data structures
+    readTemp = TempData_create();
+    TempData_init(readTemp, 0.0, 0.0);
+
+    targetTemp = TempData_create();
+    TempData_init(targetTemp, 21.0, 0.0);
 
     tempSensor = TempSensor_create();
+    TempSensor_init(tempSensor, readTemp);
+
     tempController = TempController_create();
+    TempController_init(tempController, readTemp, targetTemp);
+
     displayClient = DisplayClient_create();
+    DisplayClient_init(displayClient, readTemp, targetTemp);
+
+    keypad = Keypad_create();
+    Keypad_init(keypad);
+
     rtc = RTC_C_create();
     RTC_C_configure(rtc, TEMP_READ_PERIOD);
     RTC_C_init(rtc);
@@ -51,12 +71,62 @@ void *mainThread(void* arg)
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
-        DisplayClient_setItsTempSensed(displayClient, tempSensor->itsTempSensorProxy->itsTempData);
-        TempController_setReadTemp(tempController, tempSensor->itsTempSensorProxy->itsTempData);
+        //DisplayClient_setItsTempSensed(displayClient, tempSensor->itsTempSensorProxy->itsTempData);
+        //TempController_setReadTemp(tempController, tempSensor->itsTempSensorProxy->itsTempData);
         DisplayClient_showInfo(displayClient);
         Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     }
 }
+
+/***************** RTC interrupt handler (called every 1s) ***************/
+
+void RTC_C_IRQHandler(uint32_t arg)
+{
+    uint32_t status;
+
+    GPIO_setOutputHighOnPin(GPIO_PORT_P5, GPIO_PIN1);
+    status = RTC_C_getEnabledInterruptStatus();
+    RTC_C_clearInterruptFlag(status);
+    ++(rtc->secondsCount); // A second has elapsed
+
+    /*
+     * reset scalers for the next second
+     */
+    if(status & RTC_C_PRESCALE_TIMER1_INTERRUPT)
+    {
+        if (rtc->secondsCount == (uint32_t)(rtc->tempReadPeriod * 60))
+        {   //Allow reading temp every 12s
+            sem_post(&startReadingTemp);
+            rtc->secondsCount = 0;
+            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+        }
+    }
+    GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
+
+}
+
+/********************************* Keypad Interrupt handler **********************************************/
+
+
+void Keypad_InterruptHandler(uint_least8_t idx)
+{
+    GPIO_clearInt(idx);
+    GPIO_disableInt(idx);
+
+    if (idx == INC_TEMP_PIN_IDX)
+    {
+        targetTemp->temperature += 0.5;
+    }
+    if (idx == DEC_TEMP_PIN_IDX)
+    {
+        targetTemp->temperature -= 0.5;
+    }
+    TempController_updateHeatingState(tempController);
+    //DisplayClient_showInfo(displayClient);
+    GPIO_enableInt(idx);
+}
+
+
 
 /*
  *  ======== notifyFxn ========

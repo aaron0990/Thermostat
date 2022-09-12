@@ -17,7 +17,6 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <sched.h>
-#include "InterThreadQueues.h"
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerMSP432.h>
 

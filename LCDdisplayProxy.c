@@ -6,8 +6,9 @@ DisplayProxy* LCD_create(void)
     DisplayProxy *lcd_config = (DisplayProxy*) malloc(sizeof(DisplayProxy));
     if (lcd_config != NULL)
     {
-        LCD_configure(lcd_config);
-        LCD_init(lcd_config);
+        lcd_config->displayI2C = DisplayI2C_create();
+        //LCD_configure(lcd_config);
+        //LCD_init(lcd_config);
     }
     return lcd_config;
 }
@@ -23,10 +24,12 @@ void LCD_destroy(DisplayProxy *lcd_config)
 void LCD_init(DisplayProxy *lcd_config)
 {
 
-    lcd_config->displayI2C = DisplayI2C_create();
+    //lcd_config->displayI2C = DisplayI2C_create();
 //mutate(lcd_config, LCD_FUNCTIONSET | lcd_config->displayfunction, 0);
 
 // set the entry mode
+    DisplayI2C_initialize(lcd_config->displayI2C);
+    LCD_configure(lcd_config);
     LCD_clear(lcd_config);
     LCD_display(lcd_config);
     LCD_blink(lcd_config);

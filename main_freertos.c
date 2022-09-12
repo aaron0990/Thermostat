@@ -68,7 +68,6 @@
 #include <utils.h>
 #include <string.h>
 #include <shared_vars.h>
-#include "InterThreadQueues.h"
 #include "ThreadsArgStruct.h"
 
 extern void* displayConsoleThread(void *arg0);
@@ -76,14 +75,6 @@ extern void* displayLCDThread(void *arg0);
 extern void* mainThread(void* arg);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
-
-QueueHandle_t qTReadToLCD;
-QueueHandle_t qTReadToTCtrl;
-QueueHandle_t qDispConsole;
-QueueHandle_t qKeypadToTCtrl;
-QueueHandle_t qTCtrlToLCD;
-
-int LPM3status = -1;
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   4096
@@ -163,14 +154,6 @@ void init_Timer32_module()
     TIMER32_PERIODIC_MODE);
 }
 
-void create_Queues(void)
-{
-    qTReadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
-    qTReadToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
-    qDispConsole = xQueueCreate(QUEUE_SIZE, sizeof(DisplayConsoleMsg));
-    qKeypadToTCtrl = xQueueCreate(QUEUE_SIZE, sizeof(KeypadMsg));
-    qTCtrlToLCD = xQueueCreate(QUEUE_SIZE, sizeof(TempData));
-}
 
 void queryClockFreqs(void){
     uint32_t SMCLKfreq, MCLKfreq, HSMCLKfreq, BCLKfreq, ACLKfreq;
@@ -183,8 +166,7 @@ void queryClockFreqs(void){
 }
 
 /* TODO:
- *  - Fix: despues de cada lectura del sensor, se apaga el LED y se vuelve a encender. (seguramente relacionado con el sleep que hago mientras se
- *          capturan los datos del sensor, ya que ya no suspendo el scheduler y el thread de TempController se ejecuta)
+ *  - Hacer que la LCD se actualice al momento cuando pulso botones del Keypad.
  *  - Consejos para reducir consumo
  *      - Probar a poner el GND del relé en un GPIO
  *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
@@ -257,9 +239,6 @@ int main(void)
     queryClockFreqs();
     init_Timer32_module();
 
-    /* Create queues for inter-thread communication */
-    create_Queues();
-
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
@@ -271,34 +250,6 @@ int main(void)
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, mainThread,
                           NULL);
-
-    /************************** Temperature control Thread ******************************/
-    struct temperatureControllerThreadArgs *args_tctrl =
-            (struct temperatureControllerThreadArgs*) malloc(
-                    sizeof(struct temperatureControllerThreadArgs));
-    args_tctrl->qDispConsoleArg = qDispConsole;
-    args_tctrl->qTReadToTCtrlArg = qTReadToTCtrl;
-    args_tctrl->qKeypadToTCtrlArg = qKeypadToTCtrl;
-    args_tctrl->qTCtrlToLCDArg = qTCtrlToLCD;
-
-    priParam.sched_priority = 1;
-    retc = pthread_attr_setschedparam(&attrs, &priParam);
-    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    //retc = pthread_create(&thread, &attrs, temperatureControllerThread,
-    //                      (void*) args_tctrl);
-
-    /************************** Keypad Thread ******************************/
-    struct keypadThreadArgs *args_kpad = (struct keypadThreadArgs*) malloc(
-            sizeof(struct keypadThreadArgs));
-    args_kpad->qDispConsoleArg = qDispConsole;
-    args_kpad->qKeypadToTCtrlArg = qKeypadToTCtrl;
-
-    priParam.sched_priority = 1;
-    retc = pthread_attr_setschedparam(&attrs, &priParam);
-    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    //retc = pthread_create(&thread, &attrs, keypadThread, (void*) args_kpad);
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();

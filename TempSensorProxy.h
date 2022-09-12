@@ -37,7 +37,7 @@ extern uint8_t capturedIntervalsPtr;
 
 TempSensorProxy* TempSensorProxy_create(void);
 void TempSensorProxy_destroy(TempSensorProxy* me);
-void TempSensorProxy_init (TempSensorProxy* me);
+void TempSensorProxy_init (TempSensorProxy* me, TempData* readTemp);
 void TempSensorProxy_configure(TempSensorProxy* me);
 void TempSensorProxy_access(TempSensorProxy* me);
 

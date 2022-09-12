@@ -16,12 +16,11 @@ void DisplayClient_turnOffLCDbacklight(TimerHandle_t xTimer)
     LCD_noBacklight(gObj->itsDisplayProxy);
 }
 
-void DisplayClient_init(DisplayClient *const me)
+void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp)
 {
-
-    me->itsTempTarget.temperature = 21.0;
-    me->itsTempTarget.humidity = 0.0;
-    me->itsDisplayProxy = LCD_create();
+    me->itsTempSensed = readTemp;
+    me->itsTempTarget = targetTemp;
+    LCD_init(me->itsDisplayProxy);
 }
 
 void DisplayClient_clean(DisplayClient *const me)
@@ -52,9 +51,9 @@ void DisplayClient_showInfo(DisplayClient *const me)
     LCD_setCursor(me->itsDisplayProxy, 0, 1);
 
     //Update target temperature in the screen
-    if (me->itsTempTarget.temperature)
+    if (me->itsTempTarget->temperature)
     {
-        sprintf(output, "T. Obj:%.1f'C", me->itsTempTarget.temperature);
+        sprintf(output, "T. Obj:%.1f'C", me->itsTempTarget->temperature);
         LCD_write(me->itsDisplayProxy, output, strlen(output));
     }
     else
@@ -69,9 +68,9 @@ void DisplayClient_showInfo(DisplayClient *const me)
     LCD_write(me->itsDisplayProxy, output, strlen(output)); //Clear only this line (cannot call to LCD_clear(). Else, all screen gets cleared)
     LCD_setCursor(me->itsDisplayProxy, 0, 0);
     //Update sensed temperature in the screen
-    if (me->itsTempSensed.temperature)
+    if (me->itsTempSensed->temperature)
     {
-        sprintf(output, "T. Act:%.1f'C", me->itsTempSensed.temperature); //DIVIDE BY 10 TO GET REAL TEMPERATURE!
+        sprintf(output, "T. Act:%.1f'C", me->itsTempSensed->temperature); //DIVIDE BY 10 TO GET REAL TEMPERATURE!
         LCD_write(me->itsDisplayProxy, output, strlen(output)); //Print sensed temperature
     }
     else
@@ -83,7 +82,7 @@ void DisplayClient_showInfo(DisplayClient *const me)
 
 void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td){
     if (me != NULL){
-        me->itsTempSensed = *p_td;
+        me->itsTempSensed = p_td;
     }
 }
 
@@ -91,7 +90,8 @@ DisplayClient* DisplayClient_create(void)
 {
     DisplayClient *me = (DisplayClient*) malloc(sizeof(DisplayClient));
     if (me != NULL){
-        DisplayClient_init(me);
+        //DisplayClient_init(me);
+        me->itsDisplayProxy = LCD_create();
     }
     return me;
 }
@@ -105,7 +105,7 @@ void DisplayClient_destroy(DisplayClient *const me)
     free(me);
 }
 
-#pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
+/*#pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
 void* displayLCDThread(void *arg0)
 {
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
@@ -140,11 +140,11 @@ void* displayLCDThread(void *arg0)
             //Turn on backlight for some secs and display info
             DisplayClient_showInfo(me);
             xTimerReset(lcdOFFBl_tmr, 0);
-            /*
+
             if (!xTimerIsTimerActive(lcdOFFBl_tmr))
             {
                 xTimerStart(lcdOFFBl_tmr, 0);
-            }*/
+            }
         }
         if (xQueueReceive(me->qTCtrlToLCD, &tTarget, (TickType_t) MAX_WAIT_QUEUE))
         {
@@ -153,12 +153,12 @@ void* displayLCDThread(void *arg0)
             //Turn on backlight for some secs and display info
             DisplayClient_showInfo(me);
             xTimerReset(lcdOFFBl_tmr, 0);
-            /*
+
             if (!xTimerIsTimerActive(lcdOFFBl_tmr))
             {
                 xTimerStart(lcdOFFBl_tmr, 0);
-            }*/
+            }
         }
         sched_yield();
     }
-}
+}*/

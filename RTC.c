@@ -15,12 +15,10 @@
 #include <ti/drivers/Power.h>
 #include "RTC.h"
 
-RTC* gRTC; // To allow the IRQ accessing RTC info.
 
 RTC* RTC_C_create(void)
 {
     RTC* me = (RTC*) malloc(sizeof(RTC));
-    gRTC = me;
     return me;
 }
 
@@ -58,29 +56,4 @@ void RTC_C_configure(RTC* const me, float newTmpReadPeriod)
         me->tempReadPeriod = newTmpReadPeriod;
         me->secondsCount = 0;
     }
-}
-
-void RTC_C_IRQHandler(uint32_t arg)
-{
-    uint32_t status;
-
-    GPIO_setOutputHighOnPin(GPIO_PORT_P5, GPIO_PIN1);
-    status = RTC_C_getEnabledInterruptStatus();
-    RTC_C_clearInterruptFlag(status);
-    ++(gRTC->secondsCount); // A second has elapsed
-
-    /*
-     * reset scalers for the next second
-     */
-    if(status & RTC_C_PRESCALE_TIMER1_INTERRUPT)
-    {
-        if (gRTC->secondsCount == (uint32_t)(gRTC->tempReadPeriod * 60))
-        {   //Allow reading temp every 12s
-            sem_post(&startReadingTemp);
-            gRTC->secondsCount = 0;
-            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-        }
-    }
-    GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
-
 }
