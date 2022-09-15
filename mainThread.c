@@ -27,7 +27,7 @@ TempData* targetTemp;
 uint32_t secondsCount;
 
 extern sem_t startReadingTemp;
-extern sem_t displayData;
+extern sem_t unlockDisplayThread;
 extern sem_t initDisplayDone;
 
 Power_NotifyObj notifyObj;
@@ -64,6 +64,7 @@ void *mainThread(void* arg)
 
     displayClient = DisplayClient_create();
     DisplayClient_init(displayClient, readTemp, targetTemp);
+    DisplayClient_updateNextBacklightOffTime(displayClient,  rtc->secondsCount);
     sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
 
     RTC_C_init(rtc);
@@ -72,7 +73,9 @@ void *mainThread(void* arg)
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
         TempController_updateHeatingState(tempController);
-        sem_post(&displayData);
+        displayClient->flags = PRINT_DATA;
+        DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
+        sem_post(&unlockDisplayThread);
     }
 }
 
@@ -98,7 +101,10 @@ void RTC_C_IRQHandler(uint32_t arg)
         }
         if(RTC_C_isTimerExpired(rtc, displayClient->nextBacklightOffTime))
         {
-
+            displayClient->flags = OFF_BACKLIGHT;
+            sem_post(&unlockDisplayThread);
+            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+            //DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
         }
     }
     GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
@@ -122,7 +128,9 @@ void Keypad_InterruptHandler(uint_least8_t idx)
         targetTemp->temperature -= 0.5;
     }
     TempController_updateHeatingState(tempController);
-    sem_post(&displayData);
+    displayClient->flags = PRINT_DATA;
+    DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
+    sem_post(&unlockDisplayThread);
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     GPIO_enableInt(idx);
 }

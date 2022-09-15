@@ -18,6 +18,11 @@
 
 #define LCD_ON_BACKLIGHT_T  5 //s
 
+//Flags used to indicate why the thread is awake
+#define SLEEP               0x00
+#define PRINT_DATA          0x01
+#define OFF_BACKLIGHT       0x02
+
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
@@ -26,6 +31,7 @@ struct DisplayClient{
     DisplayProxy* itsDisplayProxy;
     uint32_t nextBacklightOffTime;
     uint32_t backlightOnDuration;
+    uint8_t flags;
 };
 
 void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp);
@@ -35,6 +41,9 @@ void DisplayClient_acceptTempTarget(DisplayClient* const me, TempData* td);
 void DisplayClient_register(DisplayClient* const me); //it calls the subscribe() function of the sensor
 void DisplayClient_showInfo(DisplayClient *const me);
 DisplayClient* DisplayClient_create(void);
+void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t currentTime);
+void DisplayClient_turnOffLCDbacklight(DisplayClient *const me);
+
 void DisplayClient_destroy(DisplayClient* const me);
 
 //Getters and setters

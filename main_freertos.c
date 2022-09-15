@@ -85,7 +85,7 @@ extern void* temperatureControllerThread(void *arg0);
 Display_Handle disp_hdl;
 
 sem_t startReadingTemp;
-sem_t displayData;
+sem_t unlockDisplayThread;
 sem_t initDisplayDone;
 
 /*
@@ -250,7 +250,7 @@ int main(void)
         while (1);
     }
 
-    retc = sem_init(&displayData, 0, 0);
+    retc = sem_init(&unlockDisplayThread, 0, 0);
     if (retc == -1) {
         while (1);
     }

@@ -12,22 +12,22 @@
 DisplayClient *gObj; //global DisplayClient "object" reference
 extern DisplayClient *displayClient;
 
-extern sem_t displayData;
+extern sem_t unlockDisplayThread;
 extern sem_t initDisplayDone;
 
-void DisplayClient_turnOffLCDbacklight(TimerHandle_t xTimer)
+void DisplayClient_turnOffLCDbacklight(DisplayClient *const me)
 {
-    LCD_noDisplay(gObj->itsDisplayProxy);
-    LCD_noBacklight(gObj->itsDisplayProxy);
+    LCD_noDisplay(me->itsDisplayProxy);
+    LCD_noBacklight(me->itsDisplayProxy);
 }
 
 void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp)
 {
     me->itsTempSensed = readTemp;
     me->itsTempTarget = targetTemp;
-    me->secondsCount = 0;
     me->nextBacklightOffTime = 0;
     me->backlightOnDuration = LCD_ON_BACKLIGHT_T;
+    me->flags = SLEEP;
     LCD_init(me->itsDisplayProxy);
 }
 
@@ -45,6 +45,15 @@ void DisplayClient_acceptTempTarget(DisplayClient *const me, TempData *td)
 {
 
 }
+
+void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t currentTime)
+{
+    if(me != NULL)
+    {
+        me->nextBacklightOffTime = currentTime + me->backlightOnDuration;
+    }
+}
+
 
 #pragma CODE_SECTION(DisplayClient_showInfo, ".TI.ramfunc")
 void DisplayClient_showInfo(DisplayClient *const me)
@@ -129,15 +138,20 @@ void* displayLCDThread(void *arg0)
 
     while (1)
     {
-        sem_wait(&displayData);
-        DisplayClient_showInfo(displayClient);
-
-            /*xTimerReset(lcdOFFBl_tmr, 0);
-
-            if (!xTimerIsTimerActive(lcdOFFBl_tmr))
-            {
-                xTimerStart(lcdOFFBl_tmr, 0);
-            }*/
+        sem_wait(&unlockDisplayThread);
+        switch(displayClient->flags)
+        {
+            case OFF_BACKLIGHT:
+                DisplayClient_turnOffLCDbacklight(displayClient);
+                break;
+            case PRINT_DATA:
+                DisplayClient_showInfo(displayClient);
+                break;
+            default:
+                break;
+        }
+        displayClient->flags = SLEEP;
+        //DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
         Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     }
 }
