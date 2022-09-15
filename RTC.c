@@ -49,11 +49,21 @@ void RTC_C_init(RTC* const me)
     RTC_C_startClock();
 }
 
-void RTC_C_configure(RTC* const me, float newTmpReadPeriod)
+int RTC_C_isTimerExpired(RTC* const me, uint32_t timestamp)
 {
     if (me != NULL)
     {
-        me->tempReadPeriod = newTmpReadPeriod;
+        if (me->secondsCount == timestamp)
+            return 1;
+        else
+            return 0;
+    }
+}
+
+void RTC_C_configure(RTC* const me)
+{
+    if (me != NULL)
+    {
         me->secondsCount = 0;
     }
 }

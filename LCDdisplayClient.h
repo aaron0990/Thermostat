@@ -16,7 +16,7 @@
 #include "Keypad.h"
 #include "ThreadsArgStruct.h"
 
-#define LCD_ON_BACKLIGHT_T  5000 //ms
+#define LCD_ON_BACKLIGHT_T  5 //s
 
 typedef struct DisplayClient DisplayClient;
 
@@ -24,11 +24,8 @@ struct DisplayClient{
     TempData* itsTempSensed;
     TempData* itsTempTarget;
     DisplayProxy* itsDisplayProxy;
-
-    //These ones are necessary
-    QueueHandle_t qDispConsole;
-    QueueHandle_t qTReadToLCD;
-    QueueHandle_t qTCtrlToLCD;
+    uint32_t nextBacklightOffTime;
+    uint32_t backlightOnDuration;
 };
 
 void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp);

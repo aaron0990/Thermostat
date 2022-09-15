@@ -5,10 +5,15 @@
  *      Author: aaron
  */
 
+#include <semaphore.h>
+#include <ti/drivers/Power.h>
 #include "LCDdisplayClient.h"
 
 DisplayClient *gObj; //global DisplayClient "object" reference
+extern DisplayClient *displayClient;
 
+extern sem_t displayData;
+extern sem_t initDisplayDone;
 
 void DisplayClient_turnOffLCDbacklight(TimerHandle_t xTimer)
 {
@@ -20,6 +25,9 @@ void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* t
 {
     me->itsTempSensed = readTemp;
     me->itsTempTarget = targetTemp;
+    me->secondsCount = 0;
+    me->nextBacklightOffTime = 0;
+    me->backlightOnDuration = LCD_ON_BACKLIGHT_T;
     LCD_init(me->itsDisplayProxy);
 }
 
@@ -105,60 +113,31 @@ void DisplayClient_destroy(DisplayClient *const me)
     free(me);
 }
 
-/*#pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
+#pragma CODE_SECTION(displayLCDThread, ".TI.ramfunc")
 void* displayLCDThread(void *arg0)
 {
-    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-    //I2C_init();
-
-    struct displayLCDThreadArgs *args = (struct displayLCDThreadArgs*) arg0;
-
     //Creates DisplayClient "instance"
-    DisplayClient *me = DisplayClient_create();
-    DisplayClient_init(me);
-    gObj = me;
+    sem_wait(&initDisplayDone);
+    //gObj = me;
 
-    TempData tSensed; //to store the dequed elem
-    TempData tTarget; //to store the dequed elem
-
-    me->itsDisplayProxy = LCD_create();
-    me->qDispConsole = args->qDispConsoleArg;
-    me->qTReadToLCD = args->qTReadToLCDArg;
-    me->qTCtrlToLCD = args->qTCtrlToLCDArg;
-
+    /*
     TimerHandle_t lcdOFFBl_tmr = xTimerCreate(
             "LCDBacklightOFF", pdMS_TO_TICKS(LCD_ON_BACKLIGHT_T), pdFALSE,
-            (void*) 0, DisplayClient_turnOffLCDbacklight);
+            (void*) 0, DisplayClient_turnOffLCDbacklight);*/
 
-    Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+    //Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+
     while (1)
     {
-        if (xQueueReceive(me->qTReadToLCD, &tSensed, (TickType_t) MAX_WAIT_QUEUE))
-        {
-            //Print value in LCD
-            me->itsTempSensed = tSensed;
-            //Turn on backlight for some secs and display info
-            DisplayClient_showInfo(me);
-            xTimerReset(lcdOFFBl_tmr, 0);
+        sem_wait(&displayData);
+        DisplayClient_showInfo(displayClient);
+
+            /*xTimerReset(lcdOFFBl_tmr, 0);
 
             if (!xTimerIsTimerActive(lcdOFFBl_tmr))
             {
                 xTimerStart(lcdOFFBl_tmr, 0);
-            }
-        }
-        if (xQueueReceive(me->qTCtrlToLCD, &tTarget, (TickType_t) MAX_WAIT_QUEUE))
-        {
-            //Print value in LCD
-            me->itsTempTarget = tTarget;
-            //Turn on backlight for some secs and display info
-            DisplayClient_showInfo(me);
-            xTimerReset(lcdOFFBl_tmr, 0);
-
-            if (!xTimerIsTimerActive(lcdOFFBl_tmr))
-            {
-                xTimerStart(lcdOFFBl_tmr, 0);
-            }
-        }
-        sched_yield();
+            }*/
+        Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     }
-}*/
+}

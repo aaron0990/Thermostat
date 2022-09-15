@@ -29,6 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <semaphore.h>
 
 /*
  *  ======== main_freertos.c ========
@@ -82,6 +83,10 @@ extern void* temperatureControllerThread(void *arg0);
 #define QUEUE_SIZE 10   //Max num of elements in the queue
 
 Display_Handle disp_hdl;
+
+sem_t startReadingTemp;
+sem_t displayData;
+sem_t initDisplayDone;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -166,7 +171,7 @@ void queryClockFreqs(void){
 }
 
 /* TODO:
- *  - Hacer que la LCD se actualice al momento cuando pulso botones del Keypad.
+ *  - Algo pasa con la gestion de los semaforos (se printa en la LCD cuando le sale de las pelotas)
  *  - Consejos para reducir consumo
  *      - Probar a poner el GND del relé en un GPIO
  *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
@@ -239,6 +244,22 @@ int main(void)
     queryClockFreqs();
     init_Timer32_module();
 
+    /* Semaphores initialization */
+    retc = sem_init(&startReadingTemp, 0, 0);
+    if (retc == -1) {
+        while (1);
+    }
+
+    retc = sem_init(&displayData, 0, 0);
+    if (retc == -1) {
+        while (1);
+    }
+
+    retc = sem_init(&initDisplayDone, 0, 0);
+    if (retc == -1) {
+        while (1);
+    }
+
     /* Initialize the attributes structure with default values */
     pthread_attr_init(&attrs);
 
@@ -249,6 +270,15 @@ int main(void)
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, mainThread,
+                          NULL);
+
+    /************************** Display LCD Thread ******************************/
+
+    priParam.sched_priority = 2;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    retc = pthread_create(&thread, &attrs, displayLCDThread,
                           NULL);
 
     /* Start the FreeRTOS scheduler */

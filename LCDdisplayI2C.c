@@ -28,6 +28,8 @@ void DisplayI2C_initialize(DisplayI2C *const me)
 
 void DisplayI2C_send(DisplayI2C *const me, uint8_t data)
 {
+
+
     uint8_t buf[1];
     buf[0] = data;
     me->i2cTransaction->slaveAddress = SLAVE_ADDR;

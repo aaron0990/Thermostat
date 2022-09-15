@@ -11,6 +11,8 @@
 void TempSensor_init(TempSensor *const me, TempData* readTemp)
 {
     TempSensorProxy_init(me->itsTempSensorProxy, readTemp);
+    me->tempUpdateInterval = TEMP_UPDATE_INT;
+    me->nextTempUpdateTime = 0;
 }
 
 //#pragma CODE_SECTION(TempSensor_readTemp, ".TI.ramfunc")
@@ -32,6 +34,14 @@ TempSensor* TempSensor_create()
         me->itsTempSensorProxy = TempSensorProxy_create();
     }
     return me;
+}
+
+void TempSensor_updateNextTempUpdateTime(TempSensor *const me, uint32_t currentTime)
+{
+    if(me != NULL)
+    {
+        me->nextTempUpdateTime = currentTime + me->tempUpdateInterval;
+    }
 }
 
 void TempSensor_destroy(TempSensor *const me)

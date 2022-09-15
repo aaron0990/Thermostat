@@ -27,6 +27,8 @@ typedef struct TempSensor TempSensor;
 struct TempSensor
 {
     TempSensorProxy *itsTempSensorProxy;
+    uint32_t tempUpdateInterval;    //seconds
+    uint32_t nextTempUpdateTime;    //seconds elapsed to time expiration
 };
 
 /*Constructors and destructors*/
@@ -38,6 +40,7 @@ void TempSensor_readTemp(TempSensor *const me);
 void TempSensor_newData(TempSensor *const me);
 void TempSensor_configure(TempSensor *const me, TempData* readTemp);
 TempSensor* TempSensor_create();
+void TempSensor_updateNextTempUpdateTime(TempSensor *const me, uint32_t currentTime);
 void TempSensor_destroy(TempSensor *const me);
 
 #endif /* TEMPSENSOR_H_ */
