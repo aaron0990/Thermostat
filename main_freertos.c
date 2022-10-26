@@ -171,12 +171,13 @@ void queryClockFreqs(void){
 }
 
 /* TODO:
- *  - Algo pasa con la gestion de los semaforos (se printa en la LCD cuando le sale de las pelotas)
  *  - Consejos para reducir consumo
  *      - Probar a poner el GND del relé en un GPIO
  *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
  *  - Probar a hacer el enablePolicy() dentro de un thread y no en el main (instanciarlo despues de vTaskStartScheduler)
- *
+ *  - Voy a usar el RTC para contar tiempo cuando se está en modo deepSleep (básicamente siempre), y utilizaré un modulo RTC DS1302N externo
+ *    para conseguir mayor accuracy en el reloj.
+ *  - Hay que adaptar los ficheros ds1302.h y ds1302.c del proyecto para portarlo a mi MCU.
  *  - Si se está en LPM3, el timer interno del MSP432 se suspende tambien:
         Note: Clock ticks halt during MSP432 deep sleep states. This is a significant consequence in
         that timeouts scheduled by the Clock module are suspended during deep sleep, and

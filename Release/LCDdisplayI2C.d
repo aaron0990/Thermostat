@@ -58,9 +58,6 @@ LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/So
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
-LCDdisplayI2C.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h
-LCDdisplayI2C.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h
-LCDdisplayI2C.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 LCDdisplayI2C.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
@@ -180,12 +177,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 

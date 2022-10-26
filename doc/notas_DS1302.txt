@@ -1,0 +1,8 @@
+-Tiene comunicacion 3-wire: IO, CLK y CE (chip enable o RST)
+-Los datos se transfieren bidireccionalmente a través de IO:
+	-Single-> 1 byte a la vez
+	-Multiple-> con ráfagas de hasta 31 bytes
+-Tiene una SRAM de 31 bytes para usarla de bloc de notas (scratchpad)
+-SCLK máximo 2 MHz
+-El contenido de los registros de tiempo y calendario estan en formato 
+BCD (cada dígito decimal codificado con 4 dígitos en binario)

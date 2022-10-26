@@ -26,10 +26,10 @@ void *displayConsoleThread(void *arg0){
     while(1)
     {
        //Print value in LCD
-       char text[msg.len];
-       strcpy(text, msg.buff);
-       Display_printf(disp_hdl, row, 0, text);
-       ++row;
+       //char text[msg.len];
+       //strcpy(text, msg.buff);
+       //Display_printf(disp_hdl, row, 0, text);
+      // ++row;
     }
 
 }

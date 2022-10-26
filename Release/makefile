@@ -10,16 +10,20 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./DS3231.obj" \
+"./DS3231_I2C.obj" \
 "./DisplayConsole.obj" \
 "./Keypad.obj" \
 "./LCDdisplayClient.obj" \
 "./LCDdisplayI2C.obj" \
 "./LCDdisplayProxy.obj" \
 "./MSP_EXP432P401R.obj" \
+"./RTC.obj" \
 "./TempController.obj" \
 "./TempData.obj" \
 "./TempSensor.obj" \
 "./TempSensorProxy.obj" \
+"./mainThread.obj" \
 "./main_freertos.obj" \
 "./utils.obj" \
 "../MSP_EXP432P401R_FREERTOS.cmd" \
@@ -175,8 +179,8 @@ Thermostat.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "DisplayConsole.obj" "Keypad.obj" "LCDdisplayClient.obj" "LCDdisplayI2C.obj" "LCDdisplayProxy.obj" "MSP_EXP432P401R.obj" "TempController.obj" "TempData.obj" "TempSensor.obj" "TempSensorProxy.obj" "main_freertos.obj" "utils.obj" 
-	-$(RM) "DisplayConsole.d" "Keypad.d" "LCDdisplayClient.d" "LCDdisplayI2C.d" "LCDdisplayProxy.d" "MSP_EXP432P401R.d" "TempController.d" "TempData.d" "TempSensor.d" "TempSensorProxy.d" "main_freertos.d" "utils.d" 
+	-$(RM) "DS3231.obj" "DS3231_I2C.obj" "DisplayConsole.obj" "Keypad.obj" "LCDdisplayClient.obj" "LCDdisplayI2C.obj" "LCDdisplayProxy.obj" "MSP_EXP432P401R.obj" "RTC.obj" "TempController.obj" "TempData.obj" "TempSensor.obj" "TempSensorProxy.obj" "mainThread.obj" "main_freertos.obj" "utils.obj" 
+	-$(RM) "DS3231.d" "DS3231_I2C.d" "DisplayConsole.d" "Keypad.d" "LCDdisplayClient.d" "LCDdisplayI2C.d" "LCDdisplayProxy.d" "MSP_EXP432P401R.d" "RTC.d" "TempController.d" "TempData.d" "TempSensor.d" "TempSensorProxy.d" "mainThread.d" "main_freertos.d" "utils.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

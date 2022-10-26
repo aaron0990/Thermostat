@@ -15,6 +15,7 @@
 #include <RTC.h>
 #include <Keypad.h>
 #include <TempData.h>
+#include <DS3231.h>
 
 /*Driverlib includes*/
 #include <interrupt.h>

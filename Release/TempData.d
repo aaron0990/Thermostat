@@ -40,8 +40,6 @@ TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/
 TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
-TempData.obj: ../InterThreadQueues.h
-TempData.obj: ../TempData.h
 TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 TempData.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h
 TempData.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
@@ -129,10 +127,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
-
-../InterThreadQueues.h:
-
-../TempData.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 

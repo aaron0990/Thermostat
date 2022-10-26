@@ -16,4 +16,5 @@
 	<origin value="C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\rtos\MSP_EXP432P401R\drivers\display\freertos\ccs\display_MSP_EXP432P401R_freertos_ccs.projectspec"/>
 	<filesToOpen value=""/>
 	<isTargetManual value="false"/>
+	<sourceLookupPath value=""/>
 </projectOptions>

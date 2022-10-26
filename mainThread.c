@@ -23,6 +23,7 @@ Keypad *keypad;
 RTC *rtc;
 TempData* readTemp;
 TempData* targetTemp;
+DS3231Proxy* ds3231hdl;
 
 uint32_t secondsCount;
 
@@ -36,8 +37,8 @@ Power_NotifyObj notifyObj;
 void *mainThread(void* arg)
 {
 
-    GPIO_setAsOutputPin(GPIO_PORT_P5, GPIO_PIN1);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
+    GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN1);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
 
     /*Power_registerNotify(&notifyObj, PowerMSP432_ENTERING_DEEPSLEEP | PowerMSP432_AWAKE_DEEPSLEEP,
             (Power_NotifyFxn)notifyFxn, 0);*/
@@ -62,6 +63,10 @@ void *mainThread(void* arg)
     keypad = Keypad_create();
     Keypad_init(keypad);
 
+    uint8_t data_array[7] = {0, 12, 20, 2, 26, 10, 22};
+    ds3231hdl = ds3231_create();
+    ds3231_init(ds3231hdl, data_array, CLOCK_RUN, FORCE_RESET);
+
     displayClient = DisplayClient_create();
     DisplayClient_init(displayClient, readTemp, targetTemp);
     DisplayClient_updateNextBacklightOffTime(displayClient,  rtc->secondsCount);
@@ -85,7 +90,7 @@ void RTC_C_IRQHandler(uint32_t arg)
 {
     uint32_t status;
 
-    GPIO_setOutputHighOnPin(GPIO_PORT_P5, GPIO_PIN1);
+    GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN1);
     status = RTC_C_getEnabledInterruptStatus();
     RTC_C_clearInterruptFlag(status);
     ++(rtc->secondsCount); // A second has elapsed
@@ -104,10 +109,9 @@ void RTC_C_IRQHandler(uint32_t arg)
             displayClient->flags = OFF_BACKLIGHT;
             sem_post(&unlockDisplayThread);
             Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-            //DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
         }
     }
-    GPIO_setOutputLowOnPin(GPIO_PORT_P5, GPIO_PIN1);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
 
 }
 

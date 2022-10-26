@@ -61,9 +61,6 @@ LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
-LCDdisplayProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h
-LCDdisplayProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h
-LCDdisplayProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 LCDdisplayProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
@@ -194,12 +191,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 

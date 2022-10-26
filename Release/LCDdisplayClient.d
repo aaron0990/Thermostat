@@ -1,9 +1,7 @@
 # FIXED
 
 LCDdisplayClient.obj: ../LCDdisplayClient.c
-LCDdisplayClient.obj: ../LCDdisplayClient.h
-LCDdisplayClient.obj: ../TempSensor.h
-LCDdisplayClient.obj: ../TempData.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdint.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/_ti_config.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/linkage.h
@@ -14,21 +12,27 @@ LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/inc
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/machine/_types.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/machine/_stdint.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/_stdint.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/_internal.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/time.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stddef.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/time.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/abi_prefix.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/xlocale/_time.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/signal.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/types.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/signal.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/timespec.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/_timespec.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
+LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h
+LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
+LCDdisplayClient.obj: ../LCDdisplayClient.h
+LCDdisplayClient.obj: ../TempSensor.h
+LCDdisplayClient.obj: ../TempData.h
 LCDdisplayClient.obj: ../shared_vars.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/display/Display.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdarg.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/pthread.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/types.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stddef.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/_internal.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/time.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/abi_prefix.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/xlocale/_time.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/time.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/signal.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/signal.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/timespec.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/_timespec.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sched.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/FreeRTOS.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/workspace/freertos_builds_MSP_EXP432P401R_release_ccs/FreeRTOSConfig.h
@@ -42,11 +46,6 @@ LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
-LCDdisplayClient.obj: ../InterThreadQueues.h
-LCDdisplayClient.obj: ../TempData.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
-LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h
-LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
 LCDdisplayClient.obj: ../TempSensorProxy.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/unistd.h
@@ -90,11 +89,7 @@ LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/inc
 
 ../LCDdisplayClient.c:
 
-../LCDdisplayClient.h:
-
-../TempSensor.h:
-
-../TempData.h:
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdint.h:
 
@@ -116,19 +111,11 @@ C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/machine/_stdint.h
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/_stdint.h:
 
-../shared_vars.h:
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/_internal.h:
 
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/display/Display.h:
-
-C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdarg.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/pthread.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/types.h:
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/time.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stddef.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/_internal.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/time.h:
 
@@ -136,15 +123,35 @@ C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/abi_prefix.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/xlocale/_time.h:
 
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/time.h:
-
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/signal.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sys/types.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/signal.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/timespec.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/sys/_timespec.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
+
+C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h:
+
+../LCDdisplayClient.h:
+
+../TempSensor.h:
+
+../TempData.h:
+
+../shared_vars.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/display/Display.h:
+
+C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdarg.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/pthread.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/sched.h:
 
@@ -171,16 +178,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
-
-../InterThreadQueues.h:
-
-../TempData.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
-
-C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h:
 

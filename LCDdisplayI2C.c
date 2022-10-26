@@ -12,7 +12,6 @@ DisplayI2C* DisplayI2C_create(void)
 
 void DisplayI2C_initialize(DisplayI2C *const me)
 {
-
     me->i2cHandle = (I2C_Handle*) malloc(sizeof(I2C_Handle));
     me->i2cParams = (I2C_Params*) malloc(sizeof(I2C_Params));
     me->i2cTransaction = (I2C_Transaction*) malloc(sizeof(I2C_Transaction));
@@ -23,13 +22,10 @@ void DisplayI2C_initialize(DisplayI2C *const me)
 
     //Open I2C bus for usage
     *(me->i2cHandle) = I2C_open(0, me->i2cParams);
-
 }
 
 void DisplayI2C_send(DisplayI2C *const me, uint8_t data)
 {
-
-
     uint8_t buf[1];
     buf[0] = data;
     me->i2cTransaction->slaveAddress = SLAVE_ADDR;

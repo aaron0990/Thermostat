@@ -15,6 +15,9 @@ void TempController_init(TempController *const me, TempData* readTemp, TempData*
 
     //Relay control pin
     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN5);
+    //Relay GND
+    GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN6);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
 
     me->heatingOn = 1; //Heating is ON when system starts up.
     GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN5);

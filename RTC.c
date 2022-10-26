@@ -32,6 +32,25 @@ void RTC_C_init(RTC* const me)
     RTC_C_setPrescaleValue(RTC_C_PRESCALE_0,0x00);
     RTC_C_setPrescaleValue(RTC_C_PRESCALE_1,0x00);
     RTC_C_definePrescaleEvent(RTC_C_PRESCALE_1, RTC_C_PSEVENTDIVIDER_128);
+
+    //this function selects the output frequency for RTCCLK
+    RTC_C_setCalibrationFrequency(RTC_C_CALIBRATIONFREQ_1HZ);
+    //Pin 4.3 output the RTCCLK to calibrate RTC clock
+    //RTC_C_setCalibrationData(RTC_C_CALIBRATION_DOWN1PPM, 240);
+    GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P4, GPIO_PIN3, GPIO_SECONDARY_MODULE_FUNCTION);
+    RTC_C_Calendar cal;
+    cal.year=2022;
+    cal.month=10;
+    cal.dayOfmonth=02;
+    cal.dayOfWeek=6;
+    cal.hours=7;
+    cal.minutes=14;
+    cal.seconds=00;
+    RTC_C_initCalendar(&cal, RTC_C_FORMAT_BINARY);
+
+
+    //this function calibrates the RTC clock once we measured the actual clock freq RTCCLK
+    //RTC_C_setCalibrationData(offsetDirection, offsetValue)
     //RTC_C_PRESCALE_TIMER1_INTERRUPT, con divider 256 permite generar interrupcion cada 2 segundos.
     //Es lo máximo que se puede en este modo.
     RTC_C_enableInterrupt(RTC_C_PRESCALE_TIMER1_INTERRUPT);

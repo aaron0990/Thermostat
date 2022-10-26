@@ -127,15 +127,6 @@ void* displayLCDThread(void *arg0)
 {
     //Creates DisplayClient "instance"
     sem_wait(&initDisplayDone);
-    //gObj = me;
-
-    /*
-    TimerHandle_t lcdOFFBl_tmr = xTimerCreate(
-            "LCDBacklightOFF", pdMS_TO_TICKS(LCD_ON_BACKLIGHT_T), pdFALSE,
-            (void*) 0, DisplayClient_turnOffLCDbacklight);*/
-
-    //Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-
     while (1)
     {
         sem_wait(&unlockDisplayThread);
@@ -151,7 +142,6 @@ void* displayLCDThread(void *arg0)
                 break;
         }
         displayClient->flags = SLEEP;
-        //DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
         Power_releaseConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     }
 }

@@ -155,14 +155,12 @@ const CaptureMSP432_HWAttrs captureMSP432HWAttrs[MSP_EXP432P401R_CAPTURECOUNT] =
         TIMER_A_CLOCKSOURCE_SMCLK,
           .clockDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1, .capturePort =
           CaptureMSP432_P3_6_TA1,
-          .intPriority = 0xFFFFFFFF }
-        };
+          .intPriority = 0xFFFFFFFF } };
 
-const Capture_Config Capture_config[MSP_EXP432P401R_CAPTURECOUNT] = {
-        { .fxnTablePtr = &CaptureMSP432_captureFxnTable, .object =
-                  &captureMSP432Objects[MSP_EXP432P401R_CAPTURE_TA0],
-          .hwAttrs = &captureMSP432HWAttrs[MSP_EXP432P401R_CAPTURE_TA0] }
-        };
+const Capture_Config Capture_config[MSP_EXP432P401R_CAPTURECOUNT] = { {
+        .fxnTablePtr = &CaptureMSP432_captureFxnTable, .object =
+                &captureMSP432Objects[MSP_EXP432P401R_CAPTURE_TA0],
+        .hwAttrs = &captureMSP432HWAttrs[MSP_EXP432P401R_CAPTURE_TA0] } };
 
 const uint_least8_t Capture_count = MSP_EXP432P401R_CAPTURECOUNT;
 
@@ -279,6 +277,7 @@ void MSP_EXP432P401R_initGeneral(void)
      */
     GPIO_init();
     I2C_init();
+
     GPIO_setAsOutputPin(GPIO_PORT_PA, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PB, PIN_ALL16);
     GPIO_setAsOutputPin(GPIO_PORT_PC, PIN_ALL16);
@@ -433,14 +432,19 @@ const I2CMSP432_HWAttrsV1 i2cMSP432HWAttrs[MSP_EXP432P401R_I2CCOUNT] = {
         { .baseAddr = EUSCI_B0_BASE, .intNum = INT_EUSCIB0, .intPriority = (~0),
           .clockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK, .dataPin =
           I2CMSP432_P1_6_UCB0SDA,
-          .clkPin = I2CMSP432_P1_7_UCB0SCL }
-        };
+          .clkPin = I2CMSP432_P1_7_UCB0SCL },
+        { .baseAddr = EUSCI_B1_BASE, .intNum = INT_EUSCIB1, .intPriority = (~0),
+          .clockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK, .dataPin =
+          I2CMSP432_P6_4_UCB1SDA,
+          .clkPin = I2CMSP432_P6_5_UCB1SCL } };
 
 const I2C_Config I2C_config[MSP_EXP432P401R_I2CCOUNT] = {
         { .fxnTablePtr = &I2CMSP432_fxnTable, .object =
                   &i2cMSP432Objects[MSP_EXP432P401R_I2CB0],
-          .hwAttrs = &i2cMSP432HWAttrs[MSP_EXP432P401R_I2CB0] }
-        };
+          .hwAttrs = &i2cMSP432HWAttrs[MSP_EXP432P401R_I2CB0] },
+        { .fxnTablePtr = &I2CMSP432_fxnTable, .object =
+                  &i2cMSP432Objects[MSP_EXP432P401R_I2CB1],
+          .hwAttrs = &i2cMSP432HWAttrs[MSP_EXP432P401R_I2CB1] } };
 
 const uint_least8_t I2C_count = MSP_EXP432P401R_I2CCOUNT;
 
@@ -455,7 +459,8 @@ I2CSlaveMSP432_Object i2cSlaveMSP432Objects[MSP_EXP432P401R_I2CSLAVECOUNT];
 const I2CSlaveMSP432_HWAttrs i2cSlaveMSP432HWAttrs[MSP_EXP432P401R_I2CSLAVECOUNT] =
         { { .baseAddr = EUSCI_B0_BASE, .intNum = INT_EUSCIB0, .intPriority = ~0,
             .slaveAddress = 0x48, .dataPin = I2CSLAVEMSP432_P1_6_UCB0SDA,
-            .clkPin = I2CSLAVEMSP432_P1_7_UCB0SCL } };
+            .clkPin =
+            I2CSLAVEMSP432_P1_7_UCB0SCL } };
 
 const I2CSlave_Config I2CSlave_config[MSP_EXP432P401R_I2CSLAVECOUNT] = { {
         .fxnTablePtr = &I2CSlaveMSP432_fxnTable, .object =
@@ -531,61 +536,51 @@ const uint_least8_t NVS_count = MSP_EXP432P401R_NVSCOUNT;
 #include <ti/devices/msp432p4xx/driverlib/pcm.h>
 
 /* Custom performance level for SPI Master Example */
-PowerMSP432_PerfLevel myPerfLevels[] = {
-                                        {   .activeState = PCM_AM_LDO_VCORE0,
-                                            .VCORE = 0,
-                                            .clockSource = CS_DCOCLK_SELECT,
-                                            .DCORESEL = CS_DCO_FREQUENCY_12,
-                                            .SELM = CS_DCOCLK_SELECT,
-                                            .DIVM = CS_CLOCK_DIVIDER_1,
-                                            .SELS = CS_DCOCLK_SELECT, //SMCLK & HSMCLK
-                                            .DIVHS = CS_CLOCK_DIVIDER_1,
-                                            .DIVS = CS_CLOCK_DIVIDER_1,
-                                            .SELB = CS_REFOCLK_SELECT,
-                                            .SELA = CS_REFOCLK_SELECT,
-                                            .DIVA = CS_CLOCK_DIVIDER_1,
-                                            //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
-                                            //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
-                                            .flashWaitStates = 0,
-                                            .enableFlashBuffer = false,
-                                            .MCLK = 12000000, //Only informational
-                                            .HSMCLK = 12000000, //Only informational
-                                            .SMCLK = 12000000, //Only informational
-                                            .BCLK = 32768, //Only informational
-                                            .ACLK = 32768, //Only informational
-                                         },
-                                         {  .activeState = PCM_AM_LDO_VCORE0,
-                                            .VCORE = 0,
-                                            .clockSource = CS_REFOCLK_SELECT,
-                                            .DCORESEL = CS_DCO_FREQUENCY_12,
-                                            .SELM = CS_REFOCLK_SELECT,
-                                            .DIVM = CS_CLOCK_DIVIDER_1,
-                                            .SELS = CS_REFOCLK_SELECT, //SMCLK & HSMCLK
-                                            .DIVHS = CS_CLOCK_DIVIDER_1,
-                                            .DIVS = CS_CLOCK_DIVIDER_1,
-                                            .SELB = CS_REFOCLK_SELECT,
-                                            .SELA = CS_REFOCLK_SELECT,
-                                            .DIVA = CS_CLOCK_DIVIDER_1,
-                                            //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
-                                            //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
-                                            .flashWaitStates = 0,
-                                            .enableFlashBuffer = true,
-                                            .MCLK = 32768, //Only informational
-                                            .HSMCLK = 32768, //Only informational
-                                            .SMCLK = 32768, //Only informational
-                                            .BCLK = 32768, //Only informational
-                                            .ACLK = 32768, //Only informational
-                                          }
-};
+PowerMSP432_PerfLevel myPerfLevels[] = { { .activeState = PCM_AM_LDO_VCORE0,
+                                           .VCORE = 0, .clockSource =
+                                           CS_DCOCLK_SELECT,
+                                           .DCORESEL = CS_DCO_FREQUENCY_12,
+                                           .SELM = CS_DCOCLK_SELECT,
+                                           .DIVM = CS_CLOCK_DIVIDER_1,
+                                           .SELS = CS_DCOCLK_SELECT, //SMCLK & HSMCLK
+                                           .DIVHS = CS_CLOCK_DIVIDER_1, .DIVS =
+                                           CS_CLOCK_DIVIDER_1,
+                                           .SELB = CS_REFOCLK_SELECT,
+                                           .SELA = CS_REFOCLK_SELECT,
+                                           .DIVA = CS_CLOCK_DIVIDER_1,
+                                           //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
+                                           //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
+                                           .flashWaitStates = 0,
+                                           .enableFlashBuffer = false, .MCLK =
+                                                   12000000, //Only informational
+                                           .HSMCLK = 12000000, //Only informational
+                                           .SMCLK = 12000000, //Only informational
+                                           .BCLK = 32768, //Only informational
+                                           .ACLK = 32768, //Only informational
+        }, { .activeState = PCM_AM_LDO_VCORE0, .VCORE = 0, .clockSource =
+        CS_REFOCLK_SELECT,
+             .DCORESEL = CS_DCO_FREQUENCY_12, .SELM = CS_REFOCLK_SELECT, .DIVM =
+             CS_CLOCK_DIVIDER_1,
+             .SELS = CS_REFOCLK_SELECT, //SMCLK & HSMCLK
+             .DIVHS = CS_CLOCK_DIVIDER_1, .DIVS = CS_CLOCK_DIVIDER_1, .SELB =
+             CS_REFOCLK_SELECT,
+             .SELA = CS_REFOCLK_SELECT, .DIVA = CS_CLOCK_DIVIDER_1,
+             //Flash memory operation with 1 wait state is limited to 24 MHz in AM_*_VCORE0 mode and 48 MHz in AM_*_VCORE1 mode.
+             //Flash memory operation with 0 wait states is limited to 16 MHz in AM_*_VCORE0 mode and 24 MHz in AM_*_VCORE1 mode.
+             .flashWaitStates = 0, .enableFlashBuffer = true, .MCLK = 32768, //Only informational
+             .HSMCLK = 32768, //Only informational
+             .SMCLK = 32768, //Only informational
+             .BCLK = 32768, //Only informational
+             .ACLK = 32768, //Only informational
+        } };
 
 const PowerMSP432_ConfigV1 PowerMSP432_config = {
-        .policyInitFxn = &PowerMSP432_initPolicy, .policyFxn =
-                &PowerMSP432_sleepPolicy,
+        .policyInitFxn = &PowerMSP432_initPolicy,
+        .policyFxn = &PowerMSP432_sleepPolicy,
         .initialPerfLevel = 4, // default perf levels -> 0-3; custom perf levels -> 4-inf
-        .enablePolicy = false,
-        .enablePerf = true,
-        .enableParking = false, .customPerfLevels = myPerfLevels, .numCustom =
-                sizeof(myPerfLevels) / sizeof(PowerMSP432_PerfLevel) };
+        .enablePolicy = false, .enablePerf = true, .enableParking = false,
+        .customPerfLevels = myPerfLevels, .numCustom = sizeof(myPerfLevels)
+                / sizeof(PowerMSP432_PerfLevel) };
 
 /*
  *  =============================== PWM ===============================
@@ -747,8 +742,7 @@ const TimerMSP432_HWAttrs timerMSP432HWAttrs[MSP_EXP432P401R_TIMERCOUNT] = {
         /* Timer_A1 */
         { .timerBaseAddress = TIMER_A1_BASE, .clockSource =
         TIMER_A_CLOCKSOURCE_SMCLK,
-          .intNum = INT_TA1_0, .intPriority = ~0 }
-        };
+          .intNum = INT_TA1_0, .intPriority = ~0 } };
 
 const Timer_Config Timer_config[MSP_EXP432P401R_TIMERCOUNT] = {
         { .fxnTablePtr = &TimerMSP432_Timer32_fxnTable, .object =
@@ -759,8 +753,7 @@ const Timer_Config Timer_config[MSP_EXP432P401R_TIMERCOUNT] = {
           .hwAttrs = &timerMSP432HWAttrs[MSP_EXP432P401R_TIMER_T32_1] },
         { .fxnTablePtr = &TimerMSP432_Timer_A_fxnTable, .object =
                   &timerMSP432Objects[MSP_EXP432P401R_TIMER_TA_1],
-          .hwAttrs = &timerMSP432HWAttrs[MSP_EXP432P401R_TIMER_TA_1] }
-};
+          .hwAttrs = &timerMSP432HWAttrs[MSP_EXP432P401R_TIMER_TA_1] } };
 
 const uint_least8_t Timer_count = MSP_EXP432P401R_TIMERCOUNT;
 
@@ -803,24 +796,22 @@ const UARTMSP432_BaudrateConfig uartMSP432Baudrates[] = {
                                                           { 9600, 32768, 3, 0,
                                                             146, 0 } };
 
-const UARTMSP432_HWAttrsV1 uartMSP432HWAttrs[MSP_EXP432P401R_UARTCOUNT] = {
-        { .baseAddr = EUSCI_A0_BASE, .intNum = INT_EUSCIA0, .intPriority = (~0),
-          .clockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK, .bitOrder =
-          EUSCI_A_UART_LSB_FIRST,
-          .numBaudrateEntries = sizeof(uartMSP432Baudrates)
-                  / sizeof(UARTMSP432_BaudrateConfig),
-          .baudrateLUT = uartMSP432Baudrates, .ringBufPtr =
-                  uartMSP432RingBuffer[MSP_EXP432P401R_UARTA0],
-          .ringBufSize = sizeof(uartMSP432RingBuffer[MSP_EXP432P401R_UARTA0]),
-          .rxPin = UARTMSP432_P1_2_UCA0RXD, .txPin = UARTMSP432_P1_3_UCA0TXD,
-          .errorFxn = NULL }
-        };
+const UARTMSP432_HWAttrsV1 uartMSP432HWAttrs[MSP_EXP432P401R_UARTCOUNT] = { {
+        .baseAddr = EUSCI_A0_BASE, .intNum = INT_EUSCIA0, .intPriority = (~0),
+        .clockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK, .bitOrder =
+        EUSCI_A_UART_LSB_FIRST,
+        .numBaudrateEntries = sizeof(uartMSP432Baudrates)
+                / sizeof(UARTMSP432_BaudrateConfig),
+        .baudrateLUT = uartMSP432Baudrates, .ringBufPtr =
+                uartMSP432RingBuffer[MSP_EXP432P401R_UARTA0],
+        .ringBufSize = sizeof(uartMSP432RingBuffer[MSP_EXP432P401R_UARTA0]),
+        .rxPin = UARTMSP432_P1_2_UCA0RXD, .txPin = UARTMSP432_P1_3_UCA0TXD,
+        .errorFxn = NULL } };
 
-const UART_Config UART_config[MSP_EXP432P401R_UARTCOUNT] = {
-        { .fxnTablePtr = &UARTMSP432_fxnTable, .object =
-                  &uartMSP432Objects[MSP_EXP432P401R_UARTA0],
-          .hwAttrs = &uartMSP432HWAttrs[MSP_EXP432P401R_UARTA0] }
-        };
+const UART_Config UART_config[MSP_EXP432P401R_UARTCOUNT] = { {
+        .fxnTablePtr = &UARTMSP432_fxnTable, .object =
+                &uartMSP432Objects[MSP_EXP432P401R_UARTA0],
+        .hwAttrs = &uartMSP432HWAttrs[MSP_EXP432P401R_UARTA0] } };
 
 const uint_least8_t UART_count = MSP_EXP432P401R_UARTCOUNT;
 

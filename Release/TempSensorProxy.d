@@ -61,15 +61,13 @@ TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
-TempSensorProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h
-TempSensorProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h
-TempSensorProxy.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/interrupt.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/sysctl.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/pcm.h
+TempSensorProxy.obj: ../TempData.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Capture.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 
@@ -195,12 +193,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
 
-C:/ti/ccs1110/ccs/workspace/Thermostat/InterThreadQueues.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/TempData.h:
-
-C:/ti/ccs1110/ccs/workspace/Thermostat/shared_vars.h:
-
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h:
@@ -212,6 +204,8 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/sysctl.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/pcm.h:
+
+../TempData.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Capture.h:
 
