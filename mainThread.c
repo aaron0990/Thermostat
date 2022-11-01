@@ -30,6 +30,7 @@ uint32_t secondsCount;
 extern sem_t startReadingTemp;
 extern sem_t unlockDisplayThread;
 extern sem_t initDisplayDone;
+extern sem_t startStateMachine;
 
 Power_NotifyObj notifyObj;
 
@@ -70,6 +71,7 @@ void *mainThread(void* arg)
     displayClient = DisplayClient_create();
     DisplayClient_init(displayClient, readTemp, targetTemp);
     DisplayClient_updateNextBacklightOffTime(displayClient,  rtc->secondsCount);
+    //sem_post(&startStateMachine);
     sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
 
     RTC_C_init(rtc);
@@ -121,25 +123,45 @@ void RTC_C_IRQHandler(uint32_t arg)
 
 void Keypad_InterruptHandler(uint_least8_t idx)
 {
+
     GPIO_clearInt(idx);
     GPIO_disableInt(idx);
-    delay_us(30000);
+    delay_us(60000);
 
     if (idx == INC_BUTTON_PIN_IDX)
     {
         if(GPIO_read(INC_BUTTON_PIN_IDX))
-            targetTemp->temperature += 0.5;
+        {
+            Event ev = {.eventType = INC_BTN_PRESSED};
+            xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
+        }
     }
     if (idx == DEC_BUTTON_PIN_IDX)
     {
         if(GPIO_read(DEC_BUTTON_PIN_IDX))
-            targetTemp->temperature -= 0.5;
+        {
+            Event ev = {.eventType = DEC_BTN_PRESSED};
+            xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
+        }
     }
-    TempController_updateHeatingState(tempController);
-    displayClient->flags = PRINT_DATA;
-    DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
-    sem_post(&unlockDisplayThread);
-    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+    if (idx == MODE_BUTTON_PIN_IDX)
+    {
+        if(GPIO_read(MODE_BUTTON_PIN_IDX))
+        {
+            Event ev = {.eventType = MODE_BTN_PRESSED};
+            xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
+        }
+
+    }
+    if (idx == OK_BUTTON_PIN_IDX)
+    {
+        if(GPIO_read(OK_BUTTON_PIN_IDX))
+        {
+            Event ev = {.eventType = OK_BTN_PRESSED};
+            xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
+        }
+    }
+    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     GPIO_enableInt(idx);
 }
 

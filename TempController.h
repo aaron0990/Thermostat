@@ -11,16 +11,12 @@
 #include "shared_vars.h"
 #include <stdio.h>
 #include "Keypad.h"
-#include "ThreadsArgStruct.h"
 
-
-typedef struct TempController TempController;
-
-struct TempController{
+typedef struct {
     TempData* targetTemp;
     TempData* readTemp;
     uint8_t heatingOn;
-};
+} TempController;
 
 void TempController_init(TempController *const me, TempData* readTemp, TempData* targetTemp);
 void TempController_clean(TempController* const me);

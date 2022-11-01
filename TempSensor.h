@@ -18,7 +18,6 @@
 #include <gpio.h>
 #include <stdlib.h>
 #include "shared_vars.h"
-#include "ThreadsArgStruct.h"
 
 #define TEMP_UPDATE_INT 10 //seconds
 

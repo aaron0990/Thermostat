@@ -14,7 +14,6 @@
 #include "LCDdisplayProxy.h"
 #include "shared_vars.h"
 #include "Keypad.h"
-#include "ThreadsArgStruct.h"
 
 #define LCD_ON_BACKLIGHT_T  5 //s
 

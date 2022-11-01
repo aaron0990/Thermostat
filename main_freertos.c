@@ -49,6 +49,7 @@
 #include <queue.h>
 
 #include <LCDdisplayClient.h>
+#include <StateMachine.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stddef.h>
@@ -69,13 +70,14 @@
 #include <utils.h>
 #include <string.h>
 #include <shared_vars.h>
-#include "ThreadsArgStruct.h"
+#include <queue.h>
 
 extern void* displayConsoleThread(void *arg0);
 extern void* displayLCDThread(void *arg0);
 extern void* mainThread(void* arg);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
+extern void* stateMachineThread(void *arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   4096
@@ -87,6 +89,9 @@ Display_Handle disp_hdl;
 sem_t startReadingTemp;
 sem_t unlockDisplayThread;
 sem_t initDisplayDone;
+sem_t startStateMachine;
+
+QueueHandle_t stateMachineEventQueue;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -200,6 +205,10 @@ void queryClockFreqs(void){
  *    C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\nortos\MSP_EXP432P401R\driverlib\flash_program_memory
  *    Echar un vistazo a este enlace también: https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/575884/ccs-msp432p401r-how-to-unlock-flash-information-memory-sector-tlv/2116505#2116505
  *
+ *  - Mirar de hacer que el BCLK tire de LFXTCLK, el cual será la señal que venga del oscilador del modulo RTC externo a 32kHz.
+ *    Así, en la MCU contaremos los segundos de manera más precisa que con la señal de clock interna de 32kHz que genera la MCU.
+ *
+ *  - En modo deepSleep, se vuelve a consumir > 2mA. El modulo RTC externo tiene algo que ver.
  */
 
 /* NOTES:
@@ -249,6 +258,10 @@ int main(void)
     queryClockFreqs();
     init_Timer32_module();
 
+    //Create stateMachineEventQueue
+
+    stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(Event));
+
     /* Semaphores initialization */
     retc = sem_init(&startReadingTemp, 0, 0);
     if (retc == -1) {
@@ -261,6 +274,10 @@ int main(void)
     }
 
     retc = sem_init(&initDisplayDone, 0, 0);
+    if (retc == -1) {
+        while (1);
+    }
+    retc = sem_init(&startStateMachine, 0, 0);
     if (retc == -1) {
         while (1);
     }
@@ -279,11 +296,21 @@ int main(void)
 
     /************************** Display LCD Thread ******************************/
 
-    priParam.sched_priority = 2;
+    priParam.sched_priority = 3;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, displayLCDThread,
+                          NULL);
+
+
+    /************************** State Machine Thread ******************************/
+
+    priParam.sched_priority = 2;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    retc = pthread_create(&thread, &attrs, stateMachineThread,
                           NULL);
 
     /* Start the FreeRTOS scheduler */
