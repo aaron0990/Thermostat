@@ -21,8 +21,10 @@
 #include "shared_vars.h"
 #include <sysctl.h>
 
-#define INC_TEMP_PIN_IDX 0
-#define DEC_TEMP_PIN_IDX 1
+#define INC_BUTTON_PIN_IDX  0
+#define DEC_BUTTON_PIN_IDX  1
+#define MODE_BUTTON_PIN_IDX 2
+#define OK_BUTTON_PIN_IDX   3
 
 /*Class Keypad*/
 typedef struct Keypad Keypad;
@@ -30,7 +32,6 @@ struct Keypad
 {
     uint8_t padding;
 };
-
 
 /*Constructors and destructors*/
 Keypad* Keypad_create(void);

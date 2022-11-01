@@ -123,14 +123,17 @@ void Keypad_InterruptHandler(uint_least8_t idx)
 {
     GPIO_clearInt(idx);
     GPIO_disableInt(idx);
+    delay_us(30000);
 
-    if (idx == INC_TEMP_PIN_IDX)
+    if (idx == INC_BUTTON_PIN_IDX)
     {
-        targetTemp->temperature += 0.5;
+        if(GPIO_read(INC_BUTTON_PIN_IDX))
+            targetTemp->temperature += 0.5;
     }
-    if (idx == DEC_TEMP_PIN_IDX)
+    if (idx == DEC_BUTTON_PIN_IDX)
     {
-        targetTemp->temperature -= 0.5;
+        if(GPIO_read(DEC_BUTTON_PIN_IDX))
+            targetTemp->temperature -= 0.5;
     }
     TempController_updateHeatingState(tempController);
     displayClient->flags = PRINT_DATA;

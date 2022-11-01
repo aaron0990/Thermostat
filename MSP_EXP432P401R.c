@@ -335,64 +335,41 @@ void Board_init(void)
  *       reduce memory usage.
  */
 GPIO_PinConfig gpioPinConfigs[] = {
-/* Input pins */
-/*
- * NOTE: Specifying FALLING edge triggering for these buttons to ensure the
- * interrupts are signaled immediately.  See the description of the
- * PowerMSP432 driver's automatic pin parking feature for this rationale.
- */
-/* MSP_EXP432P401R_GPIO_S1 */
-GPIOMSP432_P1_1 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
-                                    /* MSP_EXP432P401R_GPIO_S2 */
-                                    GPIOMSP432_P1_4 | GPIO_CFG_IN_PU
-                                            | GPIO_CFG_IN_INT_FALLING,
+    /* Input pins */
+    /*
+     * NOTE: Specifying FALLING edge triggering for these buttons to ensure the
+     * interrupts are signaled immediately.  See the description of the
+     * PowerMSP432 driver's automatic pin parking feature for this rationale.
+     */
+    /* '+' BUTTON */
+    GPIOMSP432_P2_4 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
+    /* '-' BUTTON */
+    GPIOMSP432_P2_5 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
+    /* 'MODE' BUTTON */
+    GPIOMSP432_P2_6 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
+    /* 'OK' BUTTON */
+    GPIOMSP432_P2_7 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
 
-                                    /* MSP_EXP432P401R_SPI_MASTER_READY */
-                                    GPIOMSP432_P5_7 | GPIO_DO_NOT_CONFIG,
-                                    /* MSP_EXP432P401R_SPI_SLAVE_READY */
-                                    GPIOMSP432_P6_0 | GPIO_DO_NOT_CONFIG,
+    /* MSP_EXP432P401R_GPIO_S1 */
+    GPIOMSP432_P1_1 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
+    /* MSP_EXP432P401R_GPIO_S2 */
+    GPIOMSP432_P1_4 | GPIO_CFG_IN_PU
+            | GPIO_CFG_IN_INT_FALLING,
 
-                                    /* Output pins */
-                                    /* MSP_EXP432P401R_GPIO_LED1 */
-                                    GPIOMSP432_P1_0 | GPIO_CFG_OUT_STD
-                                            | GPIO_CFG_OUT_STR_LOW
-                                            | GPIO_CFG_OUT_LOW,
-                                    /* MSP_EXP432P401R_GPIO_LED_RED */
-                                    GPIOMSP432_P2_0 | GPIO_CFG_OUT_STD
-                                            | GPIO_CFG_OUT_STR_HIGH
-                                            | GPIO_CFG_OUT_LOW,
+    /* MSP_EXP432P401R_SPI_MASTER_READY */
+    GPIOMSP432_P5_7 | GPIO_DO_NOT_CONFIG,
+    /* MSP_EXP432P401R_SPI_SLAVE_READY */
+    GPIOMSP432_P6_0 | GPIO_DO_NOT_CONFIG,
 
-                                    /*
-                                     * MSP_EXP432P401R_GPIO_LED_GREEN & MSP_EXP432P401R_GPIO_LED_BLUE are used for
-                                     * PWM examples.  Uncomment the following lines if you would like to control
-                                     * the LEDs with the GPIO driver.
-                                     */
-                                    /* MSP_EXP432P401R_GPIO_LED_GREEN */
-                                    /* GPIOMSP432_P2_1 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW, */
-                                    /* MSP_EXP432P401R_GPIO_LED_BLUE */
-                                    /* GPIOMSP432_P2_2 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW */
-
-                                    /* TMP116 EN */
-                                    GPIOMSP432_P4_7 | GPIO_DO_NOT_CONFIG,
-
-                                    /* MSP_EXP432P401R_SPI_CS1 */
-                                    GPIOMSP432_P5_4 | GPIO_CFG_OUT_STD
-                                            | GPIO_CFG_OUT_STR_LOW
-                                            | GPIO_CFG_OUT_HIGH,
-                                    /* MSP_EXP432P401R_SPI_CS2 */
-                                    GPIOMSP432_P5_5 | GPIO_CFG_OUT_STD
-                                            | GPIO_CFG_OUT_STR_LOW
-                                            | GPIO_CFG_OUT_HIGH,
-
-                                    /* MSP_EXP432P401R_SDSPI_CS */
-                                    GPIOMSP432_P4_6 | GPIO_CFG_OUT_STD
-                                            | GPIO_CFG_OUT_STR_LOW
-                                            | GPIO_CFG_OUT_HIGH,
-
-                                    /* Sharp Display - GPIO configurations will be done in the Display files */
-                                    GPIOMSP432_P4_3 | GPIO_DO_NOT_CONFIG, /* SPI chip select */
-                                    GPIOMSP432_P4_1 | GPIO_DO_NOT_CONFIG, /* LCD power control */
-                                    GPIOMSP432_P6_0 | GPIO_DO_NOT_CONFIG, /*LCD enable */
+    /* Output pins */
+    /* MSP_EXP432P401R_GPIO_LED1 */
+    GPIOMSP432_P1_0 | GPIO_CFG_OUT_STD
+            | GPIO_CFG_OUT_STR_LOW
+            | GPIO_CFG_OUT_LOW,
+    /* MSP_EXP432P401R_GPIO_LED_RED */
+    GPIOMSP432_P2_0 | GPIO_CFG_OUT_STD
+            | GPIO_CFG_OUT_STR_HIGH
+            | GPIO_CFG_OUT_LOW,
 };
 
 /*
@@ -403,14 +380,14 @@ GPIOMSP432_P1_1 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING,
  *       reduce memory usage (if placed at end of gpioPinConfigs array).
  */
 GPIO_CallbackFxn gpioCallbackFunctions[] = {
-/* MSP_EXP432P401R_GPIO_S1 */
-NULL,
-                                             /* MSP_EXP432P401R_GPIO_S2 */
-                                             NULL,
-                                             /* MSP_EXP432P401R_SPI_MASTER_READY */
-                                             NULL,
-                                             /* MSP_EXP432P401R_SPI_SLAVE_READY */
-                                             NULL };
+ /* MSP_EXP432P401R_GPIO_S1 */
+ NULL,
+ /* MSP_EXP432P401R_GPIO_S2 */
+ NULL,
+ /* MSP_EXP432P401R_SPI_MASTER_READY */
+ NULL,
+ /* MSP_EXP432P401R_SPI_SLAVE_READY */
+ NULL };
 
 const GPIOMSP432_Config GPIOMSP432_config = {
         .pinConfigs = (GPIO_PinConfig*) gpioPinConfigs, .callbacks =
