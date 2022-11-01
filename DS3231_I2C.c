@@ -38,35 +38,59 @@ void DS3231_I2C_write_single(DS3231_I2C *const me, uint8_t device_address, uint8
 /*function to transmit an array of data to device_address, starting from start_register_address*/
 void DS3231_I2C_write_multi(DS3231_I2C *const me, uint8_t device_address, uint8_t start_register_address, uint8_t *data_array, uint8_t data_length)
 {
-    uint8_t buf[1];
+    uint8_t buf[data_length+1];
+    uint8_t idx;
     buf[0] = start_register_address;
-    me->i2cTransaction->slaveAddress = device_address;
-    me->i2cTransaction->writeBuf = buf;
-    me->i2cTransaction->writeCount = 1;
-    me->i2cTransaction->readCount = 0;
-    int8_t ret = 0;
-
-    ret = I2C_transfer(*(me->i2cHandle), me->i2cTransaction);
-
-    for (; data_length && ret; data_length--)
+    for (idx = 1; idx < data_length+1; ++idx)
     {
-        buf[0] = *data_array;
-        //me->i2cTransaction->writeBuf = *data_array;
-        ret = I2C_transfer(*(me->i2cHandle), me->i2cTransaction);
+        buf[idx] = *data_array;
         ++data_array;
     }
-    //I2C_close(*(me->i2cHandle));
-
+    me->i2cTransaction->slaveAddress = device_address;
+    me->i2cTransaction->writeBuf = buf;
+    me->i2cTransaction->writeCount = 8;
+    me->i2cTransaction->readCount = 0;
+    int8_t ret = 0;
+    do
+    {
+        ret = I2C_transfer(*(me->i2cHandle), me->i2cTransaction);
+    }
+    while(!ret);
 }
 
 /*function to read one byte of data from register_address on ds3231*/
 void DS3231_I2C_read_single(DS3231_I2C *const me, uint8_t device_address, uint8_t register_address, uint8_t *data_byte)
 {
+    uint8_t buf[1];
+    buf[0] = register_address;
+    me->i2cTransaction->slaveAddress = device_address;
+    me->i2cTransaction->writeBuf = buf;
+    me->i2cTransaction->writeCount = 1;
+    me->i2cTransaction->readBuf = data_byte;
+    me->i2cTransaction->readCount = 1;
+    int8_t ret = 0;
+    /* Re-try writing to slave till I2C_transfer returns true */
+    do {
+        ret = I2C_transfer(*(me->i2cHandle), me->i2cTransaction);
+    } while(!ret);
+
 }
 
 /*function to read an array of data from device_address*/
 void DS3231_I2C_read_multi(DS3231_I2C *const me, uint8_t device_address, uint8_t start_register_address, uint8_t *data_array, uint8_t data_length)
 {
+    uint8_t buf[1];
+    buf[0] = start_register_address;
+    me->i2cTransaction->slaveAddress = device_address;
+    me->i2cTransaction->writeBuf = buf;
+    me->i2cTransaction->writeCount = 1;
+    me->i2cTransaction->readBuf = data_array;
+    me->i2cTransaction->readCount = data_length;
+    int8_t ret = 0;
+    /* Re-try writing to slave till I2C_transfer returns true */
+    do {
+        ret = I2C_transfer(*(me->i2cHandle), me->i2cTransaction);
+    } while(!ret);
 }
 
 /*function to initialize I2C peripheral in 100khz or 400khz*/

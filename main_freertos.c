@@ -175,9 +175,6 @@ void queryClockFreqs(void){
  *      - Probar a poner el GND del relé en un GPIO
  *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
  *  - Probar a hacer el enablePolicy() dentro de un thread y no en el main (instanciarlo despues de vTaskStartScheduler)
- *  - Voy a usar el RTC para contar tiempo cuando se está en modo deepSleep (básicamente siempre), y utilizaré un modulo RTC DS1302N externo
- *    para conseguir mayor accuracy en el reloj.
- *  - Hay que adaptar los ficheros ds1302.h y ds1302.c del proyecto para portarlo a mi MCU.
  *  - Si se está en LPM3, el timer interno del MSP432 se suspende tambien:
         Note: Clock ticks halt during MSP432 deep sleep states. This is a significant consequence in
         that timeouts scheduled by the Clock module are suspended during deep sleep, and
@@ -194,7 +191,14 @@ void queryClockFreqs(void){
         lighter-weight sleep policy Power_sleepPolicy() should be used. If wakeups from deep
         sleep are triggered by other sources (such as a GPIO line changing state), then the
         PowerMSP432_deepSleepPolicy() allows much better power savings.
+
+ *  - Voy a usar el RTC para contar tiempo cuando se está en modo deepSleep (básicamente siempre),
+ *     y utilizaré un modulo RTC DS3231 externo para conseguir mayor accuracy en el reloj.
  *
+ *  - Hay que implementar la funcionalidad de que se almacene en flash la programacion de la semana (para que
+ *    permanezca cuando se apague el termostato e.g. se queda sin bateria, etc.). Mirar el ejemplo que hay en esta ruta:
+ *    C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\nortos\MSP_EXP432P401R\driverlib\flash_program_memory
+ *    Echar un vistazo a este enlace también: https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/575884/ccs-msp432p401r-how-to-unlock-flash-information-memory-sector-tlv/2116505#2116505
  *
  */
 

@@ -30,7 +30,7 @@ enum ds3231_registers {
   DS3231_REGISTER_ALARM2_TEMP_LSB
   };
   
-#define DS3231_I2C_ADDRESS                    0X57
+#define DS3231_I2C_ADDRESS                    0X68
 
 #define FORCE_RESET                           0X00
 #define NO_FORCE_RESET                        0X01

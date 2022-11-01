@@ -347,7 +347,7 @@ static void ds3231_data_clone(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *i
 /*internal function related to this file and not accessible from outside*/
 static void BCD_to_HEX(DS3231Proxy* ds3231hdl, uint8_t *data_array, uint8_t array_length)
 {
-  uint8_t index;
+  int8_t index;
   for (index = (array_length - 1); index >= 0; index--)
   {
     data_array[index] = ((data_array[index] >> 4) << 1) + ((data_array[index] >> 4) << 3) + (data_array[index] & 0X0F);

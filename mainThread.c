@@ -63,7 +63,7 @@ void *mainThread(void* arg)
     keypad = Keypad_create();
     Keypad_init(keypad);
 
-    uint8_t data_array[7] = {0, 12, 20, 2, 26, 10, 22};
+    uint8_t data_array[7] = {0, 45, 19, 6, 30, 10, 22};
     ds3231hdl = ds3231_create();
     ds3231_init(ds3231hdl, data_array, CLOCK_RUN, FORCE_RESET);
 
@@ -80,6 +80,7 @@ void *mainThread(void* arg)
         TempController_updateHeatingState(tempController);
         displayClient->flags = PRINT_DATA;
         DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
+        ds3231_read(ds3231hdl, TIME, data_array);
         sem_post(&unlockDisplayThread);
     }
 }
