@@ -24,7 +24,7 @@ RTC* RTC_C_create(void)
 
 void RTC_C_init(RTC* const me)
 {
-    Power_setPolicy((Power_PolicyFxn)PowerMSP432_deepSleepPolicy);
+    Power_setPolicy((Power_PolicyFxn)PowerMSP432_sleepPolicy);
     Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1);
     Power_enablePolicy();
 

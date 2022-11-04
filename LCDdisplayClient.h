@@ -15,42 +15,43 @@
 #include "shared_vars.h"
 #include "Keypad.h"
 
+
 #define LCD_ON_BACKLIGHT_T  5 //s
 
-//Flags used to indicate why the thread is awake
-#define SLEEP               0x00
-#define PRINT_DATA          0x01
-#define OFF_BACKLIGHT       0x02
+// Events
+typedef enum
+{
+    PRINT_DATA,
+    OFF_BACKLIGHT,
+} DCEventType;
+
+typedef struct
+{
+    DCEventType eventType;
+    char* textR1;   //Text to be printed in LCD's row 1
+    uint8_t textR1Length; //length of textR1 (max 16)
+    char* textR2;   //Text to be printed in LCD's row 2
+    uint8_t textR2Length; //length of textR2 (max 16)
+} DCEvent;
 
 typedef struct DisplayClient DisplayClient;
 
 struct DisplayClient{
-    TempData* itsTempSensed;
-    TempData* itsTempTarget;
     DisplayProxy* itsDisplayProxy;
     uint32_t nextBacklightOffTime;
     uint32_t backlightOnDuration;
-    uint8_t flags;
 };
 
-void DisplayClient_init(DisplayClient *const me, TempData* readTemp, TempData* targetTemp);
+extern QueueHandle_t displayClientEventQueue; //Queue used to pass events to the DisplayClient.
+
+void DisplayClient_init(DisplayClient *const me);
 void DisplayClient_clean(DisplayClient* const me);
-void DisplayClient_acceptTempSensed(DisplayClient* const me, TempData* td);
-void DisplayClient_acceptTempTarget(DisplayClient* const me, TempData* td);
 void DisplayClient_register(DisplayClient* const me); //it calls the subscribe() function of the sensor
-void DisplayClient_showInfo(DisplayClient *const me);
+void DisplayClient_showInfo(DisplayClient *const me, DCEvent* event);
 DisplayClient* DisplayClient_create(void);
 void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t currentTime);
 void DisplayClient_turnOffLCDbacklight(DisplayClient *const me);
 
 void DisplayClient_destroy(DisplayClient* const me);
-
-//Getters and setters
-TempData* DisplayClient_getItsTempSensed(DisplayClient* const me);
-void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td);
-TempData* DisplayClient_getItsTempSensed(DisplayClient* const me);
-void DisplayClient_setItsTempSensed(DisplayClient* const me, TempData* p_td);
-TempSensor* DisplayClient_getItsTempSensor(DisplayClient* const me);
-void DisplayClient_setItsTempSensor(DisplayClient* const me, TempSensor* p_ts);
 
 #endif /* LCDDISPLAYCLIENT_H_ */

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configurations XML_version="1.2" id="configurations_0">
-                                                                                                                    
+                                                                                                                        
+    
     
     
     
@@ -29,7 +30,8 @@
     
     
     <configuration XML_version="1.2" id="configuration_0">
-                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                
+        
         
         
         
@@ -58,7 +60,8 @@
         
         
         <instance XML_version="1.2" desc="Texas Instruments XDS110 USB Debug Probe" href="connections/TIXDS110_Connection.xml" id="Texas Instruments XDS110 USB Debug Probe" xml="TIXDS110_Connection.xml" xmlpath="connections"/>
-                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                
+        
         
         
         
@@ -87,7 +90,8 @@
         
         
         <connection XML_version="1.2" id="Texas Instruments XDS110 USB Debug Probe">
-                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                        
+            
             
             
             
@@ -116,7 +120,8 @@
             
             
             <instance XML_version="1.2" href="drivers/tixds510cs_dap.xml" id="drivers" xml="tixds510cs_dap.xml" xmlpath="drivers"/>
-                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                        
+            
             
             
             
@@ -145,7 +150,8 @@
             
             
             <instance XML_version="1.2" href="drivers/tixds510cortexM.xml" id="drivers" xml="tixds510cortexM.xml" xmlpath="drivers"/>
-                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                        
+            
             
             
             
@@ -174,7 +180,8 @@
             
             
             <property Type="choicelist" Value="2" id="The JTAG TCLK Frequency (MHz)">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                
                 
                 
                 
@@ -203,7 +210,8 @@
                 
                 
                 <choice Name="Fixed with user selected faster value" value="SPECIFIC">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                    
                     
                     
                     
@@ -232,7 +240,8 @@
                     
                     
                     <property Type="choicelist" Value="2" id="Select TCK Setting"/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                
                 
                 
                 
@@ -261,7 +270,8 @@
                 
                 
                 </choice>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            
             
             
             
@@ -290,7 +300,8 @@
             
             
             </property>
-                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                        
+            
             
             
             
@@ -319,7 +330,8 @@
             
             
             <property Type="choicelist" Value="2" id="SWD Mode Settings">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                
                 
                 
                 
@@ -348,7 +360,8 @@
                 
                 
                 <choice Name="SWD Mode - Aux COM port is target TDO pin" value="nothing"/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            
             
             
             
@@ -377,7 +390,8 @@
             
             
             </property>
-                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                        
+            
             
             
             
@@ -406,7 +420,8 @@
             
             
             <platform XML_version="1.2" id="platform_0">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                
                 
                 
                 
@@ -435,7 +450,8 @@
                 
                 
                 <instance XML_version="1.2" desc="MSP432P401R" href="devices/msp432p401r.xml" id="MSP432P401R" xml="msp432p401r.xml" xmlpath="devices"/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            
             
             
             
@@ -464,7 +480,8 @@
             
             
             </platform>
-                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                    
+        
         
         
         
@@ -493,7 +510,8 @@
         
         
         </connection>
-                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                            
+    
     
     
     
@@ -522,7 +540,8 @@
     
     
     </configuration>
-                                                                                                                
+                                                                                                                    
+
 
 
 

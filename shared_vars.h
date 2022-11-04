@@ -17,6 +17,7 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <sched.h>
+#include <semaphore.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerMSP432.h>
 

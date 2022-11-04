@@ -82,7 +82,7 @@ extern void* stateMachineThread(void *arg0);
 /* Stack size in bytes */
 #define THREADSTACKSIZE   4096
 
-#define QUEUE_SIZE 10   //Max num of elements in the queue
+#define QUEUE_SIZE 64   //Max num of elements in the queue
 
 Display_Handle disp_hdl;
 
@@ -92,6 +92,7 @@ sem_t initDisplayDone;
 sem_t startStateMachine;
 
 QueueHandle_t stateMachineEventQueue;
+QueueHandle_t displayClientEventQueue;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -209,6 +210,8 @@ void queryClockFreqs(void){
  *    Así, en la MCU contaremos los segundos de manera más precisa que con la señal de clock interna de 32kHz que genera la MCU.
  *
  *  - En modo deepSleep, se vuelve a consumir > 2mA. El modulo RTC externo tiene algo que ver.
+ *
+ *  - Se produce un hard fault cuando hago click a cualquier boton.
  */
 
 /* NOTES:
@@ -260,15 +263,11 @@ int main(void)
 
     //Create stateMachineEventQueue
 
-    stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(Event));
+    stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(SMEvent));
+    displayClientEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(DCEvent));
 
     /* Semaphores initialization */
     retc = sem_init(&startReadingTemp, 0, 0);
-    if (retc == -1) {
-        while (1);
-    }
-
-    retc = sem_init(&unlockDisplayThread, 0, 0);
     if (retc == -1) {
         while (1);
     }
@@ -296,7 +295,7 @@ int main(void)
 
     /************************** Display LCD Thread ******************************/
 
-    priParam.sched_priority = 3;
+    priParam.sched_priority = 2;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);

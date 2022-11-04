@@ -6,14 +6,6 @@
  */
 
 
-/*
- * TempSensor.c
- *
- *  Created on: 12 dic. 2021
- *      Author: aaron
- */
-
-
 #include "mainThread.h"
 
 TempController *tempController;
@@ -69,21 +61,38 @@ void *mainThread(void* arg)
     ds3231_init(ds3231hdl, data_array, CLOCK_RUN, FORCE_RESET);
 
     displayClient = DisplayClient_create();
-    DisplayClient_init(displayClient, readTemp, targetTemp);
+    DisplayClient_init(displayClient);
     DisplayClient_updateNextBacklightOffTime(displayClient,  rtc->secondsCount);
-    //sem_post(&startStateMachine);
-    sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
 
     RTC_C_init(rtc);
+
+    sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
+    sem_post(&startStateMachine);
+
+    DCEvent event;
+    char text1[16];
+    char text2[16];
+
+    SMEvent smEvt;
 
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
+        sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
+        sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
+        event.eventType = PRINT_DATA;
+        event.textR1 = text1;
+        event.textR1Length = strlen(text1);
+        event.textR2 = text2;
+        event.textR2Length = strlen(text2);
+        xQueueSend(displayClientEventQueue, &event, 0);
+        smEvt.eventType = INC_BTN_PRESSED;
+        xQueueSend(stateMachineEventQueue, &smEvt, 0);
+        memset(text1, 0x00, 16); //Clear output buffer
+        memset(text2, 0x00, 16); //Clear output buffer
         TempController_updateHeatingState(tempController);
-        displayClient->flags = PRINT_DATA;
         DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
-        ds3231_read(ds3231hdl, TIME, data_array);
-        sem_post(&unlockDisplayThread);
+        //ds3231_read(ds3231hdl, TIME, data_array);
     }
 }
 
@@ -105,13 +114,14 @@ void RTC_C_IRQHandler(uint32_t arg)
             //Allow reading temp every 15s
             TempSensor_updateNextTempUpdateTime(tempSensor, rtc->secondsCount);
             sem_post(&startReadingTemp);
-            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+            //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         }
         if(RTC_C_isTimerExpired(rtc, displayClient->nextBacklightOffTime))
         {
-            displayClient->flags = OFF_BACKLIGHT;
-            sem_post(&unlockDisplayThread);
-            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+            DCEvent dcEvent;
+            dcEvent.eventType = OFF_BACKLIGHT;
+            xQueueSendFromISR(displayClientEventQueue, &dcEvent, NULL);
+            //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         }
     }
     GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
@@ -127,12 +137,12 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     GPIO_clearInt(idx);
     GPIO_disableInt(idx);
     delay_us(60000);
-
+    SMEvent ev;
     if (idx == INC_BUTTON_PIN_IDX)
     {
         if(GPIO_read(INC_BUTTON_PIN_IDX))
         {
-            Event ev = {.eventType = INC_BTN_PRESSED};
+            ev.eventType = INC_BTN_PRESSED;
             xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
         }
     }
@@ -140,7 +150,7 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     {
         if(GPIO_read(DEC_BUTTON_PIN_IDX))
         {
-            Event ev = {.eventType = DEC_BTN_PRESSED};
+            ev.eventType = DEC_BTN_PRESSED;
             xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
         }
     }
@@ -148,7 +158,7 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     {
         if(GPIO_read(MODE_BUTTON_PIN_IDX))
         {
-            Event ev = {.eventType = MODE_BTN_PRESSED};
+            ev.eventType = MODE_BTN_PRESSED;
             xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
         }
 
@@ -157,12 +167,13 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     {
         if(GPIO_read(OK_BUTTON_PIN_IDX))
         {
-            Event ev = {.eventType = OK_BTN_PRESSED};
+            ev.eventType = OK_BTN_PRESSED;
             xQueueSendFromISR(stateMachineEventQueue, &ev, NULL);
         }
     }
-    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     GPIO_enableInt(idx);
+    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+
 }
 
 
