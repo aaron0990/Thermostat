@@ -294,7 +294,7 @@ int main(void)
 
     /************************** Display LCD Thread ******************************/
 
-    priParam.sched_priority = 3;
+    priParam.sched_priority = 2;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);

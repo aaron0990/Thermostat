@@ -52,6 +52,9 @@ typedef struct
     SMEventType eventType;
 } SMEvent;
 
+extern const char* const daysOfWeek[7];
+
 extern QueueHandle_t stateMachineEventQueue; //Queue used to pass events to the FSM.
+
 
 #endif /* STATEMACHINE_H_ */

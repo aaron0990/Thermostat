@@ -25,6 +25,8 @@ extern sem_t startStateMachine;
 
 Power_NotifyObj notifyObj;
 
+extern SMState stateMachineCurrState;
+
 //#pragma CODE_SECTION(mainThread, ".TI.ramfunc")
 void *mainThread(void* arg)
 {
@@ -55,9 +57,9 @@ void *mainThread(void* arg)
     keypad = Keypad_create();
     Keypad_init(keypad);
 
-    uint8_t data_array[7] = {0, 45, 19, 6, 30, 10, 22};
+    uint8_t data_array[7] = {0, 26, 20, 5, 5, 11, 22};
     ds3231hdl = ds3231_create();
-    ds3231_init(ds3231hdl, data_array, CLOCK_RUN, FORCE_RESET);
+    ds3231_init(ds3231hdl, data_array, CLOCK_RUN, NO_RESET);
 
     displayClient = DisplayClient_create();
     DisplayClient_init(displayClient);
@@ -71,23 +73,25 @@ void *mainThread(void* arg)
     char text1[16];
     char text2[16];
 
-    SMEvent smEvt;
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
-        sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
-        sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
-        event.eventType = PRINT_DATA;
-        event.textR1 = text1;
-        event.textR1Length = strlen(text1);
-        event.textR2 = text2;
-        event.textR2Length = strlen(text2);
-        xQueueSend(displayClientEventQueue, &event, 0);
-        memset(text1, 0x00, 16); //Clear output buffer
-        memset(text2, 0x00, 16); //Clear output buffer
+        if (stateMachineCurrState == IDLE_STATE) //Print new read temperature only when in IDLE_STATE to prevent current displayed data in LCD to be overwritten
+        {
+            sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
+            sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
+            event.eventType = PRINT_DATA;
+            event.textR1 = text1;
+            event.textR1Length = strlen(text1);
+            event.textR2 = text2;
+            event.textR2Length = strlen(text2);
+            xQueueSend(displayClientEventQueue, &event, 0);
+            memset(text1, 0x00, 16); //Clear output buffer
+            memset(text2, 0x00, 16); //Clear output buffer
+        }
         TempController_updateHeatingState(tempController);
         DisplayClient_updateNextBacklightOffTime(displayClient, rtc->secondsCount);
-        //ds3231_read(ds3231hdl, TIME, data_array);
+        ds3231_read(ds3231hdl, TIME, data_array);
     }
 }
 

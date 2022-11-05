@@ -45,7 +45,6 @@ void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t 
 #pragma CODE_SECTION(DisplayClient_showInfo, ".TI.ramfunc")
 void DisplayClient_showInfo(DisplayClient *const me, DCEvent* event)
 {
-    char output[50];
     LCD_backlight(me->itsDisplayProxy);
     LCD_display(me->itsDisplayProxy);
 
@@ -58,7 +57,7 @@ void DisplayClient_showInfo(DisplayClient *const me, DCEvent* event)
     }
     if(event->textR2Length)
     {
-        LCD_setCursor(me->itsDisplayProxy, 0, 1); //Move to upper line in LCD
+        LCD_setCursor(me->itsDisplayProxy, 0, 1); //Move to lower line in LCD
         LCD_write(me->itsDisplayProxy, event->textR2, event->textR2Length);
     }
 }
