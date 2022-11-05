@@ -12,7 +12,6 @@
 DisplayClient *gObj; //global DisplayClient "object" reference
 extern DisplayClient *displayClient;
 
-extern sem_t unlockDisplayThread;
 extern sem_t initDisplayDone;
 
 void DisplayClient_turnOffLCDbacklight(DisplayClient *const me)

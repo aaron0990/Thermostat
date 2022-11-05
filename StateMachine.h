@@ -44,7 +44,7 @@ typedef enum
   INC_BTN_PRESSED,
   DEC_BTN_PRESSED,
   MODE_BTN_PRESSED,
-  OK_BTN_PRESSED,
+  OK_BTN_PRESSED
 } SMEventType;
 
 typedef struct

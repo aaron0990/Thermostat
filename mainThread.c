@@ -20,7 +20,6 @@ DS3231Proxy* ds3231hdl;
 uint32_t secondsCount;
 
 extern sem_t startReadingTemp;
-extern sem_t unlockDisplayThread;
 extern sem_t initDisplayDone;
 extern sem_t startStateMachine;
 
@@ -68,13 +67,11 @@ void *mainThread(void* arg)
 
     sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
     sem_post(&startStateMachine);
-
     DCEvent event;
     char text1[16];
     char text2[16];
 
     SMEvent smEvt;
-
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
@@ -86,8 +83,6 @@ void *mainThread(void* arg)
         event.textR2 = text2;
         event.textR2Length = strlen(text2);
         xQueueSend(displayClientEventQueue, &event, 0);
-        smEvt.eventType = INC_BTN_PRESSED;
-        xQueueSend(stateMachineEventQueue, &smEvt, 0);
         memset(text1, 0x00, 16); //Clear output buffer
         memset(text2, 0x00, 16); //Clear output buffer
         TempController_updateHeatingState(tempController);
@@ -114,14 +109,14 @@ void RTC_C_IRQHandler(uint32_t arg)
             //Allow reading temp every 15s
             TempSensor_updateNextTempUpdateTime(tempSensor, rtc->secondsCount);
             sem_post(&startReadingTemp);
-            //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         }
         if(RTC_C_isTimerExpired(rtc, displayClient->nextBacklightOffTime))
         {
             DCEvent dcEvent;
             dcEvent.eventType = OFF_BACKLIGHT;
             xQueueSendFromISR(displayClientEventQueue, &dcEvent, NULL);
-            //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+            Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         }
     }
     GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
@@ -172,7 +167,7 @@ void Keypad_InterruptHandler(uint_least8_t idx)
         }
     }
     GPIO_enableInt(idx);
-    Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
+    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
 
 }
 

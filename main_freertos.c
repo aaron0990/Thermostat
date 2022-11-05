@@ -80,14 +80,13 @@ extern void* temperatureControllerThread(void *arg0);
 extern void* stateMachineThread(void *arg0);
 
 /* Stack size in bytes */
-#define THREADSTACKSIZE   4096
+#define THREADSTACKSIZE   6144
 
-#define QUEUE_SIZE 64   //Max num of elements in the queue
+#define QUEUE_SIZE 10   //Max num of elements in the queue
 
 Display_Handle disp_hdl;
 
 sem_t startReadingTemp;
-sem_t unlockDisplayThread;
 sem_t initDisplayDone;
 sem_t startStateMachine;
 
@@ -295,7 +294,7 @@ int main(void)
 
     /************************** Display LCD Thread ******************************/
 
-    priParam.sched_priority = 2;
+    priParam.sched_priority = 3;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
