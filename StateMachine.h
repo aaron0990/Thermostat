@@ -19,6 +19,8 @@
 #include "TempData.h"
 #include "DS3231.h"
 
+#define NUM_TIME_SLOTS_PER_DOW  5
+
 /* States */
 typedef enum
 {
@@ -36,7 +38,8 @@ typedef enum
     PROG_SET_START_MINUTES_STATE,
     PROG_SET_END_HOUR_STATE,
     PROG_SET_END_MINUTES_STATE,
-} SMState;
+} SMState_t;
+
 
 // Events
 typedef enum
@@ -45,14 +48,54 @@ typedef enum
   DEC_BTN_PRESSED,
   MODE_BTN_PRESSED,
   OK_BTN_PRESSED
-} SMEventType;
+} SMEventType_t;
 
 typedef struct
 {
-    SMEventType eventType;
-} SMEvent;
+    SMEventType_t eventType;
+} SMEvent_t;
 
-extern const char* const daysOfWeek[7];
+typedef enum
+{
+  MON,
+  TUE,
+  WED,
+  THU,
+  FRI,
+  SAT,
+  SUN,
+  NUM_DOW
+} dow_t;
+
+typedef struct
+{
+    uint8_t setpointTemp;
+    uint8_t startHour;
+    uint8_t endHour;
+    uint8_t startMin;
+    uint8_t endMin;
+} timeSlot_t;
+
+
+typedef struct
+{
+    timeSlot_t timeSlot[NUM_TIME_SLOTS_PER_DOW];
+} dow_schedule_t;
+
+typedef struct
+{
+    dow_schedule_t dowSched[NUM_DOW];
+} schedule_t;
+
+typedef enum
+{
+  OFF,
+  ON,
+  NUM_PROG_STATES
+} progState_t;
+
+extern const char* const daysOfWeek[NUM_DOW];
+extern const char* const progStatus[NUM_PROG_STATES];
 
 extern QueueHandle_t stateMachineEventQueue; //Queue used to pass events to the FSM.
 

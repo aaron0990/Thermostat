@@ -262,7 +262,7 @@ int main(void)
 
     //Create stateMachineEventQueue
 
-    stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(SMEvent));
+    stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(SMEvent_t));
     displayClientEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(DCEvent));
 
     /* Semaphores initialization */

@@ -55,11 +55,18 @@ SECTIONS
 {
     .text       :   > MAIN
     .const      :   > MAIN
+    .binit		:	> MAIN
     .cinit      :   > MAIN
     .pinit      :   > MAIN
     .init_array :   > MAIN
 
-    .TI.ramfunc : {} load=MAIN, run=SRAM_CODE, table(BINIT)
+    //.TI.ramfunc : {} load=MAIN, run=SRAM_CODE, table(BINIT)
+    .TI.ramfunc :
+	{
+	  --library=rts*.lib<*printf*.obj>(.text)
+	   *(.TI.ramfunc)
+	} load=MAIN, run=SRAM_CODE, table(BINIT)
+
 
     .data   :   > SRAM_DATA
     .bss    :   > SRAM_DATA

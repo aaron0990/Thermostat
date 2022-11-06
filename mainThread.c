@@ -25,7 +25,7 @@ extern sem_t startStateMachine;
 
 Power_NotifyObj notifyObj;
 
-extern SMState stateMachineCurrState;
+extern SMState_t stateMachineCurrState;
 
 //#pragma CODE_SECTION(mainThread, ".TI.ramfunc")
 void *mainThread(void* arg)
@@ -136,7 +136,7 @@ void Keypad_InterruptHandler(uint_least8_t idx)
     GPIO_clearInt(idx);
     GPIO_disableInt(idx);
     delay_us(60000);
-    SMEvent ev;
+    SMEvent_t ev;
     if (idx == INC_BUTTON_PIN_IDX)
     {
         if(GPIO_read(INC_BUTTON_PIN_IDX))
