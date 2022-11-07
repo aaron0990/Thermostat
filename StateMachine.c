@@ -18,14 +18,14 @@ extern DS3231Proxy *ds3231hdl;
 
 extern sem_t startStateMachine;
 
-SMState_t* stateMachineCurrState;
+SMState_t *stateMachineCurrState;
 
 const char *const daysOfWeek[NUM_DOW] = { "Lunes", "Martes", "Miercoles",
                                           "Jueves", "Viernes", "Sabado",
                                           "Domingo" };
 const char *const progStatus[NUM_PROG_STATES] = { "OFF", "ON" };
 
-void StateMachine_init(StateMachine* const me)
+void StateMachine_init(StateMachine *const me)
 {
     stateMachineCurrState = &me->stateMachineCurrState;
     me->stateMachineCurrState = IDLE_STATE;
@@ -36,13 +36,24 @@ void StateMachine_init(StateMachine* const me)
     me->minute = 0;
     me->progState = OFF;
     memset(&me->schedule, 0, sizeof(schedule_t));
+    int dow, ts;
+    //Initialize setpoint temperatures to 19.0ºC (to save clicks)
+    for (dow = 0; dow < NUM_DOW; ++dow)
+    {
+        for (ts = 0; ts < NUM_TIME_SLOTS_PER_DOW; ++ts)
+        {
+            me->schedule.dowSched[dow].timeSlot[ts].setpointTemp =
+            DEFAULT_SETPOINT_TEMP;
+        }
+
+    }
 }
 
 #pragma CODE_SECTION(stateMachineThread, ".TI.ramfunc")
 void* stateMachineThread(void *arg0)
 {
     sem_wait(&startStateMachine);
-    StateMachine* me = malloc(sizeof(StateMachine));
+    StateMachine *me = malloc(sizeof(StateMachine));
     StateMachine_init(me);
     while (1)
     {
@@ -388,27 +399,19 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
-                me->timeSlotIdx = 0; //Point to first time slot (F1)
-                //Show first timeslot (F1)
-                sprintf(me->startTime,
-                        "%02u:%02u",
+                me->timeSlotIdx = 0;
+
+                sprintf(me->text1,
+                        "F%d = %02u:%02u-%02u:%02u",
+                        me->timeSlotIdx,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
-                sprintf(me->endTime, "%02u:%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
-                sprintf(me->text1, "F%d = %s-%s", me->timeSlotIdx, me->startTime, me->endTime);
 
-                //Show second timeslot (F2)
-                sprintf(me->startTime,
-                        "%02u:%02u",
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx + 1].startHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx + 1].startMin);
-                sprintf(me->endTime,
-                        "%02u:%02u",
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx + 1].endHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx + 1].endMin);
-                sprintf(me->text2, "F1 = %s-%s", me->startTime, me->endTime);
+                sprintf(me->text2,
+                        "%.1f'C",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
 
                 me->dcEvt.eventType = PRINT_DATA;
                 me->dcEvt.textR1 = me->text1;
@@ -425,28 +428,48 @@ void* stateMachineThread(void *arg0)
             {
                 ++me->timeSlotIdx;
                 me->timeSlotIdx %= NUM_TIME_SLOTS_PER_DOW; //If me->dowIdx is greater than 6, set it to 0 again.
-                sprintf(me->startTime,
-                        "%02u:%02u",
+                sprintf(me->text1,
+                        "F%d = %02u:%02u-%02u:%02u",
+                        me->timeSlotIdx,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
-                sprintf(me->endTime, "%02u:%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour,
                         me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
-                sprintf(me->text1, "F%c = %s-%s", me->timeSlotIdx, me->startTime, me->endTime);
 
                 //Show second timeslot (F2)
-                sprintf(me->startTime,
-                        "%02u:%02u",
-                        me->schedule.dowSched[me->dowIdx].timeSlot[(me->timeSlotIdx+1) % NUM_TIME_SLOTS_PER_DOW].startHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[(me->timeSlotIdx+1) % NUM_TIME_SLOTS_PER_DOW].startMin);
-                sprintf(me->endTime,
-                        "%02u:%02u",
-                        me->schedule.dowSched[me->dowIdx].timeSlot[(me->timeSlotIdx+1) % NUM_TIME_SLOTS_PER_DOW].endHour,
-                        me->schedule.dowSched[me->dowIdx].timeSlot[(me->timeSlotIdx+1) % NUM_TIME_SLOTS_PER_DOW].endMin);
-                sprintf(me->text2, "F%u = %s-%s", (me->timeSlotIdx+1) % NUM_TIME_SLOTS_PER_DOW, me->startTime, me->endTime);
+                sprintf(me->text2,
+                        "%.1f'C",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                --me->timeSlotIdx;
+                if (me->timeSlotIdx > (NUM_TIME_SLOTS_PER_DOW - 1))
+                    me->timeSlotIdx = NUM_TIME_SLOTS_PER_DOW - 1; //If me->timeSlotIdx is greater than NUM_TIME_SLOTS_PER_DOW-1, set it to NUM_TIME_SLOTS_PER_DOW-1 again.
+                sprintf(me->text1,
+                        "F%d = %02u:%02u-%02u:%02u",
+                        me->timeSlotIdx,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
+
+                //Show second timeslot (F2)
+                sprintf(me->text2,
+                        "%.1f'C",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -461,16 +484,47 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1, "Temp deseada F%d", me->timeSlotIdx);
+                sprintf(me->text2,
+                        "%.1f",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_SETPOINT_STATE;
             }
-
         }
         else if (me->stateMachineCurrState == PROG_SET_SETPOINT_STATE)
         {
             if (me->smEvent.eventType == INC_BTN_PRESSED)
             {
+                float *setpointTemp =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+                (*setpointTemp) += 0.5;
+                sprintf(me->text1, "Temp deseada F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%.1f", *setpointTemp);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                float *setpointTemp =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+                (*setpointTemp) -= 0.5;
+                sprintf(me->text1, "Temp deseada F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%.1f", *setpointTemp);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -485,6 +539,16 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1, "Hora inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2,
+                        "%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_START_HOUR_STATE;
             }
 
         }
@@ -492,9 +556,32 @@ void* stateMachineThread(void *arg0)
         {
             if (me->smEvent.eventType == INC_BTN_PRESSED)
             {
+                uint8_t *startHour =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour);
+                ++(*startHour);
+                (*startHour) %= 24;
+                sprintf(me->text1, "Hora inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *startHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                uint8_t *startHour =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour);
+                --(*startHour);
+                if (*startHour > 23)
+                    *startHour = 23; //If me->hour is greater than 23, set it to 23 again.
+                sprintf(me->text1, "Hora inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *startHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -509,6 +596,16 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1, "Minuto inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2,
+                        "%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_START_MINUTES_STATE;
             }
 
         }
@@ -516,9 +613,32 @@ void* stateMachineThread(void *arg0)
         {
             if (me->smEvent.eventType == INC_BTN_PRESSED)
             {
+                uint8_t *startMin =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
+                ++(*startMin);
+                (*startMin) %= 24;
+                sprintf(me->text1, "Minuto inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *startMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                uint8_t *startMin =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
+                --(*startMin);
+                if (*startMin > 59)
+                    *startMin = 59; //If me->hour is greater than 59, set it to 59 again.
+                sprintf(me->text1, "Minuto inicio F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *startMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -533,6 +653,17 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1, "Hora fin F%d", me->timeSlotIdx);
+                sprintf(me->text2,
+                        "%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_START_MINUTES_STATE;
+                me->stateMachineCurrState = PROG_SET_END_HOUR_STATE;
             }
 
         }
@@ -540,9 +671,32 @@ void* stateMachineThread(void *arg0)
         {
             if (me->smEvent.eventType == INC_BTN_PRESSED)
             {
+                uint8_t *endHour =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour);
+                ++(*endHour);
+                (*endHour) %= 24;
+                sprintf(me->text1, "Hora fin F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *endHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                uint8_t *endHour =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour);
+                --(*endHour);
+                if (*endHour > 23)
+                    *endHour = 23; //If me->hour is greater than 23, set it to 23 again.
+                sprintf(me->text1, "Hora fin F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *endHour);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -557,16 +711,48 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1, "Minuto fin F%d", me->timeSlotIdx);
+                sprintf(me->text2,
+                        "%02u",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_END_MINUTES_STATE;
             }
-
         }
         else
         {
             if (me->smEvent.eventType == INC_BTN_PRESSED)
             {
+                uint8_t *endMin =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
+                ++(*endMin);
+                (*endMin) %= 24;
+                sprintf(me->text1, "Minuto fin F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *endMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == DEC_BTN_PRESSED)
             {
+                uint8_t *endMin =
+                        &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
+                --(*endMin);
+                if (*endMin > 59)
+                    *endMin = 59; //If me->hour is greater than 59, set it to 59 again.
+                sprintf(me->text1, "Minuto fin F%d", me->timeSlotIdx);
+                sprintf(me->text2, "%02u", *endMin);
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
             }
             else if (me->smEvent.eventType == MODE_BTN_PRESSED)
             {
@@ -581,6 +767,24 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                sprintf(me->text1,
+                        "F%d = %02u:%02u-%02u:%02u",
+                        me->timeSlotIdx,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startHour,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endHour,
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
+
+                sprintf(me->text2,
+                        "%.1f'C",
+                        me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].setpointTemp);
+
+                me->dcEvt.eventType = PRINT_DATA;
+                me->dcEvt.textR1 = me->text1;
+                me->dcEvt.textR1Length = strlen(me->text1);
+                me->dcEvt.textR2 = me->text2;
+                me->dcEvt.textR2Length = strlen(me->text2);
+                me->stateMachineCurrState = PROG_SET_TIME_SLOT_STATE;
             }
 
         }

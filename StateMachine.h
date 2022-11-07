@@ -21,6 +21,7 @@
 #include <stdarg.h>
 
 #define NUM_TIME_SLOTS_PER_DOW  5
+#define DEFAULT_SETPOINT_TEMP   19.0
 
 /* States */
 typedef enum
@@ -59,7 +60,7 @@ typedef enum
 
 typedef struct
 {
-    uint8_t setpointTemp;
+    float setpointTemp;
     uint8_t startHour;
     uint8_t endHour;
     uint8_t startMin;
