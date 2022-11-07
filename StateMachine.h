@@ -18,6 +18,7 @@
 #include "Keypad.h"
 #include "TempData.h"
 #include "DS3231.h"
+#include <stdarg.h>
 
 #define NUM_TIME_SLOTS_PER_DOW  5
 
@@ -40,14 +41,10 @@ typedef enum
     PROG_SET_END_MINUTES_STATE,
 } SMState_t;
 
-
 // Events
 typedef enum
 {
-  INC_BTN_PRESSED,
-  DEC_BTN_PRESSED,
-  MODE_BTN_PRESSED,
-  OK_BTN_PRESSED
+    INC_BTN_PRESSED, DEC_BTN_PRESSED, MODE_BTN_PRESSED, OK_BTN_PRESSED
 } SMEventType_t;
 
 typedef struct
@@ -57,14 +54,7 @@ typedef struct
 
 typedef enum
 {
-  MON,
-  TUE,
-  WED,
-  THU,
-  FRI,
-  SAT,
-  SUN,
-  NUM_DOW
+    MON, TUE, WED, THU, FRI, SAT, SUN, NUM_DOW
 } dow_t;
 
 typedef struct
@@ -75,7 +65,6 @@ typedef struct
     uint8_t startMin;
     uint8_t endMin;
 } timeSlot_t;
-
 
 typedef struct
 {
@@ -89,15 +78,32 @@ typedef struct
 
 typedef enum
 {
-  OFF,
-  ON,
-  NUM_PROG_STATES
+    OFF, ON, NUM_PROG_STATES
 } progState_t;
 
-extern const char* const daysOfWeek[NUM_DOW];
-extern const char* const progStatus[NUM_PROG_STATES];
+typedef struct
+{
+    SMEvent_t smEvent;
+    SMState_t stateMachineCurrState;
+    progState_t progState;
+    uint8_t dowIdx;
+    uint8_t timeSlotIdx;
+    uint8_t hour;
+    uint8_t minute;
+    char startTime[6];
+    char endTime[6];
+
+    DCEvent dcEvt;
+    char text1[16];
+    char text2[16];
+    //Vars used to set the current date and the scheduler
+    schedule_t schedule;
+} StateMachine;
+
+extern const char *const daysOfWeek[NUM_DOW];
+extern const char *const progStatus[NUM_PROG_STATES];
 
 extern QueueHandle_t stateMachineEventQueue; //Queue used to pass events to the FSM.
 
-
+void StateMachine_init(StateMachine* const me);
 #endif /* STATEMACHINE_H_ */

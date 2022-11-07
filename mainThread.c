@@ -25,7 +25,7 @@ extern sem_t startStateMachine;
 
 Power_NotifyObj notifyObj;
 
-extern SMState_t stateMachineCurrState;
+extern SMState_t* stateMachineCurrState;
 
 //#pragma CODE_SECTION(mainThread, ".TI.ramfunc")
 void *mainThread(void* arg)
@@ -76,7 +76,7 @@ void *mainThread(void* arg)
     while(1){
         sem_wait(&startReadingTemp);
         TempSensor_readTemp(tempSensor);
-        if (stateMachineCurrState == IDLE_STATE) //Print new read temperature only when in IDLE_STATE to prevent current displayed data in LCD to be overwritten
+        if (*stateMachineCurrState == IDLE_STATE) //Print new read temperature only when in IDLE_STATE to prevent current displayed data in LCD to be overwritten
         {
             sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
             sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
