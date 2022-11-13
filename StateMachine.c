@@ -25,8 +25,15 @@ const char *const daysOfWeek[NUM_DOW] = { "Lunes", "Martes", "Miercoles",
                                           "Domingo" };
 const char *const progStatus[NUM_PROG_STATES] = { "OFF", "ON" };
 
+#pragma DATA_SECTION(schedule, ".schedule_data");
+#pragma DATA_ALIGN(schedule, 4);
+schedule_t schedule;
+
 void StateMachine_init(StateMachine *const me)
 {
+    //FlashCtl_setWaitState(FLASH_BANK0, 1);
+    //FlashCtl_setWaitState(FLASH_BANK1, 1);
+    //memcpy(&schedule, &me->schedule, sizeof(schedule_t));
     stateMachineCurrState = &me->stateMachineCurrState;
     me->stateMachineCurrState = IDLE_STATE;
     memset(&me->smEvent, 0, sizeof(SMEvent_t));
@@ -35,9 +42,14 @@ void StateMachine_init(StateMachine *const me)
     me->hour = 0;
     me->minute = 0;
     me->progState = OFF;
-    memset(&me->schedule, 0, sizeof(schedule_t));
+
+    FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, FLASH_SECTOR31);
+    memcpy(&me->schedule, (void*) SCHEDULE_FLASH_START, sizeof(schedule_t));
+    FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, FLASH_SECTOR31);
+
+    /*memset(&me->schedule, 0, sizeof(schedule_t));
     int dow, ts;
-    //Initialize setpoint temperatures to 19.0ºC (to save clicks)
+    //Initialize default setpoint temperatures to 19.0ºC (to save clicks)
     for (dow = 0; dow < NUM_DOW; ++dow)
     {
         for (ts = 0; ts < NUM_TIME_SLOTS_PER_DOW; ++ts)
@@ -46,7 +58,7 @@ void StateMachine_init(StateMachine *const me)
             DEFAULT_SETPOINT_TEMP;
         }
 
-    }
+    }*/
 }
 
 #pragma CODE_SECTION(stateMachineThread, ".TI.ramfunc")
@@ -616,7 +628,7 @@ void* stateMachineThread(void *arg0)
                 uint8_t *startMin =
                         &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].startMin);
                 ++(*startMin);
-                (*startMin) %= 24;
+                (*startMin) %= 60;
                 sprintf(me->text1, "Minuto inicio F%d", me->timeSlotIdx);
                 sprintf(me->text2, "%02u", *startMin);
                 me->dcEvt.eventType = PRINT_DATA;
@@ -730,7 +742,7 @@ void* stateMachineThread(void *arg0)
                 uint8_t *endMin =
                         &(me->schedule.dowSched[me->dowIdx].timeSlot[me->timeSlotIdx].endMin);
                 ++(*endMin);
-                (*endMin) %= 24;
+                (*endMin) %= 60;
                 sprintf(me->text1, "Minuto fin F%d", me->timeSlotIdx);
                 sprintf(me->text2, "%02u", *endMin);
                 me->dcEvt.eventType = PRINT_DATA;
@@ -767,6 +779,13 @@ void* stateMachineThread(void *arg0)
             }
             else //if me->smEvent.eventType == OK_BTN_PRESSED
             {
+                //Update schedule configuration in Flash.
+                //memcpy(&schedule, &me->schedule, sizeof(schedule_t));
+                FlashCtl_unprotectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, FLASH_SECTOR31);
+                while (!FlashCtl_eraseSector(SCHEDULE_FLASH_START));
+                while (!FlashCtl_programMemory(&me->schedule, (void*) SCHEDULE_FLASH_START, sizeof(schedule_t)));
+                FlashCtl_protectSector(FLASH_MAIN_MEMORY_SPACE_BANK1, FLASH_SECTOR31);
+
                 sprintf(me->text1,
                         "F%d = %02u:%02u-%02u:%02u",
                         me->timeSlotIdx,

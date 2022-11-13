@@ -47,6 +47,10 @@ DS3231Proxy* ds3231_create(void)
   (NO_FORCE_RESET)*/
 void ds3231_init(DS3231Proxy* ds3231hdl, uint8_t *data_array, uint8_t run_command, uint8_t reset_state)
 {
+  GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN6); //DS3231 GND
+  GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to LOW to power it on
+  ds3231hdl->nextMinuteCheck = 0;
+  delay_us(300000);
   DS3231_I2C_init(ds3231hdl->ds3231I2C);
   if (((ds3231_init_status_report(ds3231hdl) == DS3231_NOT_INITIALIZED) && (reset_state == NO_FORCE_RESET)) || (reset_state == FORCE_RESET))
   {
@@ -55,6 +59,7 @@ void ds3231_init(DS3231Proxy* ds3231hdl, uint8_t *data_array, uint8_t run_comman
   }
   ds3231_init_status_update(ds3231hdl);        /*now the device is initialized (DS3231_INITIALIZED)*/
   ds3231_run_command(ds3231hdl, run_command);
+  GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to HIGH to power it off
 }
 
 /*function to command ds3231 to stop or start updating its time registers, WORKS ONLY WITH BATTERY BACKED DS3231*/
@@ -192,6 +197,8 @@ void ds3231_reset(DS3231Proxy* ds3231hdl, uint8_t option)
 /*function to read internal registers of ds3231, one register at a time or an array of registers*/
 uint8_t ds3231_read(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *data_array)
 {
+  GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to LOW to power it on
+  delay_us(300000);
   switch (option)
   {
     case SECOND:
@@ -247,12 +254,15 @@ uint8_t ds3231_read(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *data_array)
     default:
       return OPERATION_FAILED;
   }
+  GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to HIGH to shut it down
   return OPERATION_DONE;
 }
 
 /*function to set internal registers of ds3231, one register at a time or an array of registers*/
 uint8_t ds3231_set(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *data_array)
 {
+  GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to LOW to power it on
+  delay_us(300000);
   switch (option)
   {
     case SECOND:
@@ -312,6 +322,7 @@ uint8_t ds3231_set(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *data_array)
     default:
       return OPERATION_FAILED;
   }
+  GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN6); //Set to HIGH to power it off
   return OPERATION_DONE;
 }
 
@@ -342,6 +353,14 @@ static void ds3231_data_clone(DS3231Proxy* ds3231hdl, uint8_t option, uint8_t *i
     default:
       break;
   }
+}
+
+void ds3231_updateNextMinuteCheck(DS3231Proxy* ds3231hdl, uint32_t currentTime)
+{
+    if (ds3231hdl != NULL)
+    {
+        ds3231hdl->nextMinuteCheck = currentTime + 60;
+    }
 }
 
 /*internal function related to this file and not accessible from outside*/

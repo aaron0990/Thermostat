@@ -19,9 +19,12 @@
 #include "TempData.h"
 #include "DS3231.h"
 #include <stdarg.h>
+#include <flash.h>
 
 #define NUM_TIME_SLOTS_PER_DOW  5
 #define DEFAULT_SETPOINT_TEMP   19.0
+
+#define SCHEDULE_FLASH_START    0x0003F000 //Start address of last sector (31) from bank 1. Each sector is 4KB.
 
 /* States */
 typedef enum

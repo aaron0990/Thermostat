@@ -12,7 +12,9 @@ uint8_t capturedIntervalsPtr;
 uint8_t readingData;
 Capture_Handle capHandle;
 
-void TempSensorProxy_init(TempSensorProxy *me, TempData* readTemp)
+static uint8_t startupReading = 1;
+
+void TempSensorProxy_init(TempSensorProxy *me, TempData *readTemp)
 {
     Capture_init();
     me->itsTempData = readTemp;
@@ -31,86 +33,98 @@ void TempSensorProxy_configure(TempSensorProxy *me)
 
 }
 
+#pragma CODE_SECTION(TempSensorProxy_access, ".TI.ramfunc")
 void TempSensorProxy_access(TempSensorProxy *me)
 {
-
-    *(me->captureHandle) = Capture_open(0, me->captureParams);
-    if (*(me->captureHandle) == NULL)
+    TempData prevTempData = {.humidity = 0.0, .temperature=0.0};
+    prevTempData = *(me->itsTempData);
+    uint8_t it = 0;
+    do
     {
-        exit(-1);
-    }
-    capturedIntervalsPtr = 0;
-    readingData = 0;
-    memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
-
-    //Send 3.3V to temp sensor to power it ON.
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN3);
-    sleep(1); //stabilization time
-
-    //Use pin P3.0 for debugging
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
-
-    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
-    delay_us(1000);
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
-
-    //MCU start signal ~18ms
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
-    delay_us(20000);
-
-    //MCU waits for DHT response (~20-40us)
-    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
-    delay_us(80); //not using usleep() because it doesn't work well with so small values.
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
-    //Set timer for capture
-    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN6,
-    GPIO_PRIMARY_MODULE_FUNCTION);
-    readingData = 1;
-
-    int32_t ret = Capture_start(*(me->captureHandle));
-
-    if (ret != Capture_STATUS_SUCCESS)
-    {
-        Display_printf(disp_hdl, 0, 0,
-                       "TempSensorProxy.access()::Capture_start() failed!\n");
+        if (it > 0) //
+        {
+            sleep(2);
+        }
+        *(me->captureHandle) = Capture_open(0, me->captureParams);
+        if (*(me->captureHandle) == NULL)
+        {
+            exit(-1);
+        }
+        capturedIntervalsPtr = 0;
         readingData = 0;
+        memset(capturedIntervals, 0, sizeof(uint32_t) * MAX_TICK_VALUES);
+
+        //Send 3.3V to temp sensor to power it ON.
+        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN3);
+        sleep(1); //stabilization time
+
+        //Use pin P3.0 for debugging
+        GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
+
+        GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
+        delay_us(1000);
+        GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
+
+        //MCU start signal ~18ms
+        GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN6);
+        delay_us(20000);
+
+        //MCU waits for DHT response (~20-40us)
+        GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
+        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
+        delay_us(80); //not using usleep() because it doesn't work well with so small values.
+        GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
+        //Set timer for capture
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN6,
+        GPIO_PRIMARY_MODULE_FUNCTION);
+        readingData = 1;
+
+        int32_t ret = Capture_start(*(me->captureHandle));
+
+        if (ret != Capture_STATUS_SUCCESS)
+        {
+            Display_printf(
+                    disp_hdl, 0, 0,
+                    "TempSensorProxy.access()::Capture_start() failed!\n");
+            readingData = 0;
+        }
+
+        // Wait until sensor data are read
+        // while (readingData){
+        //    sched_yield();
+        //}
+        usleep(5000); //wait 5ms for the sensor reading to be done
+
+        Capture_stop(*(me->captureHandle));
+        Capture_close(*(me->captureHandle));
+
+        //Set DHT22 GND to high so that VCC-GND = 0V -> temp sensor is powered OFF.
+        GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN3);
+
+        uint64_t sensorData = 0;
+        int i;
+        uint32_t captureFreq = CS_getSMCLK();
+        for (i = 0; i < MAX_TICK_VALUES; ++i)
+        {
+            // time less than 100us -> logic 0. Otherwise logic 1
+            float period_us = (capturedIntervals[i] * 1000000) / captureFreq;
+            sensorData |= (((uint64_t) (period_us < 100.0 ? 0 : 1))
+                    << MAX_TICK_VALUES - i - 1);
+        }
+        me->itsTempData->humidity = (float) (((sensorData >> 24) & 0xFFFF)
+                / 10.0);
+        me->itsTempData->temperature = (float) (((sensorData >> 8) & 0xFFFF)
+                / 10.0);
+        ++it;
     }
+    while (abs((int) (me->itsTempData->temperature - prevTempData.temperature))
+            > 5 && !startupReading);
 
-    // Wait until sensor data are read
-   // while (readingData){
-    //    sched_yield();
-    //}
-    usleep(5000); //wait 5ms for the sensor reading to be done
+    if(startupReading)
+        startupReading = 0;
 
-    Capture_stop(*(me->captureHandle));
-    Capture_close(*(me->captureHandle));
-
-    //Set DHT22 GND to high so that VCC-GND = 0V -> temp sensor is powered OFF.
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN3);
-
-    uint64_t sensorData = 0;
-    int i;
-    uint32_t captureFreq = CS_getSMCLK();
-    for (i = 0; i < MAX_TICK_VALUES; ++i)
-    {
-        // time less than 100us -> logic 0. Otherwise logic 1
-        float period_us = (capturedIntervals[i]*1000000) / captureFreq;
-        sensorData |= (((uint64_t) (period_us < 100.0 ? 0 : 1))
-                << MAX_TICK_VALUES - i - 1);
-    }
-    me->itsTempData->humidity = (float) (((sensorData >> 24) & 0xFFFF)/10.0);
-    me->itsTempData->temperature = (float) (((sensorData >> 8) & 0xFFFF)/10.0);
-
-    //Checksum
-    /*if (me->humidityInt + me->humidityDec + me->temperatureInt + me->temperatureDec == (sensorData & 0xFF)){
-     return 1;
-     }
-     else{
-     return 0;
-     }*/
 }
 
 /*

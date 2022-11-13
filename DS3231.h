@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "DS3231_I2C.h"
+#include "utils.h"
 
 enum options {SECOND, MINUTE, HOUR, DAY_OF_WEEK, DATE, MONTH, YEAR, CONTROL, CONTROL_STATUS, AGING_OFFSET, ALARM1, ALARM2, ALARMS, TEMPERATURE, TIME, ALL};
 enum square_wave {WAVE_OFF, WAVE_1, WAVE_2, WAVE_3, WAVE_4};
@@ -29,7 +30,7 @@ enum ds3231_registers {
   DS3231_REGISTER_ALARM2_TEMP_MSB,
   DS3231_REGISTER_ALARM2_TEMP_LSB
   };
-  
+
 #define DS3231_I2C_ADDRESS                    0X68
 
 #define FORCE_RESET                           0X00
@@ -90,6 +91,7 @@ enum ds3231_registers {
 typedef struct
 {
     DS3231_I2C* ds3231I2C;
+    uint32_t nextMinuteCheck;
 } DS3231Proxy;
 
 DS3231Proxy* ds3231_create(void);
@@ -101,6 +103,8 @@ uint8_t ds3231_set(DS3231Proxy* ds3231hdl, uint8_t registers, uint8_t *data_arra
 uint8_t ds3231_init_status_report(DS3231Proxy* ds3231hdl);
 uint8_t ds3231_run_command(DS3231Proxy* ds3231hdl, uint8_t command);
 uint8_t ds3231_run_status(DS3231Proxy* ds3231hdl);
+
+void ds3231_updateNextMinuteCheck(DS3231Proxy* ds3231hdl, uint32_t currentTime);
 
 
 #endif

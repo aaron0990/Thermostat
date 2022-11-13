@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include "shared_vars.h"
 
-#define TEMP_UPDATE_INT 10 //seconds
+#define TEMP_UPDATE_INT 20 //seconds
 
 /*Class TempSensor*/
 typedef struct TempSensor TempSensor;

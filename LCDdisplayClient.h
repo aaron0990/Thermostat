@@ -16,7 +16,7 @@
 #include "Keypad.h"
 
 
-#define LCD_ON_BACKLIGHT_T  60 //s
+#define LCD_ON_BACKLIGHT_T  5 //s
 
 // Events
 typedef enum

@@ -40,7 +40,8 @@
 
 MEMORY
 {
-    MAIN       (RX) : origin = 0x00000000, length = 0x00040000 /* Flash main memory region*/
+    MAIN       (RX) : origin = 0x00000000, length = 0x0003F000 /* Flash main memory region*/
+    MYDATA	   (RX) : origin = 0x0003F000, length = 0x00001000
     INFO       (RX) : origin = 0x00200000, length = 0x00004000 /* Flash information memory region*/
     ALIAS
     {
@@ -59,6 +60,7 @@ SECTIONS
     .cinit      :   > MAIN
     .pinit      :   > MAIN
     .init_array :   > MAIN
+    .schedule_data : {} > MYDATA
 
     //.TI.ramfunc : {} load=MAIN, run=SRAM_CODE, table(BINIT)
     .TI.ramfunc :

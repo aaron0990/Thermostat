@@ -80,7 +80,7 @@ extern void* temperatureControllerThread(void *arg0);
 extern void* stateMachineThread(void *arg0);
 
 /* Stack size in bytes */
-#define THREADSTACKSIZE   6144
+#define THREADSTACKSIZE   4096
 
 #define QUEUE_SIZE 10   //Max num of elements in the queue
 
@@ -200,17 +200,11 @@ void queryClockFreqs(void){
  *  - Voy a usar el RTC para contar tiempo cuando se está en modo deepSleep (básicamente siempre),
  *     y utilizaré un modulo RTC DS3231 externo para conseguir mayor accuracy en el reloj.
  *
- *  - Hay que implementar la funcionalidad de que se almacene en flash la programacion de la semana (para que
- *    permanezca cuando se apague el termostato e.g. se queda sin bateria, etc.). Mirar el ejemplo que hay en esta ruta:
- *    C:\ti\simplelink_msp432p4_sdk_3_40_01_02\examples\nortos\MSP_EXP432P401R\driverlib\flash_program_memory
- *    Echar un vistazo a este enlace también: https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/575884/ccs-msp432p401r-how-to-unlock-flash-information-memory-sector-tlv/2116505#2116505
- *
  *  - Mirar de hacer que el BCLK tire de LFXTCLK, el cual será la señal que venga del oscilador del modulo RTC externo a 32kHz.
  *    Así, en la MCU contaremos los segundos de manera más precisa que con la señal de clock interna de 32kHz que genera la MCU.
+ *    ESTO IMPLICA QUE EL MODULO RTC ESTÉ ENCENDIDO SIEMPRE, LO QUE AUMENTA EL CONSUMO DE BATERIA -> NO POR AHORA.
  *
- *  - En modo deepSleep, se vuelve a consumir > 2mA. El modulo RTC externo tiene algo que ver.
  *
- *  - Se produce un hard fault cuando hago click a cualquier boton.
  */
 
 /* NOTES:
