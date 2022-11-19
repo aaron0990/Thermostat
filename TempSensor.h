@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include "shared_vars.h"
 
-#define TEMP_UPDATE_INT 20 //seconds
+#define TEMP_SAMPLE_RATE 300 //Read temperature every 5 mins
 
 /*Class TempSensor*/
 typedef struct TempSensor TempSensor;

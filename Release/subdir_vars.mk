@@ -11,13 +11,13 @@ CMD_SRCS += \
 C_SRCS += \
 ../DS3231.c \
 ../DS3231_I2C.c \
-../DisplayConsole.c \
 ../Keypad.c \
 ../LCDdisplayClient.c \
 ../LCDdisplayI2C.c \
 ../LCDdisplayProxy.c \
 ../MSP_EXP432P401R.c \
 ../RTC.c \
+../StateMachine.c \
 ../TempController.c \
 ../TempData.c \
 ../TempSensor.c \
@@ -29,13 +29,13 @@ C_SRCS += \
 C_DEPS += \
 ./DS3231.d \
 ./DS3231_I2C.d \
-./DisplayConsole.d \
 ./Keypad.d \
 ./LCDdisplayClient.d \
 ./LCDdisplayI2C.d \
 ./LCDdisplayProxy.d \
 ./MSP_EXP432P401R.d \
 ./RTC.d \
+./StateMachine.d \
 ./TempController.d \
 ./TempData.d \
 ./TempSensor.d \
@@ -47,13 +47,13 @@ C_DEPS += \
 OBJS += \
 ./DS3231.obj \
 ./DS3231_I2C.obj \
-./DisplayConsole.obj \
 ./Keypad.obj \
 ./LCDdisplayClient.obj \
 ./LCDdisplayI2C.obj \
 ./LCDdisplayProxy.obj \
 ./MSP_EXP432P401R.obj \
 ./RTC.obj \
+./StateMachine.obj \
 ./TempController.obj \
 ./TempData.obj \
 ./TempSensor.obj \
@@ -65,13 +65,13 @@ OBJS += \
 OBJS__QUOTED += \
 "DS3231.obj" \
 "DS3231_I2C.obj" \
-"DisplayConsole.obj" \
 "Keypad.obj" \
 "LCDdisplayClient.obj" \
 "LCDdisplayI2C.obj" \
 "LCDdisplayProxy.obj" \
 "MSP_EXP432P401R.obj" \
 "RTC.obj" \
+"StateMachine.obj" \
 "TempController.obj" \
 "TempData.obj" \
 "TempSensor.obj" \
@@ -83,13 +83,13 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "DS3231.d" \
 "DS3231_I2C.d" \
-"DisplayConsole.d" \
 "Keypad.d" \
 "LCDdisplayClient.d" \
 "LCDdisplayI2C.d" \
 "LCDdisplayProxy.d" \
 "MSP_EXP432P401R.d" \
 "RTC.d" \
+"StateMachine.d" \
 "TempController.d" \
 "TempData.d" \
 "TempSensor.d" \
@@ -101,13 +101,13 @@ C_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../DS3231.c" \
 "../DS3231_I2C.c" \
-"../DisplayConsole.c" \
 "../Keypad.c" \
 "../LCDdisplayClient.c" \
 "../LCDdisplayI2C.c" \
 "../LCDdisplayProxy.c" \
 "../MSP_EXP432P401R.c" \
 "../RTC.c" \
+"../StateMachine.c" \
 "../TempController.c" \
 "../TempData.c" \
 "../TempSensor.c" \

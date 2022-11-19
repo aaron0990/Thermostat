@@ -41,6 +41,7 @@ Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/in
 Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
+Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h
 Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 Keypad.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h
 Keypad.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
@@ -146,6 +147,8 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 

@@ -61,6 +61,7 @@ TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
+TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
 TempSensorProxy.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/power/PowerMSP432.h
@@ -192,6 +193,8 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 

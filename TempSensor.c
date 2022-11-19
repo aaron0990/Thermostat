@@ -11,7 +11,7 @@
 void TempSensor_init(TempSensor *const me, TempData* readTemp)
 {
     TempSensorProxy_init(me->itsTempSensorProxy, readTemp);
-    me->tempUpdateInterval = TEMP_UPDATE_INT;
+    me->tempUpdateInterval = TEMP_SAMPLE_RATE;
     me->nextTempUpdateTime = 0;
 }
 

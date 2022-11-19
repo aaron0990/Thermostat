@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include <flash.h>
 
-#define NUM_TIME_SLOTS_PER_DOW  5
 #define DEFAULT_SETPOINT_TEMP   19.0
 
 #define SCHEDULE_FLASH_START    0x0003F000 //Start address of last sector (31) from bank 1. Each sector is 4KB.
@@ -45,6 +44,7 @@ typedef enum
     PROG_SET_END_MINUTES_STATE,
 } SMState_t;
 
+
 // Events
 typedef enum
 {
@@ -60,6 +60,16 @@ typedef enum
 {
     MON, TUE, WED, THU, FRI, SAT, SUN, NUM_DOW
 } dow_t;
+
+typedef enum
+{
+    F0,
+    F1,
+    F2,
+    F3,
+    F4,
+    NUM_TIME_SLOTS_PER_DOW
+} timeSlotIdx_t;
 
 typedef struct
 {

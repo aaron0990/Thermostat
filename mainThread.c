@@ -21,26 +21,17 @@ uint32_t secondsCount;
 extern sem_t startReadingTemp;
 extern sem_t initDisplayDone;
 extern sem_t startStateMachine;
+extern sem_t initDs3231Done;
 
 Power_NotifyObj notifyObj;
 
-extern SMState_t *stateMachineCurrState;
+extern StateMachine *stateMachine;
 
 //#pragma CODE_SECTION(mainThread, ".TI.ramfunc")
 void* mainThread(void *arg)
 {
-
-    GPIO_setAsOutputPin(GPIO_PORT_P6, GPIO_PIN1);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
-
     /*Power_registerNotify(&notifyObj, PowerMSP432_ENTERING_DEEPSLEEP | PowerMSP432_AWAKE_DEEPSLEEP,
      (Power_NotifyFxn)notifyFxn, 0);*/
-
-    //Enable LEDs for debugging purposes
-    /*GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN1);
-     GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN2);
-     GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN1);
-     GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN2);*/
 
     //Initialize data structures
     readTemp = TempData_create();
@@ -77,6 +68,7 @@ void* mainThread(void *arg)
     RTC_C_init(rtc);
 
     sem_post(&initDisplayDone); //Allow DisplayLCDThread to continue since displayClient instance is already initialized
+    sem_post(&initDs3231Done);
     sem_post(&startStateMachine);
     DCEvent event;
     char text1[16];
@@ -86,7 +78,7 @@ void* mainThread(void *arg)
     {
         Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
         TempSensor_readTemp(tempSensor);
-        if (*stateMachineCurrState == IDLE_STATE) //Print new read temperature only when in IDLE_STATE to prevent current displayed data in LCD to be overwritten
+        if (stateMachine->stateMachineCurrState == IDLE_STATE) //Print new read temperature only when in IDLE_STATE to prevent current displayed data in LCD to be overwritten
         {
             sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
             sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
@@ -113,10 +105,8 @@ void RTC_C_IRQHandler(uint32_t arg)
 {
     uint32_t status;
 
-    GPIO_setOutputHighOnPin(GPIO_PORT_P6, GPIO_PIN1);
     status = RTC_C_getEnabledInterruptStatus();
     RTC_C_clearInterruptFlag(status);
-    ++(rtc->secondsCount); // A second has elapsed
 
     if (status & RTC_C_PRESCALE_TIMER1_INTERRUPT)
     {
@@ -136,12 +126,45 @@ void RTC_C_IRQHandler(uint32_t arg)
         }
         if (RTC_C_isTimerExpired(rtc, ds3231hdl->nextMinuteCheck))
         {
+            schedule_t sched = stateMachine->schedule;
             //Check schedule
-            //ds3231_updateNextMinuteCheck(ds3231hdl)
+            ds3231_updateNextMinuteCheck(ds3231hdl, rtc->secondsCount);
+            if (stateMachine->progState == ON)
+            {
+                //Read current time from DS3231
+                DS3231Event ds3231Event;
+                ds3231Event.eventType = READ_TIME;
+                xQueueSendFromISR(ds3231EventQueue, &ds3231Event, NULL);
+                //Check if we should jump to another timeslot setpoint temperature
+
+                uint8_t currDow = ds3231hdl->dow;
+                uint8_t currHour = ds3231hdl->hour;
+                uint8_t currMin = ds3231hdl->min;
+                uint8_t tsIdx;
+                for (tsIdx = F0; tsIdx < NUM_TIME_SLOTS_PER_DOW; ++tsIdx)
+                {
+                    timeSlot_t *ts = &(sched.dowSched[currDow].timeSlot[tsIdx]);
+                    if (currHour >= ts->startHour && currHour <= ts->endHour
+                            && (currHour != ts->startHour
+                                    || currMin >= ts->startMin)
+                            && (currHour != ts->endHour || currMin < ts->endMin))
+                    {
+                        targetTemp->temperature = ts->setpointTemp;
+                        break;
+                    }
+                }
+                TempController_updateHeatingState(tempController);
+            }
+            /*sprintf(text1, "T. Obj:%.1f'C", targetTemp->temperature);
+             sprintf(text2, "T. Act:%.1f'C", readTemp->temperature);
+             dcEvent.eventType = PRINT_DATA;
+             dcEvent.textR1 = text1;
+             dcEvent.textR1Length = strlen(text1);
+             dcEvent.textR2 = text2;
+             dcEvent.textR2Length = strlen(text2);*/
         }
     }
-    GPIO_setOutputLowOnPin(GPIO_PORT_P6, GPIO_PIN1);
-
+    ++(rtc->secondsCount); // A second has elapsed
 }
 
 /********************************* Keypad Interrupt handler **********************************************/

@@ -75,7 +75,6 @@ main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Ca
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/timer_a.h
 main_freertos.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
-main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/ThreadsArgStruct.h
 main_freertos.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h
 main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/LCDdisplayProxy.h
@@ -86,7 +85,13 @@ main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/I2
 main_freertos.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
 main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/Keypad.h
 main_freertos.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
+main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/StateMachine.h
 main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/TempController.h
+main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/RTC.h
+main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/DS3231.h
+main_freertos.obj: C:/ti/ccs1110/ccs/workspace/Thermostat/DS3231_I2C.h
+main_freertos.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
+main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Board.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/UART.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Watchdog.h
@@ -112,7 +117,6 @@ main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/ms
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/systick.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/uart.h
 main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/wdt_a.h
-main_freertos.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h
 
 ../main_freertos.c:
 
@@ -264,8 +268,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
 
-C:/ti/ccs1110/ccs/workspace/Thermostat/ThreadsArgStruct.h:
-
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h:
@@ -286,7 +288,19 @@ C:/ti/ccs1110/ccs/workspace/Thermostat/Keypad.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
 
+C:/ti/ccs1110/ccs/workspace/Thermostat/StateMachine.h:
+
 C:/ti/ccs1110/ccs/workspace/Thermostat/TempController.h:
+
+C:/ti/ccs1110/ccs/workspace/Thermostat/RTC.h:
+
+C:/ti/ccs1110/ccs/workspace/Thermostat/DS3231.h:
+
+C:/ti/ccs1110/ccs/workspace/Thermostat/DS3231_I2C.h:
+
+C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
+
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Board.h:
 
@@ -337,6 +351,4 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/uart.h:
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/wdt_a.h:
-
-C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/flash.h:
 

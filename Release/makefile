@@ -12,13 +12,13 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./DS3231.obj" \
 "./DS3231_I2C.obj" \
-"./DisplayConsole.obj" \
 "./Keypad.obj" \
 "./LCDdisplayClient.obj" \
 "./LCDdisplayI2C.obj" \
 "./LCDdisplayProxy.obj" \
 "./MSP_EXP432P401R.obj" \
 "./RTC.obj" \
+"./StateMachine.obj" \
 "./TempController.obj" \
 "./TempData.obj" \
 "./TempSensor.obj" \
@@ -165,7 +165,7 @@ dependents:
 Thermostat.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS) C:/ti/ccs1110/ccs/workspace/freertos_builds_MSP_EXP432P401R_release_ccs/Debug/freertos_builds_MSP_EXP432P401R_release_ccs.lib
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -O4 --opt_for_speed=1 --advice:power="all" --advice:power_severity=warning --define=BOARD_DISPLAY_USE_UART_ANSI=1 --define=BOARD_DISPLAY_USE_LCD=1 --define=DeviceFamily_MSP432P401x --define=__MSP432P401R__ -g --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on -z -m"Thermostat.map" -i"C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source" -i"C:/ti/ccs1110/ccs/workspace/freertos_builds_MSP_EXP432P401R_release_ccs/Debug" -i"C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" --define=DeviceFamily_MSP432P401x --define=__MSP432P401R__ --diag_suppress=10063 --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Thermostat_linkInfo.xml" --rom_model -o "Thermostat.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me -O0 --opt_for_speed=1 --advice:power="all" --advice:power_severity=warning --define=BOARD_DISPLAY_USE_UART_ANSI=1 --define=BOARD_DISPLAY_USE_LCD=1 --define=DeviceFamily_MSP432P401x --define=__MSP432P401R__ -g --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on -z -m"Thermostat.map" -i"C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source" -i"C:/ti/ccs1110/ccs/workspace/freertos_builds_MSP_EXP432P401R_release_ccs/Debug" -i"C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" --define=DeviceFamily_MSP432P401x --define=__MSP432P401R__ --diag_suppress=10063 --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Thermostat_linkInfo.xml" --rom_model -o "Thermostat.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
@@ -179,8 +179,8 @@ Thermostat.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "DS3231.obj" "DS3231_I2C.obj" "DisplayConsole.obj" "Keypad.obj" "LCDdisplayClient.obj" "LCDdisplayI2C.obj" "LCDdisplayProxy.obj" "MSP_EXP432P401R.obj" "RTC.obj" "TempController.obj" "TempData.obj" "TempSensor.obj" "TempSensorProxy.obj" "mainThread.obj" "main_freertos.obj" "utils.obj" 
-	-$(RM) "DS3231.d" "DS3231_I2C.d" "DisplayConsole.d" "Keypad.d" "LCDdisplayClient.d" "LCDdisplayI2C.d" "LCDdisplayProxy.d" "MSP_EXP432P401R.d" "RTC.d" "TempController.d" "TempData.d" "TempSensor.d" "TempSensorProxy.d" "mainThread.d" "main_freertos.d" "utils.d" 
+	-$(RM) "DS3231.obj" "DS3231_I2C.obj" "Keypad.obj" "LCDdisplayClient.obj" "LCDdisplayI2C.obj" "LCDdisplayProxy.obj" "MSP_EXP432P401R.obj" "RTC.obj" "StateMachine.obj" "TempController.obj" "TempData.obj" "TempSensor.obj" "TempSensorProxy.obj" "mainThread.obj" "main_freertos.obj" "utils.obj" 
+	-$(RM) "DS3231.d" "DS3231_I2C.d" "Keypad.d" "LCDdisplayClient.d" "LCDdisplayI2C.d" "LCDdisplayProxy.d" "MSP_EXP432P401R.d" "RTC.d" "StateMachine.d" "TempController.d" "TempData.d" "TempSensor.d" "TempSensorProxy.d" "mainThread.d" "main_freertos.d" "utils.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

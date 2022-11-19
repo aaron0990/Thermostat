@@ -6,30 +6,55 @@
 #include "DS3231_I2C.h"
 #include "utils.h"
 
-enum options {SECOND, MINUTE, HOUR, DAY_OF_WEEK, DATE, MONTH, YEAR, CONTROL, CONTROL_STATUS, AGING_OFFSET, ALARM1, ALARM2, ALARMS, TEMPERATURE, TIME, ALL};
-enum square_wave {WAVE_OFF, WAVE_1, WAVE_2, WAVE_3, WAVE_4};
-enum run_state {CLOCK_HALT, CLOCK_RUN};
-enum ds3231_registers {
-  DS3231_REGISTER_SECONDS, 
-  DS3231_REGISTER_MINUTES, 
-  DS3231_REGISTER_HOURS, 
-  DS3231_REGISTER_DAY_OF_WEEK, 
-  DS3231_REGISTER_DATE, 
-  DS3231_REGISTER_MONTH, 
-  DS3231_REGISTER_YEAR, 
-  DS3231_REGISTER_ALARM1_SECONDS,
-  DS3231_REGISTER_ALARM1_MINUTES,
-  DS3231_REGISTER_ALARM1_HOURS,
-  DS3231_REGISTER_ALARM1_DAY_OF_WEEK_OR_DATE,
-  DS3231_REGISTER_ALARM2_MINUTES,
-  DS3231_REGISTER_ALARM2_HOURS,
-  DS3231_REGISTER_ALARM2_DAY_OF_WEEK_OR_DATE,
-  DS3231_REGISTER_CONTROL,
-  DS3231_REGISTER_CONTROL_STATUS,
-  DS3231_REGISTER_AGING_OFFSET,
-  DS3231_REGISTER_ALARM2_TEMP_MSB,
-  DS3231_REGISTER_ALARM2_TEMP_LSB
-  };
+enum options
+{
+    SECOND,
+    MINUTE,
+    HOUR,
+    DAY_OF_WEEK,
+    DATE,
+    MONTH,
+    YEAR,
+    CONTROL,
+    CONTROL_STATUS,
+    AGING_OFFSET,
+    ALARM1,
+    ALARM2,
+    ALARMS,
+    TEMPERATURE,
+    TIME,
+    ALL
+};
+enum square_wave
+{
+    WAVE_OFF, WAVE_1, WAVE_2, WAVE_3, WAVE_4
+};
+enum run_state
+{
+    CLOCK_HALT, CLOCK_RUN
+};
+enum ds3231_registers
+{
+    DS3231_REGISTER_SECONDS,
+    DS3231_REGISTER_MINUTES,
+    DS3231_REGISTER_HOURS,
+    DS3231_REGISTER_DAY_OF_WEEK,
+    DS3231_REGISTER_DATE,
+    DS3231_REGISTER_MONTH,
+    DS3231_REGISTER_YEAR,
+    DS3231_REGISTER_ALARM1_SECONDS,
+    DS3231_REGISTER_ALARM1_MINUTES,
+    DS3231_REGISTER_ALARM1_HOURS,
+    DS3231_REGISTER_ALARM1_DAY_OF_WEEK_OR_DATE,
+    DS3231_REGISTER_ALARM2_MINUTES,
+    DS3231_REGISTER_ALARM2_HOURS,
+    DS3231_REGISTER_ALARM2_DAY_OF_WEEK_OR_DATE,
+    DS3231_REGISTER_CONTROL,
+    DS3231_REGISTER_CONTROL_STATUS,
+    DS3231_REGISTER_AGING_OFFSET,
+    DS3231_REGISTER_ALARM2_TEMP_MSB,
+    DS3231_REGISTER_ALARM2_TEMP_LSB
+};
 
 #define DS3231_I2C_ADDRESS                    0X68
 
@@ -88,23 +113,44 @@ enum ds3231_registers {
 #define DS3231_REGISTER_CONTROL_STATUS_DEFAULT                0X00
 #define DS3231_REGISTER_AGING_OFFSET_DEFAULT                  0X00
 
+typedef enum
+{
+    READ_TIME,
+} DS3231EventType;
+
 typedef struct
 {
-    DS3231_I2C* ds3231I2C;
+    DS3231EventType eventType;
+} DS3231Event;
+
+typedef struct
+{
+    DS3231_I2C *ds3231I2C;
+    uint8_t sec;
+    uint8_t min;
+    uint8_t hour;
+    uint8_t dow;
+    uint8_t day;
+    uint8_t month;
+    uint8_t year;
     uint32_t nextMinuteCheck;
 } DS3231Proxy;
 
+extern QueueHandle_t ds3231EventQueue; //Queue used to pass events to the DisplayClient.
+
 DS3231Proxy* ds3231_create(void);
-void ds3231_reset(DS3231Proxy* ds3231hdl, uint8_t input);
-void ds3231_init(DS3231Proxy* ds3231hdl, uint8_t *data_array, uint8_t run_command, uint8_t reset_state);
-void ds3231_init_status_update(DS3231Proxy* ds3231hdl);
-uint8_t ds3231_read(DS3231Proxy* ds3231hdl, uint8_t registers, uint8_t *data_array);
-uint8_t ds3231_set(DS3231Proxy* ds3231hdl, uint8_t registers, uint8_t *data_array);
-uint8_t ds3231_init_status_report(DS3231Proxy* ds3231hdl);
-uint8_t ds3231_run_command(DS3231Proxy* ds3231hdl, uint8_t command);
-uint8_t ds3231_run_status(DS3231Proxy* ds3231hdl);
+void ds3231_reset(DS3231Proxy *ds3231hdl, uint8_t input);
+void ds3231_init(DS3231Proxy *ds3231hdl, uint8_t *data_array,
+                 uint8_t run_command, uint8_t reset_state);
+void ds3231_init_status_update(DS3231Proxy *ds3231hdl);
+uint8_t ds3231_read(DS3231Proxy *ds3231hdl, uint8_t registers,
+                    uint8_t *data_array);
+uint8_t ds3231_set(DS3231Proxy *ds3231hdl, uint8_t registers,
+                   uint8_t *data_array);
+uint8_t ds3231_init_status_report(DS3231Proxy *ds3231hdl);
+uint8_t ds3231_run_command(DS3231Proxy *ds3231hdl, uint8_t command);
+uint8_t ds3231_run_status(DS3231Proxy *ds3231hdl);
 
-void ds3231_updateNextMinuteCheck(DS3231Proxy* ds3231hdl, uint32_t currentTime);
-
+void ds3231_updateNextMinuteCheck(DS3231Proxy *ds3231hdl, uint32_t currentTime);
 
 #endif

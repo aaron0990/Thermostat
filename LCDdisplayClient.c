@@ -32,7 +32,6 @@ void DisplayClient_clean(DisplayClient *const me)
 
 }
 
-
 void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t currentTime)
 {
     if(me != NULL)
@@ -40,7 +39,6 @@ void DisplayClient_updateNextBacklightOffTime(DisplayClient *const me, uint32_t 
         me->nextBacklightOffTime = currentTime + me->backlightOnDuration;
     }
 }
-
 
 #pragma CODE_SECTION(DisplayClient_showInfo, ".TI.ramfunc")
 void DisplayClient_showInfo(DisplayClient *const me, DCEvent* event)

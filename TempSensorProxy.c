@@ -58,13 +58,8 @@ void TempSensorProxy_access(TempSensorProxy *me)
         GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN3);
         sleep(1); //stabilization time
 
-        //Use pin P3.0 for debugging
-        GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
-        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
-
         GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
         delay_us(1000);
-        GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
 
         //MCU start signal ~18ms
         GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN6);
@@ -73,9 +68,7 @@ void TempSensorProxy_access(TempSensorProxy *me)
 
         //MCU waits for DHT response (~20-40us)
         GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P3, GPIO_PIN6);
-        GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
         delay_us(80); //not using usleep() because it doesn't work well with so small values.
-        GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
         //Set timer for capture
         GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN6,
         GPIO_PRIMARY_MODULE_FUNCTION);
@@ -133,7 +126,6 @@ void TempSensorProxy_access(TempSensorProxy *me)
 
 void Capture_Callback(Capture_Handle handle, uint32_t interval)
 {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P3, GPIO_PIN0);
     capturedIntervals[capturedIntervalsPtr] = interval;
     ++capturedIntervalsPtr;
     if (capturedIntervalsPtr == MAX_TICK_VALUES)
@@ -141,7 +133,6 @@ void Capture_Callback(Capture_Handle handle, uint32_t interval)
         //Last bit has been read. Reading finished.
         readingData = 0;
     }
-    GPIO_setOutputHighOnPin(GPIO_PORT_P3, GPIO_PIN0);
 }
 
 TempSensorProxy* TempSensorProxy_create(void)

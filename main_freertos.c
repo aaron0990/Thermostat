@@ -35,7 +35,6 @@
  *  ======== main_freertos.c ========
  */
 
-
 #ifdef __ICCARM__
 #include <DLib_Threads.h>
 #endif
@@ -74,10 +73,11 @@
 
 extern void* displayConsoleThread(void *arg0);
 extern void* displayLCDThread(void *arg0);
-extern void* mainThread(void* arg);
+extern void* mainThread(void *arg);
 extern void* keypadThread(void *arg0);
 extern void* temperatureControllerThread(void *arg0);
 extern void* stateMachineThread(void *arg0);
+extern void* ds3231Thread(void *arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE   4096
@@ -89,9 +89,11 @@ Display_Handle disp_hdl;
 sem_t startReadingTemp;
 sem_t initDisplayDone;
 sem_t startStateMachine;
+sem_t initDs3231Done;
 
 QueueHandle_t stateMachineEventQueue;
 QueueHandle_t displayClientEventQueue;
+QueueHandle_t ds3231EventQueue;
 
 /*
  * THERMOSTAT MODULES CLOCK SOURCES AND DIVIDERS
@@ -164,8 +166,8 @@ void init_Timer32_module()
     TIMER32_PERIODIC_MODE);
 }
 
-
-void queryClockFreqs(void){
+void queryClockFreqs(void)
+{
     uint32_t SMCLKfreq, MCLKfreq, HSMCLKfreq, BCLKfreq, ACLKfreq;
     MCLKfreq = CS_getMCLK();
     HSMCLKfreq = CS_getHSMCLK();
@@ -181,21 +183,21 @@ void queryClockFreqs(void){
  *  - Si no consigo hacer funcionar el deepSleep (LPM3), pasar el active state a PCM_AM_LDO_VCORE0 en vez de PCM_AM_DCDC_VCORE0 (baja el consumo unos 200uA)
  *  - Probar a hacer el enablePolicy() dentro de un thread y no en el main (instanciarlo despues de vTaskStartScheduler)
  *  - Si se está en LPM3, el timer interno del MSP432 se suspende tambien:
-        Note: Clock ticks halt during MSP432 deep sleep states. This is a significant consequence in
-        that timeouts scheduled by the Clock module are suspended during deep sleep, and
-        so will not be able to wake up the device.
-        For example, when Task_sleep() is called, it blocks the execution of the Task for a
-        number of system ticks. But if the power policy puts the device into deep sleep, the
-        Clock ticking is suspended while the device is in deep sleep. In other words, the timer
-        generating Clock ticks is halted. So the timeout that would normally trigger resumption
-        of the Task_sleep() call is suspended too, and the device will not be able to wake to
-        service the timeout at the anticipated time. Instead, the device will need to be awoken
-        by another source. When awoken, the Clock module will start ticking again, but the time
-        spent in deep sleep will not be factored in to future timeouts.
-        In summary, on MSP432, if timeouts via the Clock module are needed, then the default,
-        lighter-weight sleep policy Power_sleepPolicy() should be used. If wakeups from deep
-        sleep are triggered by other sources (such as a GPIO line changing state), then the
-        PowerMSP432_deepSleepPolicy() allows much better power savings.
+ Note: Clock ticks halt during MSP432 deep sleep states. This is a significant consequence in
+ that timeouts scheduled by the Clock module are suspended during deep sleep, and
+ so will not be able to wake up the device.
+ For example, when Task_sleep() is called, it blocks the execution of the Task for a
+ number of system ticks. But if the power policy puts the device into deep sleep, the
+ Clock ticking is suspended while the device is in deep sleep. In other words, the timer
+ generating Clock ticks is halted. So the timeout that would normally trigger resumption
+ of the Task_sleep() call is suspended too, and the device will not be able to wake to
+ service the timeout at the anticipated time. Instead, the device will need to be awoken
+ by another source. When awoken, the Clock module will start ticking again, but the time
+ spent in deep sleep will not be factored in to future timeouts.
+ In summary, on MSP432, if timeouts via the Clock module are needed, then the default,
+ lighter-weight sleep policy Power_sleepPolicy() should be used. If wakeups from deep
+ sleep are triggered by other sources (such as a GPIO line changing state), then the
+ PowerMSP432_deepSleepPolicy() allows much better power savings.
 
  *  - Voy a usar el RTC para contar tiempo cuando se está en modo deepSleep (básicamente siempre),
  *     y utilizaré un modulo RTC DS3231 externo para conseguir mayor accuracy en el reloj.
@@ -233,18 +235,17 @@ int main(void)
     Board_init();
 
     /*Comment out the notification registering to save power*/
-   /*Power_registerNotify(&notifyObj,
-            PowerMSP432_ENTERING_SLEEP |
-            PowerMSP432_ENTERING_DEEPSLEEP |
-            PowerMSP432_AWAKE_SLEEP |
-            PowerMSP432_AWAKE_DEEPSLEEP |
-            PowerMSP432_START_CHANGE_PERF_LEVEL |
-            PowerMSP432_DONE_CHANGE_PERF_LEVEL,
-            (Power_NotifyFxn) notifyFxn, 0x1);*/
+    /*Power_registerNotify(&notifyObj,
+     PowerMSP432_ENTERING_SLEEP |
+     PowerMSP432_ENTERING_DEEPSLEEP |
+     PowerMSP432_AWAKE_SLEEP |
+     PowerMSP432_AWAKE_DEEPSLEEP |
+     PowerMSP432_START_CHANGE_PERF_LEVEL |
+     PowerMSP432_DONE_CHANGE_PERF_LEVEL,
+     (Power_NotifyFxn) notifyFxn, 0x1);*/
 
-   //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
-   //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
-
+    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_1); //Disallow LPM4 (otherwise peripherals will not work)
+    //Power_setConstraint(PowerMSP432_DISALLOW_DEEPSLEEP_0);
     /* Enabling SRAM Bank Retention for all banks */
     MAP_SysCtl_enableSRAMBankRetention(
             SYSCTL_SRAM_BANK1 | SYSCTL_SRAM_BANK2 | SYSCTL_SRAM_BANK3
@@ -258,20 +259,33 @@ int main(void)
 
     stateMachineEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(SMEvent_t));
     displayClientEventQueue = xQueueCreate(QUEUE_SIZE, sizeof(DCEvent));
+    ds3231EventQueue = xQueueCreate(QUEUE_SIZE, sizeof(DS3231Event));
 
     /* Semaphores initialization */
     retc = sem_init(&startReadingTemp, 0, 0);
-    if (retc == -1) {
-        while (1);
+    if (retc == -1)
+    {
+        while (1)
+            ;
     }
 
     retc = sem_init(&initDisplayDone, 0, 0);
-    if (retc == -1) {
-        while (1);
+    if (retc == -1)
+    {
+        while (1)
+            ;
     }
     retc = sem_init(&startStateMachine, 0, 0);
-    if (retc == -1) {
-        while (1);
+    if (retc == -1)
+    {
+        while (1)
+            ;
+    }
+    retc = sem_init(&initDs3231Done, 0, 0);
+    if (retc == -1)
+    {
+        while (1)
+            ;
     }
 
     /* Initialize the attributes structure with default values */
@@ -284,7 +298,7 @@ int main(void)
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, mainThread,
-                          NULL);
+    NULL);
 
     /************************** Display LCD Thread ******************************/
 
@@ -293,8 +307,7 @@ int main(void)
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, displayLCDThread,
-                          NULL);
-
+    NULL);
 
     /************************** State Machine Thread ******************************/
 
@@ -303,7 +316,16 @@ int main(void)
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
     retc = pthread_create(&thread, &attrs, stateMachineThread,
-                          NULL);
+    NULL);
+
+    /************************** DS3231 Thread ******************************/
+
+    priParam.sched_priority = 2;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
+    retc = pthread_create(&thread, &attrs, ds3231Thread,
+    NULL);
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
@@ -311,13 +333,11 @@ int main(void)
     return (0);
 }
 
-
-
 /* MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK. */
 /*void vApplicationIdleHook(void)
-{
+ {
 
-}*/
+ }*/
 
 //*****************************************************************************
 //

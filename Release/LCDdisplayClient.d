@@ -75,7 +75,6 @@ LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/timer_a.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
-LCDdisplayClient.obj: ../ThreadsArgStruct.h
 LCDdisplayClient.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h
 LCDdisplayClient.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/timers.h
 LCDdisplayClient.obj: ../LCDdisplayProxy.h
@@ -236,8 +235,6 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h:
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/timer_a.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
-
-../ThreadsArgStruct.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdio.h:
 

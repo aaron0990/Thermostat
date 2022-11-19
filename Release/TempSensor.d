@@ -41,6 +41,7 @@ TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Sourc
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/queue.h
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h
+TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h
 TempSensor.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/utils/List.h
@@ -73,7 +74,6 @@ TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Captu
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h
 TempSensor.obj: C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/timer_a.h
 TempSensor.obj: C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h
-TempSensor.obj: ../ThreadsArgStruct.h
 
 ../TempSensor.c:
 
@@ -157,6 +157,8 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/task.h
 
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/FreeRTOS/FreeRTOS/Source/include/list.h:
 
+C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/posix/ccs/semaphore.h:
+
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/Power.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdbool.h:
@@ -220,6 +222,4 @@ C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/drivers/GPIO.h:
 C:/ti/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/timer_a.h:
 
 C:/ti/ccs1110/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdlib.h:
-
-../ThreadsArgStruct.h:
 
